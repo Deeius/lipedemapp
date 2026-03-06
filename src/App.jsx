@@ -1359,7 +1359,7 @@ export default function App() {
           );
         })()}
 
-                {/* ── TODAY ── */
+        {/* ── TODAY ── */}
         {tab === "today" && (
           <>
             <div style={S.card}>
