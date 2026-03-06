@@ -2387,7 +2387,7 @@ export default function App() {
                 <label style={S.label}>{lang==="es"?"Tipo de especialidad":"Specialty type"}</label>
                 <select style={{ ...S.input, marginBottom:12 }} value={centerForm.type} onChange={e => setCenterForm({...centerForm, type:e.target.value})}>
                   <option value="">{lang==="es"?"Selecciona…":"Select…"}</option>
-                  {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  {TYPES.map(typ => <option key={typ} value={typ}>{typ}</option>)}
                 </select>
                 {/* Specialty description */}
                 <label style={S.label}>{lang==="es"?"Descripción de la especialidad":"Specialty description"}</label>
