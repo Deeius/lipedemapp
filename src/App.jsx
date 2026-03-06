@@ -691,6 +691,8 @@ export default function App() {
   const [savedMsg, setSavedMsg] = useState("");
   const [profileSaved, setProfileSaved] = useState(false);
   const [suppsSaved, setSuppsSaved] = useState(false);
+  const [cycleData, setCycleData] = useState({});   // { "2025-06-14": "period"|"spm"|"retention" }
+  const [cycleMonth, setCycleMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`; });
   const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
   const [customSuppName, setCustomSuppName] = useState("");
   const [infoFilter, setInfoFilter] = useState("all");
@@ -706,6 +708,8 @@ export default function App() {
       const sl2 = localStorage.getItem("lt_lang");
       const sw = localStorage.getItem("lt_welcome_seen");
       const so = localStorage.getItem("lt_onboarding_done");
+      const sc = localStorage.getItem("lt_cycle");
+      if (sc) setCycleData(JSON.parse(sc));
       if (sl) setLogs(JSON.parse(sl));
       if (sf) setFoods(JSON.parse(sf));
       if (sp) setProfile(JSON.parse(sp));
@@ -769,6 +773,16 @@ export default function App() {
     setFoods(updated);
     persist("lt_foods", updated);
     setNewFood({ name: "", reaction: "good", notes: "", category: "other" });
+  };
+
+  const toggleCycleDay = (dateStr, type) => {
+    setCycleData(prev => {
+      const next = { ...prev };
+      if (next[dateStr] === type) delete next[dateStr];  // tap same → clear
+      else next[dateStr] = type;
+      try { localStorage.setItem("lt_cycle", JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const removeFood = (id) => {
@@ -1174,6 +1188,155 @@ export default function App() {
                 </div>
               </div>
             )}
+
+
+            {/* ── CICLO MENSTRUAL ── */}
+            <div style={S.card}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.sage} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg>
+                    <span style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px" }}>
+                      {lang === "es" ? "Ciclo menstrual" : "Menstrual cycle"}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display:"flex", gap:4 }}>
+                  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo-2, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
+                    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
+                  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
+                    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
+                </div>
+              </div>
+
+              {/* Month title */}
+              <div style={{ fontSize:13, fontWeight:700, color:C.creamMuted, textAlign:"center", marginBottom:10 }}>
+                {(() => {
+                  const [y,m] = cycleMonth.split("-").map(Number);
+                  const months_es = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+                  const months_en = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                  return `${lang === "es" ? months_es[m-1] : months_en[m-1]} ${y}`;
+                })()}
+              </div>
+
+              {/* Day-of-week headers */}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
+                {(lang === "es" ? ["L","M","X","J","V","S","D"] : ["M","T","W","T","F","S","S"]).map((d,i) => (
+                  <div key={i} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:C.creamMuted, padding:"4px 0" }}>{d}</div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              {(() => {
+                const [y, mo] = cycleMonth.split("-").map(Number);
+                const firstDay = new Date(y, mo-1, 1).getDay(); // 0=Sun
+                const offset = firstDay === 0 ? 6 : firstDay - 1; // Mon-first
+                const daysInMonth = new Date(y, mo, 0).getDate();
+                const cells = [];
+                for (let i = 0; i < offset; i++) cells.push(null);
+                for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+                // pad to full weeks
+                while (cells.length % 7 !== 0) cells.push(null);
+
+                const typeColors = {
+                  period:    { bg: "#e8a0b0", border: "#c06080", text: "#7a1030" },
+                  spm:       { bg: "#c5a97d33", border: C.accent, text: C.accent },
+                  retention: { bg: "#a0c4e833", border: "#5080a0", text: "#305070" },
+                };
+                const today = new Date().toISOString().slice(0,10);
+
+                return (
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
+                    {cells.map((day, idx) => {
+                      if (!day) return <div key={idx} />;
+                      const dateStr = `${y}-${String(mo).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+                      const type = cycleData[dateStr];
+                      const col = type ? typeColors[type] : null;
+                      const isToday = dateStr === today;
+                      return (
+                        <div key={idx}
+                          onClick={() => {
+                            // Cycle through: none → period → spm → retention → none
+                            const cycle = [null, "period", "spm", "retention"];
+                            const next = cycle[(cycle.indexOf(type ?? null) + 1) % cycle.length];
+                            if (next) toggleCycleDay(dateStr, next);
+                            else toggleCycleDay(dateStr, "period"); // will clear if same
+                            if (!type) toggleCycleDay(dateStr, "period");
+                          }}
+                          style={{
+                            aspectRatio: "1",
+                            borderRadius: 7,
+                            display:"flex", alignItems:"center", justifyContent:"center",
+                            fontSize: 11, fontWeight: type ? 700 : 500,
+                            cursor: "pointer",
+                            background: col ? col.bg : isToday ? C.creamFaint : "transparent",
+                            border: `1.5px solid ${col ? col.border : isToday ? C.sage : "transparent"}`,
+                            color: col ? col.text : isToday ? C.sage : C.cream,
+                            transition: "all 0.15s",
+                            userSelect: "none",
+                          }}
+                        >{day}</div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+              {/* Legend */}
+              <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginTop:12, paddingTop:12, borderTop:`1px solid ${C.border}` }}>
+                {[
+                  { key:"period",    color:"#c06080", bg:"#e8a0b0", label: lang==="es" ? "Menstruación" : "Period" },
+                  { key:"spm",       color:C.accent,  bg:`${C.accent}33`, label: lang==="es" ? "SPM" : "PMS" },
+                  { key:"retention", color:"#5080a0", bg:"#a0c4e833", label: lang==="es" ? "Retención" : "Retention" },
+                ].map(l => (
+                  <div key={l.key} style={{ display:"flex", alignItems:"center", gap:5 }}>
+                    <div style={{ width:12, height:12, borderRadius:3, background:l.bg, border:`1.5px solid ${l.color}` }}/>
+                    <span style={{ fontSize:11, color:C.creamMuted, fontWeight:600 }}>{l.label}</span>
+                  </div>
+                ))}
+                <div style={{ marginLeft:"auto", fontSize:10, color:C.creamMuted, fontStyle:"italic", alignSelf:"center" }}>
+                  {lang==="es" ? "Toca para marcar · vuelve a tocar para cambiar" : "Tap to mark · tap again to change"}
+                </div>
+              </div>
+
+              {/* Cycle summary */}
+              {(() => {
+                const periodDays = Object.entries(cycleData).filter(([,v]) => v === "period").map(([k]) => k).sort();
+                if (periodDays.length < 2) return null;
+                // Find last cycle start
+                let lastStart = null, lastEnd = null, gap = 0;
+                for (let i = 0; i < periodDays.length; i++) {
+                  const d = new Date(periodDays[i]);
+                  const prev = i > 0 ? new Date(periodDays[i-1]) : null;
+                  if (!prev || (d - prev) > 86400000 * 2) { lastStart = periodDays[i]; }
+                  lastEnd = periodDays[i];
+                }
+                const duration = lastStart && lastEnd
+                  ? Math.round((new Date(lastEnd) - new Date(lastStart)) / 86400000) + 1 : null;
+                return (
+                  <div style={{ marginTop:12, padding:"10px 12px", background:C.creamFaint, borderRadius:10, border:`1px solid ${C.border}` }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
+                      {lang==="es" ? "Resumen del ciclo" : "Cycle summary"}
+                    </div>
+                    <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+                      {lastStart && <div>
+                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es" ? "Último inicio" : "Last start"}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:C.cream }}>{lastStart.slice(8)}/{lastStart.slice(5,7)}</div>
+                      </div>}
+                      {duration && <div>
+                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es" ? "Duración" : "Duration"}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:C.cream }}>{duration} {lang==="es" ? "días" : "days"}</div>
+                      </div>}
+                      <div>
+                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es" ? "Días marcados" : "Days marked"}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:C.cream }}>{periodDays.length}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
 
             <button style={S.btn} onClick={saveLog}>{savedMsg || t.today.save}</button>
           </>
