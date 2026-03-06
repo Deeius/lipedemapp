@@ -5,6 +5,248 @@ import {
   BarChart, Bar, Legend,
 } from "recharts";
 
+// ─── INFO RESOURCES ──────────────────────────────────────────────────────────
+const INFO_RESOURCES = {
+  science: {
+    icon: "🔬",
+    es: "Artículos Científicos",
+    en: "Scientific Articles",
+    items: [
+      {
+        lang: "en",
+        title: "Lipedema: Progress, Challenges, and the Road Ahead (2025)",
+        authors: "Systematic review — PubMed / PMC",
+        desc_es: "Revisión sistemática de más de 100 estudios sobre fisiopatología, diagnóstico y opciones de tratamiento.",
+        desc_en: "Systematic review of 100+ studies on pathophysiology, diagnosis and treatment options.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/40425048/",
+        year: 2025,
+        type: "review",
+      },
+      {
+        lang: "en",
+        title: "Lipedema: Insights into Morphology, Pathophysiology, and Challenges",
+        authors: "Biomedicines — PubMed",
+        desc_es: "Análisis en profundidad de las características morfológicas, fibrosis e inflamación del lipedema.",
+        desc_en: "In-depth analysis of morphological features, fibrosis and inflammation in lipedema.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/36551837/",
+        year: 2022,
+        type: "review",
+      },
+      {
+        lang: "en",
+        title: "S2k Guideline Lipedema (Guía clínica oficial alemana)",
+        authors: "DGPL — PubMed",
+        desc_es: "Guía oficial con 60 recomendaciones sobre diagnóstico, tratamiento conservador, quirúrgico y autogestión.",
+        desc_en: "Official guideline with 60 recommendations on diagnosis, conservative & surgical treatment, and self-management.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/39188170/",
+        year: 2024,
+        type: "guideline",
+      },
+      {
+        lang: "en",
+        title: "Proposed Framework for Research Case Definitions of Lipedema",
+        authors: "Lipedema Simplified / Harvard — PubMed",
+        desc_es: "Marco de referencia para estandarizar el diagnóstico en investigación, con 5 características clave.",
+        desc_en: "Framework for standardizing lipedema research diagnosis, with 5 agreed-upon characteristics.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/38546398/",
+        year: 2024,
+        type: "research",
+      },
+      {
+        lang: "en",
+        title: "Lipedema and Adipose Tissue: Current Understanding & Future Directions",
+        authors: "Frontiers in Cell and Developmental Biology",
+        desc_es: "Estado del arte en 2025: macrófagos, fibrosis, dieta cetogénica e IA en el diagnóstico.",
+        desc_en: "2025 state of the art: macrophages, fibrosis, ketogenic diet and AI in diagnosis.",
+        url: "https://www.frontiersin.org/journals/cell-and-developmental-biology/articles/10.3389/fcell.2025.1691161/full",
+        year: 2025,
+        type: "review",
+      },
+      {
+        lang: "es",
+        title: "¿Qué sabemos del lipedema? Una enfermedad poco conocida",
+        authors: "The Conversation — Divulgación científica",
+        desc_es: "Artículo divulgativo en español sobre causas, diagnóstico y tratamiento multidisciplinar del lipedema.",
+        desc_en: "Scientific outreach article in Spanish on causes, diagnosis and multidisciplinary treatment.",
+        url: "https://theconversation.com/que-sabemos-del-lipedema-una-enfermedad-con-acumulacion-de-grasa-patologica-que-afecta-sobre-todo-a-las-mujeres-232179",
+        year: 2025,
+        type: "article",
+      },
+    ],
+  },
+  treatment: {
+    icon: "💆‍♀️",
+    es: "Guías de Tratamiento",
+    en: "Treatment Guides",
+    items: [
+      {
+        lang: "en",
+        title: "Treating Lipedema — Lipedema Foundation",
+        authors: "Lipedema Foundation (USA)",
+        desc_es: "Guía completa de tratamientos conservadores y quirúrgicos de la organización líder en investigación.",
+        desc_en: "Complete guide to conservative and surgical treatments from the leading research organization.",
+        url: "https://www.lipedema.org/treating-lipedema",
+        year: 2024,
+        type: "guide",
+      },
+      {
+        lang: "en",
+        title: "Lipedema Treatment & Causes — The Lipedema Project",
+        authors: "The Lipedema Project",
+        desc_es: "Explicación detallada de la Terapia Descongestiva Completa (CDT), MLD, compresión y liposucción linfática.",
+        desc_en: "Detailed explanation of Complete Decongestive Therapy (CDT), MLD, compression and lymphatic liposuction.",
+        url: "https://lipedemaproject.org/treatment-for-lipedema/",
+        year: 2024,
+        type: "guide",
+      },
+      {
+        lang: "en",
+        title: "Patient Guide: Treatment of Lipedema and Lipo-Lymphedema",
+        authors: "Toronto Physiotherapy",
+        desc_es: "Guía para pacientes: qué puede y no puede hacer el MLD, compresión, dispositivos neumáticos y cirugía.",
+        desc_en: "Patient guide: what MLD can and cannot do, compression, pneumatic devices and surgery.",
+        url: "https://torontophysiotherapy.ca/patient-guide-lipedema-lipolymphedema-treatment/",
+        year: 2022,
+        type: "guide",
+      },
+      {
+        lang: "en",
+        title: "Finding a Lipedema Specialist — Lipedema Foundation",
+        authors: "Lipedema Foundation",
+        desc_es: "Directorio de especialistas y guía para navegar el sistema de salud con lipedema.",
+        desc_en: "Specialist directory and guide to navigating the healthcare system with lipedema.",
+        url: "https://www.lipedema.org/findspecialists",
+        year: 2024,
+        type: "guide",
+      },
+      {
+        lang: "es",
+        title: "Qué es el Lipedema — Lipemedical (España)",
+        authors: "Lipemedical — Dr. Burgos de la Obra",
+        desc_es: "Información clínica en español sobre síntomas, estadios y tratamiento quirúrgico WAL del lipedema.",
+        desc_en: "Clinical info in Spanish on symptoms, stages and WAL surgical treatment for lipedema.",
+        url: "https://lipedema.es/que-es-lipedema/",
+        year: 2024,
+        type: "clinical",
+      },
+    ],
+  },
+  community: {
+    icon: "🤝",
+    es: "Comunidades y Asociaciones",
+    en: "Communities & Associations",
+    items: [
+      {
+        lang: "es",
+        title: "ADALIPE — Asociación de Afectadas de Lipedema de España",
+        authors: "Asociación española de pacientes",
+        desc_es: "La principal asociación de pacientes con lipedema en España. Foro privado, eventos y apoyo entre pares.",
+        desc_en: "Main Spanish lipedema patient association. Private forum, events and peer support.",
+        url: "https://www.adalipe.es/",
+        year: 2024,
+        type: "association",
+      },
+      {
+        lang: "es",
+        title: "FEDEAL — Federación Española de Asociaciones de Linfedema y Lipedema",
+        authors: "Federación española",
+        desc_es: "Punto de encuentro nacional de las asociaciones regionales. Trabaja por el reconocimiento institucional.",
+        desc_en: "National federation of regional associations. Works for institutional recognition.",
+        url: "https://fedeal.org/",
+        year: 2024,
+        type: "association",
+      },
+      {
+        lang: "en",
+        title: "Lipedema Foundation — Comunidad & Recursos",
+        authors: "Lipedema Foundation (USA)",
+        desc_es: "La mayor organización financiadora de investigación sobre lipedema. Registro de pacientes y directorio de proveedores.",
+        desc_en: "Largest lipedema research funder. Patient registry and provider directory.",
+        url: "https://www.lipedema.org/",
+        year: 2024,
+        type: "association",
+      },
+      {
+        lang: "en",
+        title: "r/Lipedema — Reddit Community",
+        authors: "Reddit",
+        desc_es: "Comunidad activa en inglés con miles de miembros compartiendo experiencias, cirugías y consejos diarios.",
+        desc_en: "Active English community with thousands of members sharing experiences, surgeries and daily tips.",
+        url: "https://www.reddit.com/r/Lipedema/",
+        year: 2024,
+        type: "forum",
+      },
+    ],
+  },
+  social: {
+    icon: "📱",
+    es: "Perfiles Recomendados",
+    en: "Recommended Profiles",
+    items: [
+      {
+        lang: "en",
+        platform: "Instagram + TikTok",
+        title: "@allison.jacobsss — Allison Jacobs",
+        authors: "450K Instagram · 900K TikTok",
+        desc_es: "Activista del lipedema y creadora de contenido. Baile, salud mental y visibilidad de la enfermedad.",
+        desc_en: "Lipedema activist and content creator. Dance, mental health and disease visibility.",
+        url: "https://www.instagram.com/allison.jacobsss/",
+        type: "influencer",
+      },
+      {
+        lang: "en",
+        platform: "Instagram",
+        title: "@sarah.whitlow_ — Sarah Whitlow",
+        authors: "182K seguidores · Lipedema Movement & Fitness",
+        desc_es: "Fundadora de Lipedema Movement & Fitness. Ejercicio adaptado y comunidad de apoyo.",
+        desc_en: "Founder of Lipedema Movement & Fitness. Adapted exercise and support community.",
+        url: "https://www.instagram.com/sarah.whitlow_/",
+        type: "influencer",
+      },
+      {
+        lang: "en",
+        platform: "Instagram",
+        title: "@xanthia_efthymiou — Xanthia Efthymiou",
+        authors: "339K seguidores · Australia",
+        desc_es: "Concienciación sobre lipoedema desde Australia. Transparente sobre su proceso y tratamientos.",
+        desc_en: "Lipoedema awareness from Australia. Transparent about her process and treatments.",
+        url: "https://www.instagram.com/xanthia_efthymiou/",
+        type: "influencer",
+      },
+      {
+        lang: "en",
+        platform: "Instagram",
+        title: "@the_lippy_lady — Ashley Fisher",
+        authors: "12K seguidores · Co-host Lipedema Mamas Podcast",
+        desc_es: "Comparte su viaje con el lipedema y co-conduce el podcast Lipedema Mamas.",
+        desc_en: "Shares her lipedema journey and co-hosts the Lipedema Mamas Podcast.",
+        url: "https://www.instagram.com/the_lippy_lady/",
+        type: "influencer",
+      },
+      {
+        lang: "es",
+        platform: "Instagram + Blog",
+        title: "@lipedemadiary — Lipedema Diary (España)",
+        authors: "Comunidad española",
+        desc_es: "Cuenta española que documenta el proceso, la cirugía en Barcelona y la vida diaria con lipedema.",
+        desc_en: "Spanish account documenting the process, surgery in Barcelona and daily life with lipedema.",
+        url: "https://www.instagram.com/lipedemadiary/",
+        type: "influencer",
+      },
+      {
+        lang: "en",
+        platform: "Instagram",
+        title: "@lipedemafitness — Lipedema Fitness",
+        authors: "9K seguidores · Desde 2013",
+        desc_es: "Dedicado al ejercicio y actividad física adaptada para personas con lipedema desde 2013.",
+        desc_en: "Dedicated to adapted exercise and physical activity for people with lipedema since 2013.",
+        url: "https://www.instagram.com/lipedemafitness/",
+        type: "influencer",
+      },
+    ],
+  },
+};
+
 // ─── SUPPLEMENTS DATA ────────────────────────────────────────────────────────
 const SUPPLEMENT_OPTIONS = [
   { key: "omega3",       icon: "🐟", es: "Omega-3",              en: "Omega-3",              note_es: "Antiinflamatorio",             note_en: "Anti-inflammatory" },
@@ -29,7 +271,7 @@ const LANG = {
   es: {
     appTitle: "Lipedema Tracker",
     appSubtitle: "Tu diario de salud personalizado",
-    nav: { today: "Hoy", history: "Historial", charts: "Gráficos", foods: "Alimentos", supps: "Suplementos", profile: "Perfil" },
+    nav: { today: "Hoy", history: "Historial", charts: "Gráficos", foods: "Alimentos", supps: "Suplementos", info: "Info", profile: "Perfil" },
     today: {
       title: "Registro de Hoy",
       date: "Fecha",
@@ -84,6 +326,20 @@ const LANG = {
       dailyLog: "Registro diario de toma",
       dailyNote: "Marca en 'Hoy' qué suplementos tomaste",
     },
+    info: {
+      title: "Información & Recursos",
+      subtitle: "Recursos curados y verificados sobre lipedema",
+      filterAll: "Todos",
+      filterEs: "En español",
+      filterEn: "En inglés",
+      tagTypes: {
+        review: "Revisión", guideline: "Guía clínica", research: "Investigación",
+        article: "Artículo", guide: "Guía", clinical: "Clínico",
+        association: "Asociación", forum: "Foro", influencer: "Perfil", platform: "Plataforma",
+      },
+      disclaimer: "⚠️ Esta información es educativa. Consulta siempre con tu médico especialista antes de cambiar tu tratamiento.",
+      openLink: "Abrir →",
+    },
     profile: {
       title: "Mi Perfil",
       name: "Nombre",
@@ -116,7 +372,7 @@ const LANG = {
   en: {
     appTitle: "Lipedema Tracker",
     appSubtitle: "Your personalized health diary",
-    nav: { today: "Today", history: "History", charts: "Charts", foods: "Foods", supps: "Supplements", profile: "Profile" },
+    nav: { today: "Today", history: "History", charts: "Charts", foods: "Foods", supps: "Supplements", info: "Info", profile: "Profile" },
     today: {
       title: "Today's Log",
       date: "Date",
@@ -170,6 +426,20 @@ const LANG = {
       empty: "No active supplements yet",
       dailyLog: "Daily intake log",
       dailyNote: "Mark in 'Today' which supplements you took",
+    },
+    info: {
+      title: "Information & Resources",
+      subtitle: "Curated and verified resources about lipedema",
+      filterAll: "All",
+      filterEs: "In Spanish",
+      filterEn: "In English",
+      tagTypes: {
+        review: "Review", guideline: "Guideline", research: "Research",
+        article: "Article", guide: "Guide", clinical: "Clinical",
+        association: "Association", forum: "Forum", influencer: "Profile", platform: "Platform",
+      },
+      disclaimer: "⚠️ This information is educational. Always consult your specialist before changing your treatment.",
+      openLink: "Open →",
     },
     profile: {
       title: "My Profile",
@@ -362,6 +632,7 @@ export default function App() {
   const [suppsSaved, setSuppsSaved] = useState(false);
   const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
   const [customSuppName, setCustomSuppName] = useState("");
+  const [infoFilter, setInfoFilter] = useState("all");
 
   const t = LANG[lang];
 
@@ -841,6 +1112,82 @@ export default function App() {
             </div>
 
             <button style={S.btn} onClick={saveSupps}>{suppsSaved ? t.supps.saved : t.supps.save}</button>
+          </>
+        )}
+
+        {/* ── INFO ── */}
+        {tab === "info" && (
+          <>
+            {/* Disclaimer */}
+            <div style={{ background: "#fefce8", borderRadius: 10, padding: "10px 14px", marginBottom: 16, border: "1px solid #fde047", fontSize: 12, color: "#854d0e" }}>
+              {t.info.disclaimer}
+            </div>
+
+            {/* Language filter */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+              {[["all", t.info.filterAll], ["es", t.info.filterEs], ["en", t.info.filterEn]].map(([val, label]) => (
+                <button key={val} onClick={() => setInfoFilter(val)}
+                  style={{ padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: infoFilter === val ? "#111827" : "#f3f4f6", color: infoFilter === val ? "#fff" : "#6b7280", transition: "all 0.2s" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sections */}
+            {Object.entries(INFO_RESOURCES).map(([sectionKey, section]) => {
+              const sectionName = lang === "es" ? section.es : section.en;
+              const filtered = section.items.filter(item =>
+                infoFilter === "all" ? true : item.lang === infoFilter
+              );
+              if (filtered.length === 0) return null;
+              return (
+                <div key={sectionKey} style={S.card}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                    <span style={{ fontSize: 20 }}>{section.icon}</span>
+                    <div style={S.cardTitle}>{sectionName}</div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {filtered.map((item, i) => {
+                      const desc = lang === "es" ? item.desc_es : item.desc_en;
+                      const typeLabel = t.info.tagTypes[item.type] || item.type;
+                      const langColor = item.lang === "es" ? "#6366f1" : "#0ea5e9";
+                      const typeColors = {
+                        review: "#8b5cf6", guideline: "#ef4444", research: "#f97316",
+                        guide: "#22c55e", clinical: "#14b8a6", association: "#6366f1",
+                        forum: "#f59e0b", influencer: "#ec4899", article: "#64748b", platform: "#0ea5e9",
+                      };
+                      return (
+                        <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
+                          style={{ display: "block", textDecoration: "none", padding: "12px 14px", borderRadius: 10, border: "1.5px solid #e5e7eb", background: "#f9fafb", transition: "border-color 0.2s, background 0.2s" }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = "#111827"; e.currentTarget.style.background = "#fff"; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#f9fafb"; }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontWeight: 700, fontSize: 13, color: "#111827", marginBottom: 3, lineHeight: 1.4 }}>
+                                {item.platform && <span style={{ fontSize: 11, color: "#9ca3af", marginRight: 6 }}>{item.platform}</span>}
+                                {item.title}
+                              </div>
+                              <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6 }}>{item.authors}{item.year ? ` · ${item.year}` : ""}</div>
+                              <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.5 }}>{desc}</div>
+                            </div>
+                            <span style={{ fontSize: 14, color: "#9ca3af", flexShrink: 0, marginTop: 2 }}>↗</span>
+                          </div>
+                          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: langColor + "18", color: langColor }}>
+                              {item.lang === "es" ? "ES" : "EN"}
+                            </span>
+                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (typeColors[item.type] || "#6b7280") + "18", color: typeColors[item.type] || "#6b7280" }}>
+                              {typeLabel}
+                            </span>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </>
         )}
 
