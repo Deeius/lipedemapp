@@ -486,6 +486,7 @@ const defaultEntry = () => ({
   inflammationNote: "",
   measures: {},
   suppsTaken: [],
+  pillTaken: false,
 });
 
 const defaultProfile = {
@@ -493,6 +494,8 @@ const defaultProfile = {
   stage: "unknown",
   diagnosis: "",
   activeZones: ["leftThigh","rightThigh","leftCalf","rightCalf"],
+  pillActive: false,   // is she taking the pill?
+  pillBrand: "",       // brand name
 };
 
 const defaultSupps = { active: [], custom: [] };
@@ -1780,6 +1783,34 @@ export default function App() {
               })()}
             </div>
 
+
+            {/* Pill taken today */}
+            {profile.pillActive && (
+              <div style={S.card}>
+                <div style={S.cardTitle}>{lang === "es" ? "Anticonceptivo" : "Contraceptive"}</div>
+                <div
+                  onClick={() => updateEntry("pillTaken", !entry.pillTaken)}
+                  style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 14px", borderRadius:12, border:`1.5px solid ${entry.pillTaken ? C.sage : C.border}`, background: entry.pillTaken ? C.creamFaint : "white", cursor:"pointer", transition:"all 0.2s", userSelect:"none" }}>
+                  <span style={{ fontSize:22 }}>💊</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color: entry.pillTaken ? C.sage : C.cream }}>
+                      {profile.pillBrand
+                        ? (lang==="es" ? `${profile.pillBrand} — tomada hoy` : `${profile.pillBrand} — taken today`)
+                        : (lang==="es" ? "Píldora tomada hoy" : "Pill taken today")}
+                    </div>
+                    <div style={{ fontSize:11, color:C.creamMuted, marginTop:1 }}>
+                      {entry.pillTaken
+                        ? (lang==="es" ? "✓ Marcada como tomada" : "✓ Marked as taken")
+                        : (lang==="es" ? "Toca para marcar como tomada" : "Tap to mark as taken")}
+                    </div>
+                  </div>
+                  <div style={{ width:22, height:22, borderRadius:"50%", border:`2px solid ${entry.pillTaken ? C.sage : C.border}`, background: entry.pillTaken ? C.sage : "transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    {entry.pillTaken && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                  </div>
+                </div>
+              </div>
+            )}
+
                         <button style={S.btn} onClick={saveLog}>{savedMsg || t.today.save}</button>
           </>
         )}
@@ -1897,6 +1928,18 @@ export default function App() {
                                   ) : null;
                                 })}
                               </div>
+                            </div>
+                          )}
+
+                          {/* Pill taken */}
+                          {l.pillTaken && (
+                            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px", background:C.creamFaint, borderRadius:8, border:`1px solid ${C.border}` }}>
+                              <span style={{ fontSize:16 }}>💊</span>
+                              <span style={{ fontSize:12, fontWeight:600, color:C.sage }}>
+                                {profile.pillBrand
+                                  ? (lang==="es" ? `${profile.pillBrand} tomada` : `${profile.pillBrand} taken`)
+                                  : (lang==="es" ? "Píldora tomada" : "Pill taken")}
+                              </span>
                             </div>
                           )}
 
@@ -2314,6 +2357,31 @@ export default function App() {
             <input style={{ ...S.input, marginBottom: 8 }} placeholder={lang === "es" ? "España, México…" : "Spain, Mexico…"} value={profile.country || ""} onChange={(e) => setProfile({ ...profile, country: e.target.value })} />
             <label style={S.label}>{lang === "es" ? "Provincia / Ciudad" : "Region / City"}</label>
             <input style={{ ...S.input, marginBottom: 16 }} placeholder={lang === "es" ? "Madrid, Barcelona…" : "Madrid, Barcelona…"} value={profile.region || ""} onChange={(e) => setProfile({ ...profile, region: e.target.value })} />
+
+            {/* Pill / contraceptive */}
+            <label style={S.label}>{lang === "es" ? "Anticonceptivo hormonal (píldora)" : "Hormonal contraceptive (pill)"}</label>
+            <div style={{ display:"flex", gap:8, marginBottom:10 }}>
+              {[
+                { val:true,  label: lang==="es" ? "Sí, la tomo" : "Yes, I take it" },
+                { val:false, label: lang==="es" ? "No la tomo"  : "No, I don't"    },
+              ].map(o => (
+                <button key={String(o.val)}
+                  onClick={() => setProfile({ ...profile, pillActive: o.val })}
+                  style={{ flex:1, padding:"9px 12px", borderRadius:10, border:`1.5px solid ${profile.pillActive === o.val ? C.sage : C.border}`, background: profile.pillActive === o.val ? C.creamFaint : "white", fontSize:12, fontWeight:700, color: profile.pillActive === o.val ? C.sage : C.creamMuted, cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" }}>
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            {profile.pillActive && (
+              <>
+                <label style={S.label}>{lang === "es" ? "Marca o nombre comercial" : "Brand or commercial name"}</label>
+                <input style={{ ...S.input, marginBottom: 16 }}
+                  placeholder={lang === "es" ? "Ej: Yasmin, Diane 35, Loette…" : "e.g. Yasmin, Microgynon, Cilest…"}
+                  value={profile.pillBrand || ""}
+                  onChange={(e) => setProfile({ ...profile, pillBrand: e.target.value })} />
+              </>
+            )}
+
             <label style={S.label}>{t.profile.activeZones}</label>
             <div style={S.grid2}>
               {ALL_ZONES.map((z) => {
