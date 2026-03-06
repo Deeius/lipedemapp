@@ -696,6 +696,7 @@ export default function App() {
   const [cycleData, setCycleData] = useState({});
   const [cycleMonth, setCycleMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`; });
   const [cycleActiveType, setCycleActiveType] = useState(null); // "period"|"spm"|"retention"|null
+  const [recipeExpanded, setRecipeExpanded] = useState(false);
   const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
   const [customSuppName, setCustomSuppName] = useState("");
   const [infoFilter, setInfoFilter] = useState("all");
@@ -1148,21 +1149,119 @@ export default function App() {
 
           // anti-inflammatory recipes
           const recipes = lang === "es" ? [
-            { name: "Batido antiinflamatorio de cúrcuma", time:"5 min", ingredients:["1 taza leche vegetal","1 cdta cúrcuma","½ cdta jengibre","1 cdta miel","pizca de pimienta negra"], tip:"La pimienta negra aumenta la absorción de curcumina hasta un 2000%." },
-            { name: "Ensalada de salmón y aguacate", time:"10 min", ingredients:["150g salmón","1 aguacate","espinacas","limón","AOVE","semillas de chía"], tip:"Omega-3 del salmón + grasas saludables del aguacate = combinación antiinflamatoria potente." },
-            { name: "Sopa de miso con algas", time:"15 min", ingredients:["2 cdas miso blanco","alga wakame","tofu firme","cebollino","1L agua caliente"], tip:"Los probióticos del miso apoyan la microbiota, clave en la respuesta inflamatoria." },
-            { name: "Smoothie de frutos rojos y espinacas", time:"5 min", ingredients:["1 taza arándanos","½ taza fresas","1 puñado espinacas","leche de avena","1 cdta chía"], tip:"Los antioxidantes de los arándanos combaten el estrés oxidativo asociado al lipedema." },
-            { name: "Té de jengibre y limón", time:"5 min", ingredients:["2cm raíz jengibre","½ limón","1 cdta miel cruda","500ml agua caliente"], tip:"El gingerol del jengibre inhibe las mismas vías inflamatorias que el ibuprofeno." },
-            { name: "Bowl de quinoa con verduras asadas", time:"25 min", ingredients:["½ taza quinoa","calabacín","pimiento rojo","cebolla morada","AOVE","romero"], tip:"La quinoa es proteína completa sin gluten, con perfil aminoacídico que favorece la reparación tisular." },
-            { name: "Crema de brócoli y almendras", time:"20 min", ingredients:["2 tazas brócoli","½ taza almendras","ajo","caldo vegetal","nuez moscada"], tip:"El sulforafano del brócoli activa las defensas antioxidantes naturales del organismo." },
+            {
+              name: "Batido antiinflamatorio de cúrcuma",
+              time: "5 min", difficulty: "Fácil",
+              ingredients: ["1 taza leche vegetal","1 cdta cúrcuma","½ cdta jengibre rallado","1 cdta miel cruda","pizca de pimienta negra"],
+              steps: ["Calienta la leche vegetal sin que llegue a hervir.","Añade la cúrcuma, el jengibre y la pimienta negra. Remueve bien.","Endulza con miel y sirve inmediatamente."],
+              nutrition: { kcal:120, protein:"2g", carbs:"18g", fat:"4g" },
+              tip: "La pimienta negra aumenta la absorción de curcumina hasta un 2000%.",
+            },
+            {
+              name: "Ensalada de salmón y aguacate",
+              time: "10 min", difficulty: "Fácil",
+              ingredients: ["150g salmón ahumado","1 aguacate maduro","2 puñados espinacas","½ limón","2 cdas AOVE","1 cdta semillas de chía"],
+              steps: ["Lava y seca las espinacas, colócalas en un bol.","Corta el aguacate en láminas y el salmón en tiras.","Dispón sobre las espinacas. Aliña con zumo de limón y AOVE.","Espolvorea las semillas de chía por encima."],
+              nutrition: { kcal:380, protein:"28g", carbs:"8g", fat:"28g" },
+              tip: "Omega-3 del salmón + grasas saludables del aguacate = potente sinergia antiinflamatoria.",
+            },
+            {
+              name: "Sopa de miso con algas",
+              time: "15 min", difficulty: "Fácil",
+              ingredients: ["2 cdas miso blanco","10g alga wakame seca","150g tofu firme","2 cebollinos","1L agua caliente"],
+              steps: ["Hidrata el alga wakame en agua fría 5 minutos. Escurre.","Calienta el agua sin hervir. Disuelve el miso removiendo (no hiervas el miso — destruye los probióticos).","Añade el tofu cortado en cubos y el alga hidratada.","Sirve con cebollino picado por encima."],
+              nutrition: { kcal:95, protein:"9g", carbs:"7g", fat:"3g" },
+              tip: "Los probióticos del miso apoyan la microbiota intestinal, clave en la modulación inflamatoria.",
+            },
+            {
+              name: "Smoothie de frutos rojos y espinacas",
+              time: "5 min", difficulty: "Fácil",
+              ingredients: ["1 taza arándanos","½ taza fresas","1 puñado espinacas baby","200ml leche de avena","1 cdta semillas de chía"],
+              steps: ["Congela los frutos rojos la noche anterior para textura más cremosa.","Pon todos los ingredientes en la batidora.","Tritura a máxima potencia 60 segundos.","Sirve inmediatamente."],
+              nutrition: { kcal:165, protein:"4g", carbs:"30g", fat:"3g" },
+              tip: "Los antioxidantes de los arándanos (antocianinas) reducen el estrés oxidativo asociado al lipedema.",
+            },
+            {
+              name: "Té de jengibre y limón",
+              time: "5 min", difficulty: "Fácil",
+              ingredients: ["2cm raíz de jengibre fresco","½ limón (zumo)","1 cdta miel cruda","500ml agua caliente (no hirviendo)"],
+              steps: ["Pela y ralla o lamina el jengibre fresco.","Infusiona en agua a 80–85°C durante 4 minutos.","Cuela, añade el zumo de limón y la miel.","Bebe caliente o deja enfriar para tomar frío."],
+              nutrition: { kcal:25, protein:"0g", carbs:"6g", fat:"0g" },
+              tip: "El gingerol del jengibre inhibe las ciclooxigenasas (COX), las mismas enzimas que bloquea el ibuprofeno.",
+            },
+            {
+              name: "Bowl de quinoa con verduras asadas",
+              time: "25 min", difficulty: "Media",
+              ingredients: ["½ taza quinoa","1 calabacín","1 pimiento rojo","½ cebolla morada","2 cdas AOVE","romero y tomillo al gusto"],
+              steps: ["Precalienta el horno a 200°C.","Corta las verduras en dados, aliña con AOVE, romero y tomillo. Hornea 20 minutos.","Mientras, cuece la quinoa en el doble de agua con sal (12 min).","Monta el bowl: quinoa de base, verduras asadas encima. Añade un chorrito de limón."],
+              nutrition: { kcal:310, protein:"10g", carbs:"42g", fat:"12g" },
+              tip: "La quinoa es proteína completa sin gluten; su perfil de aminoácidos favorece la reparación del tejido conectivo.",
+            },
+            {
+              name: "Crema de brócoli y almendras",
+              time: "20 min", difficulty: "Media",
+              ingredients: ["2 tazas brócoli","½ taza almendras crudas","2 dientes de ajo","750ml caldo vegetal bajo en sodio","nuez moscada al gusto"],
+              steps: ["Cuece el brócoli al vapor 8 minutos (no más, para conservar el sulforafano).","Sofríe el ajo laminado en un poco de AOVE 1 minuto.","Tritura el brócoli, el ajo, las almendras y el caldo hasta textura suave.","Calienta suavemente, sirve con nuez moscada rallada."],
+              nutrition: { kcal:220, protein:"9g", carbs:"16g", fat:"14g" },
+              tip: "El sulforafano del brócoli (mayor concentración si no se supera 70°C al cocinar) activa el factor Nrf2, regulador maestro de la respuesta antioxidante.",
+            },
           ] : [
-            { name:"Anti-inflammatory turmeric smoothie", time:"5 min", ingredients:["1 cup plant milk","1 tsp turmeric","½ tsp ginger","1 tsp honey","pinch black pepper"], tip:"Black pepper increases curcumin absorption by up to 2000%." },
-            { name:"Salmon & avocado salad", time:"10 min", ingredients:["150g salmon","1 avocado","spinach","lemon","olive oil","chia seeds"], tip:"Salmon omega-3 + avocado healthy fats = powerful anti-inflammatory combination." },
-            { name:"Miso soup with seaweed", time:"15 min", ingredients:["2 tbsp white miso","wakame seaweed","firm tofu","spring onion","1L hot water"], tip:"Miso probiotics support the gut microbiome, key to inflammation response." },
-            { name:"Red berry & spinach smoothie", time:"5 min", ingredients:["1 cup blueberries","½ cup strawberries","1 handful spinach","oat milk","1 tsp chia"], tip:"Blueberry antioxidants combat the oxidative stress associated with lipedema." },
-            { name:"Ginger & lemon tea", time:"5 min", ingredients:["2cm ginger root","½ lemon","1 tsp raw honey","500ml hot water"], tip:"Gingerol in ginger inhibits the same inflammatory pathways as ibuprofen." },
-            { name:"Quinoa bowl with roasted vegetables", time:"25 min", ingredients:["½ cup quinoa","courgette","red pepper","red onion","olive oil","rosemary"], tip:"Quinoa is gluten-free complete protein with an amino acid profile that supports tissue repair." },
-            { name:"Broccoli & almond cream soup", time:"20 min", ingredients:["2 cups broccoli","½ cup almonds","garlic","vegetable stock","nutmeg"], tip:"Broccoli sulforaphane activates the body's natural antioxidant defences." },
+            {
+              name: "Anti-inflammatory turmeric smoothie",
+              time: "5 min", difficulty: "Easy",
+              ingredients: ["1 cup plant milk","1 tsp turmeric","½ tsp fresh grated ginger","1 tsp raw honey","pinch black pepper"],
+              steps: ["Warm the plant milk without boiling.","Add turmeric, ginger and black pepper. Stir well.","Sweeten with honey and serve immediately."],
+              nutrition: { kcal:120, protein:"2g", carbs:"18g", fat:"4g" },
+              tip: "Black pepper increases curcumin absorption by up to 2000% through piperine.",
+            },
+            {
+              name: "Salmon & avocado salad",
+              time: "10 min", difficulty: "Easy",
+              ingredients: ["150g smoked salmon","1 ripe avocado","2 handfuls spinach","½ lemon","2 tbsp olive oil","1 tsp chia seeds"],
+              steps: ["Wash and dry the spinach, place in a bowl.","Slice the avocado and cut salmon into strips.","Arrange over the spinach. Dress with lemon juice and olive oil.","Sprinkle chia seeds on top."],
+              nutrition: { kcal:380, protein:"28g", carbs:"8g", fat:"28g" },
+              tip: "Salmon omega-3 + avocado healthy fats create a powerful anti-inflammatory synergy.",
+            },
+            {
+              name: "Miso soup with seaweed",
+              time: "15 min", difficulty: "Easy",
+              ingredients: ["2 tbsp white miso","10g dried wakame seaweed","150g firm tofu","2 spring onions","1L hot water"],
+              steps: ["Rehydrate wakame in cold water for 5 minutes. Drain.","Heat water to just below boiling. Dissolve miso by stirring (do not boil — destroys probiotics).","Add tofu cut into cubes and the rehydrated seaweed.","Serve with sliced spring onions on top."],
+              nutrition: { kcal:95, protein:"9g", carbs:"7g", fat:"3g" },
+              tip: "Miso probiotics support the gut microbiome, a key regulator of the inflammatory response.",
+            },
+            {
+              name: "Red berry & spinach smoothie",
+              time: "5 min", difficulty: "Easy",
+              ingredients: ["1 cup blueberries","½ cup strawberries","1 handful baby spinach","200ml oat milk","1 tsp chia seeds"],
+              steps: ["Freeze the berries the night before for creamier texture.","Put all ingredients in the blender.","Blend at full speed for 60 seconds.","Serve immediately."],
+              nutrition: { kcal:165, protein:"4g", carbs:"30g", fat:"3g" },
+              tip: "Blueberry anthocyanins reduce the oxidative stress associated with lipedema tissue.",
+            },
+            {
+              name: "Ginger & lemon tea",
+              time: "5 min", difficulty: "Easy",
+              ingredients: ["2cm fresh ginger root","½ lemon (juice)","1 tsp raw honey","500ml hot water (not boiling)"],
+              steps: ["Peel and grate or slice the fresh ginger.","Steep in water at 80–85°C for 4 minutes.","Strain, add lemon juice and honey.","Drink warm or leave to cool and serve cold."],
+              nutrition: { kcal:25, protein:"0g", carbs:"6g", fat:"0g" },
+              tip: "Gingerol inhibits cyclooxygenases (COX) — the same enzymes blocked by ibuprofen.",
+            },
+            {
+              name: "Quinoa bowl with roasted vegetables",
+              time: "25 min", difficulty: "Medium",
+              ingredients: ["½ cup quinoa","1 courgette","1 red pepper","½ red onion","2 tbsp olive oil","rosemary and thyme to taste"],
+              steps: ["Preheat oven to 200°C / 400°F.","Dice the vegetables, toss with olive oil, rosemary and thyme. Roast 20 minutes.","Meanwhile, cook quinoa in double the water with a pinch of salt (12 min).","Build the bowl: quinoa base, roasted vegetables on top. Finish with a squeeze of lemon."],
+              nutrition: { kcal:310, protein:"10g", carbs:"42g", fat:"12g" },
+              tip: "Quinoa is a gluten-free complete protein; its amino acid profile supports connective tissue repair.",
+            },
+            {
+              name: "Broccoli & almond cream soup",
+              time: "20 min", difficulty: "Medium",
+              ingredients: ["2 cups broccoli","½ cup raw almonds","2 garlic cloves","750ml low-sodium vegetable stock","nutmeg to taste"],
+              steps: ["Steam broccoli for 8 minutes (not more, to preserve sulforaphane).","Sauté sliced garlic in a little olive oil for 1 minute.","Blend broccoli, garlic, almonds and stock until smooth.","Gently reheat and serve with freshly grated nutmeg."],
+              nutrition: { kcal:220, protein:"9g", carbs:"16g", fat:"14g" },
+              tip: "Broccoli sulforaphane (highest when not cooked above 70°C) activates Nrf2, the master antioxidant regulator.",
+            },
           ];
           const recipe = recipes[new Date().getDate() % recipes.length];
 
@@ -1315,25 +1414,74 @@ export default function App() {
               </div>
 
               {/* 5. RECETA DEL DÍA */}
-              <div style={{ background:C.bgCard, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
-                <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10 }}>
-                  {lang==="es" ? "🥗 Receta antiinflamatoria del día" : "🥗 Anti-inflammatory recipe of the day"}
-                </div>
-                <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:10 }}>
-                  <div style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px", flex:1 }}>{recipe.name}</div>
-                  <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, background:C.creamFaint, padding:"3px 8px", borderRadius:20, flexShrink:0 }}>⏱ {recipe.time}</div>
-                </div>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:10 }}>
-                  {recipe.ingredients.map((ing,i) => (
-                    <span key={i} style={{ fontSize:11, background:C.creamFaint, border:`1px solid ${C.border}`, borderRadius:20, padding:"3px 9px", color:C.cream }}>
-                      {ing}
-                    </span>
-                  ))}
-                </div>
-                <div style={{ fontSize:11, color:C.sage, lineHeight:1.5, padding:"8px 10px", background:`${C.sage}0d`, borderRadius:8, borderLeft:`3px solid ${C.sage}` }}>
-                  💡 {recipe.tip}
-                </div>
-              </div>
+              {(() => {
+                const [recipeOpen, setRecipeOpen] = [tab === "home" ? recipeExpanded : false, setRecipeExpanded];
+                const diffColor = recipe.difficulty === "Fácil" || recipe.difficulty === "Easy" ? C.sage : C.accent;
+                return (
+                  <div style={{ background:C.bgCard, borderRadius:14, marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)", overflow:"hidden" }}>
+                    {/* Header — always visible, clickable */}
+                    <div onClick={() => setRecipeExpanded(o => !o)}
+                      style={{ padding:"16px 18px", cursor:"pointer", userSelect:"none" }}>
+                      <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
+                        {lang==="es" ? "🥗 Receta antiinflamatoria del día" : "🥗 Anti-inflammatory recipe of the day"}
+                      </div>
+                      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:10 }}>
+                        <div style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px", flex:1 }}>{recipe.name}</div>
+                        <div style={{ display:"flex", flexDirection:"column", gap:4, alignItems:"flex-end", flexShrink:0 }}>
+                          <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, background:C.creamFaint, padding:"3px 8px", borderRadius:20 }}>⏱ {recipe.time}</div>
+                          <div style={{ fontSize:10, fontWeight:700, color:diffColor, background:`${diffColor}15`, padding:"2px 7px", borderRadius:20 }}>
+                            {recipe.difficulty}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Nutrition row */}
+                      <div style={{ display:"flex", gap:10, marginBottom:10 }}>
+                        {Object.entries(recipe.nutrition).map(([k,v]) => (
+                          <div key={k} style={{ textAlign:"center" }}>
+                            <div style={{ fontSize:12, fontWeight:800, color:C.cream }}>{v}</div>
+                            <div style={{ fontSize:9, color:C.creamMuted, textTransform:"uppercase" }}>{k === "kcal" ? "kcal" : k === "protein" ? (lang==="es"?"prot":"prot") : k === "carbs" ? (lang==="es"?"hidr":"carbs") : "grasas"}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Ingredients */}
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                        {recipe.ingredients.map((ing,i) => (
+                          <span key={i} style={{ fontSize:11, background:C.creamFaint, border:`1px solid ${C.border}`, borderRadius:20, padding:"3px 9px", color:C.cream }}>
+                            {ing}
+                          </span>
+                        ))}
+                      </div>
+                      {/* Expand hint */}
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:4, marginTop:10, fontSize:11, color:C.creamMuted }}>
+                        <span>{recipeOpen ? (lang==="es"?"Ocultar preparación":"Hide preparation") : (lang==="es"?"Ver preparación paso a paso":"View step-by-step")}</span>
+                        <span style={{ transition:"transform 0.2s", display:"inline-block", transform: recipeOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+                      </div>
+                    </div>
+
+                    {/* Expandable: steps + tip */}
+                    {recipeOpen && (
+                      <div style={{ borderTop:`1px solid ${C.border}`, padding:"16px 18px", background:C.bg }}>
+                        <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:10 }}>
+                          {lang==="es" ? "Preparación" : "Preparation"}
+                        </div>
+                        <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:14 }}>
+                          {recipe.steps.map((step,i) => (
+                            <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
+                              <div style={{ width:22, height:22, borderRadius:"50%", background:C.sage, color:"white", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                                {i+1}
+                              </div>
+                              <div style={{ fontSize:13, color:C.cream, lineHeight:1.6, paddingTop:2 }}>{step}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ fontSize:11, color:C.sage, lineHeight:1.6, padding:"10px 12px", background:`${C.sage}0d`, borderRadius:8, borderLeft:`3px solid ${C.sage}` }}>
+                          💡 {recipe.tip}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* 6. ACCESOS RÁPIDOS */}
               <div style={{ marginTop:4 }}>
