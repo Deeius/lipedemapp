@@ -720,7 +720,7 @@ export default function App() {
       if (sc) setCycleData(JSON.parse(sc));
       if (sl) setLogs(JSON.parse(sl));
       if (sf) setFoods(JSON.parse(sf));
-      if (sp) setProfile(JSON.parse(sp));
+      if (sp) setProfile({ ...defaultProfile, ...JSON.parse(sp) });
       if (ss) setSupps(JSON.parse(ss));
       if (sl2) setLang(sl2);
       if (sw) setShowWelcome(false);
