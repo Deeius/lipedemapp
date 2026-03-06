@@ -387,8 +387,8 @@ function SymptomVisual({ type }) {
       {/* Cuff accumulation */}
       <ellipse cx="30" cy="44" rx="11" ry="7" fill="#f97316" opacity="0.6" />
       {/* Arrow indicating cuff */}
-      <line x1="50" y1="44" x2="44" y2="44" stroke=WC.cream strokeWidth="1.5" markerEnd="url(#arr)" />
-      <text x="52" y="47" fontSize="8" fill=WC.cream fontWeight="600">cuff</text>
+      <line x1="50" y1="44" x2="44" y2="44" stroke="#e8e0d0" strokeWidth="1.5" />
+      <text x="52" y="47" fontSize="8" fill="#e8e0d0" fontWeight="600">cuff</text>
       {/* Foot - normal */}
       <ellipse cx="28" cy="62" rx="10" ry="5" fill="#3a4a46" opacity="0.6" />
     </svg>
