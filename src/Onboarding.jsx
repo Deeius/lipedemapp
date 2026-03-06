@@ -16,17 +16,21 @@ const C = {
 };
 
 const STEPS_ES = [
-  { id: "name",     title: "¿Cómo te llamas?",          sub: "Así personalizaremos tu experiencia." },
-  { id: "language", title: "¿En qué idioma prefieres la app?", sub: "Puedes cambiarlo en cualquier momento." },
-  { id: "location", title: "¿Dónde estás?",              sub: "Para mostrarte centros especializados cerca de ti." },
-  { id: "stage",    title: "¿Conoces tu estadio?",       sub: "No te preocupes si aún no tienes diagnóstico." },
+  { id: "name",        title: "¿Cómo te llamas?",                    sub: "Así personalizaremos tu experiencia." },
+  { id: "language",    title: "¿En qué idioma prefieres la app?",     sub: "Puedes cambiarlo en cualquier momento." },
+  { id: "location",    title: "¿Dónde estás?",                        sub: "Para mostrarte centros especializados cerca de ti." },
+  { id: "stage",       title: "¿Conoces tu estadio?",                 sub: "No te preocupes si aún no tienes diagnóstico." },
+  { id: "compression", title: "¿Usas prendas de compresión?",         sub: "Medias, manguitos o prendas de presoterapia." },
+  { id: "posture",     title: "¿Cómo es tu jornada habitual?",        sub: "La postura durante el día afecta mucho al lipedema." },
 ];
 
 const STEPS_EN = [
-  { id: "name",     title: "What's your name?",          sub: "We'll use it to personalise your experience." },
-  { id: "language", title: "Which language do you prefer?", sub: "You can change this at any time." },
-  { id: "location", title: "Where are you?",              sub: "To show you specialist centres near you." },
-  { id: "stage",    title: "Do you know your stage?",    sub: "Don't worry if you don't have a diagnosis yet." },
+  { id: "name",        title: "What's your name?",                    sub: "We'll use it to personalise your experience." },
+  { id: "language",    title: "Which language do you prefer?",        sub: "You can change this at any time." },
+  { id: "location",    title: "Where are you?",                       sub: "To show you specialist centres near you." },
+  { id: "stage",       title: "Do you know your stage?",              sub: "Don't worry if you don't have a diagnosis yet." },
+  { id: "compression", title: "Do you use compression garments?",     sub: "Stockings, sleeves or pressotherapy garments." },
+  { id: "posture",     title: "What does your typical day look like?", sub: "Your daily posture has a big impact on lipedema." },
 ];
 
 const COUNTRIES_ES = ["España","México","Argentina","Colombia","Chile","Perú","Venezuela","Ecuador","Bolivia","Uruguay","Paraguay","Guatemala","Honduras","El Salvador","Nicaragua","Costa Rica","Panamá","Cuba","Rep. Dominicana","Puerto Rico","Otro"];
@@ -58,6 +62,8 @@ function Icon({ name, size = 20, color = C.sage }) {
     activity: <svg style={s} viewBox="0 0 24 24" {...p}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
     check:    <svg style={s} viewBox="0 0 24 24" {...p}><polyline points="20 6 9 17 4 12"/></svg>,
     arrow:    <svg style={s} viewBox="0 0 24 24" {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+    layers:   <svg style={s} viewBox="0 0 24 24" {...p}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>,
+    briefcase:<svg style={s} viewBox="0 0 24 24" {...p}><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12" strokeWidth="2"/></svg>,
   };
   return icons[name] || null;
 }
@@ -70,6 +76,8 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [stage, setStage] = useState("unknown");
+  const [compression, setCompression] = useState("");   // none | occasional | daily | prescribed
+  const [posture, setPosture] = useState([]);           // standing | sitting | mixed | active | sedentary
   const [locLoading, setLocLoading] = useState(false);
   const [locDetected, setLocDetected] = useState(false);
 
@@ -109,15 +117,17 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
   };
 
   const canAdvance = () => {
-    if (current.id === "name")     return name.trim().length >= 2;
-    if (current.id === "language") return true;
-    if (current.id === "location") return true; // optional
-    if (current.id === "stage")    return true;
+    if (current.id === "name")        return name.trim().length >= 2;
+    if (current.id === "language")    return true;
+    if (current.id === "location")    return true;
+    if (current.id === "stage")       return true;
+    if (current.id === "compression") return compression !== "";
+    if (current.id === "posture")     return posture.length > 0;
     return true;
   };
 
   const handleComplete = () => {
-    onComplete({ name: name.trim(), lang, country, region, stage });
+    onComplete({ name: name.trim(), lang, country, region, stage, compression, posture });
   };
 
   const advance = () => {
@@ -273,7 +283,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
     },
   };
 
-  const stepIcons = { name: "user", language: "globe", location: "mappin", stage: "activity" };
+  const stepIcons = { name: "user", language: "globe", location: "mappin", stage: "activity", compression: "layers", posture: "briefcase" };
 
   return (
     <div style={S.wrap}>
@@ -394,6 +404,79 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
             ))}
           </div>
         )}
+
+        {/* ── STEP: COMPRESSION ── */}
+        {current.id === "compression" && (() => {
+          const opts = lang === "es" ? [
+            { val: "none",       label: "No uso compresión",              desc: "No llevo ninguna prenda compresiva",           icon: "🚫" },
+            { val: "occasional", label: "Ocasionalmente",                 desc: "Solo en viajes largos o días de mucho esfuerzo",icon: "🔄" },
+            { val: "daily",      label: "A diario (por iniciativa propia)",desc: "Me lo pongo habitualmente por mi cuenta",       icon: "📅" },
+            { val: "prescribed", label: "A diario (pautado por médico)",   desc: "Llevo prescripción médica de compresión",       icon: "🩺" },
+          ] : [
+            { val: "none",       label: "I don't use compression",         desc: "I don't wear any compression garment",          icon: "🚫" },
+            { val: "occasional", label: "Occasionally",                    desc: "Only on long trips or intense activity",         icon: "🔄" },
+            { val: "daily",      label: "Daily (my own choice)",           desc: "I wear it regularly on my own initiative",       icon: "📅" },
+            { val: "prescribed", label: "Daily (doctor prescribed)",       desc: "I have a medical prescription for compression",  icon: "🩺" },
+          ];
+          return (
+            <div>
+              {opts.map(o => (
+                <div key={o.val} style={S.stageCard(compression === o.val)} onClick={() => setCompression(o.val)}>
+                  <span style={{ fontSize: 22, flexShrink: 0 }}>{o.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: compression === o.val ? C.sage : C.cream }}>{o.label}</div>
+                    <div style={{ fontSize: 11, color: C.creamMuted, marginTop: 1 }}>{o.desc}</div>
+                  </div>
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${compression === o.val ? C.sage : C.border}`, background: compression === o.val ? C.sage : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {compression === o.val && <Icon name="check" size={10} color="#fff" />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* ── STEP: POSTURE / ACTIVITY ── */}
+        {current.id === "posture" && (() => {
+          const opts = lang === "es" ? [
+            { val: "standing",   label: "De pie la mayor parte del día",   desc: "Trabajas o estudias principalmente en bipedestación", icon: "🧍" },
+            { val: "sitting",    label: "Sentada la mayor parte del día",   desc: "Oficina, estudio, trabajo remoto…",                   icon: "🪑" },
+            { val: "mixed",      label: "Combinación de pie y sentada",     desc: "Alternas posiciones a lo largo del día",              icon: "🔀" },
+            { val: "active",     label: "Trabajo físicamente activo",       desc: "Movimiento constante, carga física, desplazamientos", icon: "🏃" },
+            { val: "sedentary",  label: "Poco movimiento general",          desc: "Paso muchas horas sin levantarme ni caminar",         icon: "🛋️" },
+          ] : [
+            { val: "standing",   label: "Standing most of the day",         desc: "You work or study mainly on your feet",               icon: "🧍" },
+            { val: "sitting",    label: "Sitting most of the day",           desc: "Office, study, remote work…",                         icon: "🪑" },
+            { val: "mixed",      label: "Mix of standing and sitting",       desc: "You alternate positions throughout the day",          icon: "🔀" },
+            { val: "active",     label: "Physically active work",            desc: "Constant movement, physical effort, commuting",       icon: "🏃" },
+            { val: "sedentary",  label: "Generally low movement",            desc: "I spend many hours without getting up or walking",    icon: "🛋️" },
+          ];
+          const toggle = (val) => setPosture(p =>
+            p.includes(val) ? p.filter(x => x !== val) : [...p, val]
+          );
+          return (
+            <div>
+              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 10, fontStyle: "italic" }}>
+                {lang === "es" ? "Puedes seleccionar varias opciones" : "You can select multiple options"}
+              </div>
+              {opts.map(o => {
+                const active = posture.includes(o.val);
+                return (
+                  <div key={o.val} style={S.stageCard(active)} onClick={() => toggle(o.val)}>
+                    <span style={{ fontSize: 22, flexShrink: 0 }}>{o.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: active ? C.sage : C.cream }}>{o.label}</div>
+                      <div style={{ fontSize: 11, color: C.creamMuted, marginTop: 1 }}>{o.desc}</div>
+                    </div>
+                    <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${active ? C.sage : C.border}`, background: active ? C.sage : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {active && <Icon name="check" size={10} color="#fff" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {/* CTA */}
         <button style={S.btnPrimary} onClick={advance} disabled={!canAdvance()}>
