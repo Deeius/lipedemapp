@@ -5,6 +5,7 @@ import {
   BarChart, Bar, Legend,
 } from "recharts";
 import WelcomeGuide from "./WelcomeGuide";
+import Onboarding from "./Onboarding";
 
 // ─── INFO RESOURCES ──────────────────────────────────────────────────────────
 const INFO_RESOURCES = {
@@ -679,6 +680,7 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
 export default function App() {
   const [lang, setLang] = useState("es");
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [tab, setTab] = useState("today");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [entry, setEntry] = useState(defaultEntry());
@@ -703,18 +705,35 @@ export default function App() {
       const ss = localStorage.getItem("lt_supps");
       const sl2 = localStorage.getItem("lt_lang");
       const sw = localStorage.getItem("lt_welcome_seen");
+      const so = localStorage.getItem("lt_onboarding_done");
       if (sl) setLogs(JSON.parse(sl));
       if (sf) setFoods(JSON.parse(sf));
       if (sp) setProfile(JSON.parse(sp));
       if (ss) setSupps(JSON.parse(ss));
       if (sl2) setLang(sl2);
       if (sw) setShowWelcome(false);
+      // Show onboarding if welcome seen but not yet completed onboarding
+      if (sw && !so) setShowOnboarding(true);
     } catch {}
   }, []);
 
   const handleEnterApp = useCallback(() => {
     try { localStorage.setItem("lt_welcome_seen", "1"); } catch {}
     setShowWelcome(false);
+    setShowOnboarding(true);
+  }, []);
+
+  const handleOnboardingComplete = useCallback(({ name, lang: newLang, country, region, stage }) => {
+    const updatedProfile = { ...defaultProfile, name, stage, country, region };
+    setProfile(updatedProfile);
+    setLang(newLang);
+    try {
+      localStorage.setItem("lt_profile", JSON.stringify(updatedProfile));
+      localStorage.setItem("lt_lang", newLang);
+      localStorage.setItem("lt_onboarding_done", "1");
+      if (country) localStorage.setItem("lt_location", JSON.stringify({ country, region }));
+    } catch {}
+    setShowOnboarding(false);
   }, []);
 
   const persist = useCallback((key, val) => {
@@ -919,6 +938,10 @@ export default function App() {
   // ─── RENDER ───────────────────────────────────────────────────────────────
   if (showWelcome) {
     return <WelcomeGuide lang={lang} onEnter={handleEnterApp} />;
+  }
+
+  if (showOnboarding) {
+    return <Onboarding initialLang={lang} onComplete={handleOnboardingComplete} />;
   }
 
   return (
@@ -1488,34 +1511,56 @@ export default function App() {
                   {lang === "es" ? "Centros especializados en lipedema" : "Lipedema specialist centres"}
                 </div>
               </div>
+
+              {/* Location context */}
+              {(profile.country || profile.region) ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", background: C.creamFaint, borderRadius: 10, marginBottom: 16, border: `1px solid ${C.border}` }}>
+                  <Icon name="mappin" size={14} color={C.sage} />
+                  <span style={{ fontSize: 13, color: C.cream, fontWeight: 600 }}>
+                    {[profile.region, profile.country].filter(Boolean).join(", ")}
+                  </span>
+                  <button onClick={() => setTab("profile")} style={{ marginLeft: "auto", fontSize: 11, color: C.creamMuted, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                    {lang === "es" ? "Cambiar" : "Change"}
+                  </button>
+                </div>
+              ) : (
+                <div style={{ padding: "10px 12px", background: "#fffbe6", borderRadius: 10, marginBottom: 16, border: "1px solid #f0d060", fontSize: 12, color: "#7a6020" }}>
+                  {lang === "es"
+                    ? "💡 Añade tu ubicación en Perfil para ver centros cercanos."
+                    : "💡 Add your location in Profile to see nearby centres."}
+                </div>
+              )}
+
               <p style={{ fontSize: 13, color: C.creamMuted, lineHeight: 1.65, marginBottom: 16 }}>
                 {lang === "es"
-                  ? "Directorio de clínicas, fisioterapeutas especializados y cirujanos linfáticos con experiencia en lipedema en España."
-                  : "Directory of clinics, specialist physiotherapists and lymphatic surgeons with lipedema expertise in Spain."}
+                  ? "Directorio de clínicas, fisioterapeutas especializados y cirujanos linfáticos con experiencia en lipedema."
+                  : "Directory of clinics, specialist physiotherapists and lymphatic surgeons with lipedema expertise."}
               </p>
-              {/* Location filter */}
+
+              {/* City filter chips */}
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
                 {["Madrid","Barcelona","Valencia","Sevilla","Bilbao"].map(city => (
-                  <button key={city} style={{ padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${C.border}`, background: C.bgInput, fontSize: 12, fontWeight: 600, color: C.creamMuted, cursor: "pointer" }}>
+                  <button key={city} style={{ padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${C.border}`, background: C.bgInput, fontSize: 12, fontWeight: 600, color: C.creamMuted, cursor: "pointer", fontFamily: "inherit" }}>
                     {city}
                   </button>
                 ))}
               </div>
-              {/* Coming soon notice */}
-              <div style={{ background: C.creamFaint, borderRadius: 12, padding: "16px 18px", border: `1px solid ${C.border}`, textAlign: "center" }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>🗺️</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.cream, marginBottom: 4 }}>
-                  {lang === "es" ? "Próximamente" : "Coming soon"}
+
+              {/* Coming soon */}
+              <div style={{ background: C.creamFaint, borderRadius: 12, padding: "20px 18px", border: `1px solid ${C.border}`, textAlign: "center" }}>
+                <Icon name="mappin" size={28} color={C.border} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.cream, margin: "10px 0 4px" }}>
+                  {lang === "es" ? "Directorio en construcción" : "Directory coming soon"}
                 </div>
                 <div style={{ fontSize: 12, color: C.creamMuted, lineHeight: 1.6 }}>
                   {lang === "es"
-                    ? "Estamos construyendo el directorio de centros verificados. Podrás filtrar por ubicación, tipo de tratamiento y especialidad."
-                    : "We're building the verified centre directory. You'll be able to filter by location, treatment type and specialty."}
+                    ? "Estamos verificando centros y especialistas. Podrás filtrar por ubicación, tipo de tratamiento y especialidad."
+                    : "We're verifying centres and specialists. You'll be able to filter by location, treatment type and specialty."}
                 </div>
               </div>
             </div>
 
-            {/* Sample centre cards */}
+            {/* Sample cards */}
             {[
               { name: "Clínica Linfovascular Madrid", specialty: lang === "es" ? "Cirugía linfática · Liposucción especializada" : "Lymphatic surgery · Specialist liposuction", city: "Madrid", type: lang === "es" ? "Cirugía" : "Surgery", verified: true },
               { name: "Fisioterapia Integral Barcelona", specialty: lang === "es" ? "Drenaje linfático manual · Presoterapia" : "Manual lymphatic drainage · Pressotherapy", city: "Barcelona", type: lang === "es" ? "Fisioterapia" : "Physiotherapy", verified: true },
@@ -1534,7 +1579,7 @@ export default function App() {
                       <span style={{ fontSize: 11, fontWeight: 600, color: C.accent, background: `${C.accent}15`, padding: "2px 8px", borderRadius: 20 }}>{c.type}</span>
                     </div>
                   </div>
-                  <button style={{ padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${C.border}`, background: "white", fontSize: 12, fontWeight: 600, color: C.sage, cursor: "pointer", flexShrink: 0 }}>
+                  <button style={{ padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${C.border}`, background: "white", fontSize: 12, fontWeight: 600, color: C.sage, cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}>
                     {lang === "es" ? "Ver más" : "View"}
                   </button>
                 </div>
@@ -1555,6 +1600,10 @@ export default function App() {
             </select>
             <label style={S.label}>{t.profile.diagnosis}</label>
             <input style={{ ...S.input, marginBottom: 16 }} type="date" value={profile.diagnosis} onChange={(e) => setProfile({ ...profile, diagnosis: e.target.value })} />
+            <label style={S.label}>{lang === "es" ? "País" : "Country"}</label>
+            <input style={{ ...S.input, marginBottom: 8 }} placeholder={lang === "es" ? "España, México…" : "Spain, Mexico…"} value={profile.country || ""} onChange={(e) => setProfile({ ...profile, country: e.target.value })} />
+            <label style={S.label}>{lang === "es" ? "Provincia / Ciudad" : "Region / City"}</label>
+            <input style={{ ...S.input, marginBottom: 16 }} placeholder={lang === "es" ? "Madrid, Barcelona…" : "Madrid, Barcelona…"} value={profile.region || ""} onChange={(e) => setProfile({ ...profile, region: e.target.value })} />
             <label style={S.label}>{t.profile.activeZones}</label>
             <div style={S.grid2}>
               {ALL_ZONES.map((z) => {
