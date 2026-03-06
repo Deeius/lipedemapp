@@ -2024,28 +2024,40 @@ export default function App() {
         {/* ── CHARTS ── */}
         {tab === "charts" && (
           <>
-            {logs.length < 2 ? (
+            {logs.length < 1 ? (
               <div style={{ ...S.card, textAlign: "center", padding: 40 }}>
                 <div style={{ fontSize: 40 }}>📊</div>
                 <div style={{ color: C.creamMuted, marginTop: 8 }}>{t.charts.noData}</div>
               </div>
             ) : (
               <>
-                <div style={S.card}>
-                  <div style={S.cardTitle}>{t.charts.weight}</div>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-                      <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} domain={["auto","auto"]} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="weight" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 3 }} connectNulls />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                {/* Weight chart — only if at least one weight entry */}
+                {chartData.some(d => d.weight) ? (
+                  <div style={S.card}>
+                    <div style={S.cardTitle}>{t.charts.weight}</div>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
+                        <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                        <YAxis tick={{ fontSize: 10 }} domain={["auto","auto"]} />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="weight" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 5 }} connectNulls />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div style={{ ...S.card, color:C.creamMuted, fontSize:12, textAlign:"center", padding:"18px 16px" }}>
+                    {lang==="es" ? "Añade peso en el registro diario para ver esta gráfica" : "Add weight in your daily log to see this chart"}
+                  </div>
+                )}
 
                 <div style={S.card}>
                   <div style={S.cardTitle}>{t.charts.painEnergy}</div>
+                  {logs.length === 1 && (
+                    <div style={{ fontSize:11, color:C.creamMuted, marginBottom:8, fontStyle:"italic" }}>
+                      {lang==="es" ? "Con más registros verás la evolución en el tiempo" : "Add more entries to see your trend over time"}
+                    </div>
+                  )}
                   <ResponsiveContainer width="100%" height={180}>
                     <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
@@ -2053,13 +2065,13 @@ export default function App() {
                       <YAxis tick={{ fontSize: 10 }} domain={[0,6]} />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="pain" stroke="#ef4444" strokeWidth={2} dot={{ r: 2 }} name={t.history.pain} />
-                      <Line type="monotone" dataKey="energy" stroke="#22c55e" strokeWidth={2} dot={{ r: 2 }} name={t.history.energy} />
+                      <Line type="monotone" dataKey="pain" stroke="#ef4444" strokeWidth={2} dot={{ r: 5 }} name={t.history.pain} />
+                      <Line type="monotone" dataKey="energy" stroke="#22c55e" strokeWidth={2} dot={{ r: 5 }} name={t.history.energy} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
 
-                {inflammationData.length > 0 && (
+                {inflammationData.some(d => d.value > 0) && (
                   <div style={S.card}>
                     <div style={S.cardTitle}>{t.charts.inflammation}</div>
                     <ResponsiveContainer width="100%" height={220}>
