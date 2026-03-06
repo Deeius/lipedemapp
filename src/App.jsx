@@ -1784,36 +1784,142 @@ export default function App() {
         )}
 
         {/* ── HISTORY ── */}
-        {tab === "history" && (
-          <div style={S.card}>
-            <div style={S.cardTitle}>{t.history.title}</div>
-            {logs.length === 0 ? (
-              <p style={{ color: C.creamMuted, fontSize: 14 }}>{t.history.empty}</p>
-            ) : (
-              [...logs].reverse().map((l, i) => (
-                <div key={i} style={{ padding: "12px 0", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 14 }}>{l.date}</div>
-                    {l.inflammationNote && <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 3, maxWidth: 260 }}>{l.inflammationNote.slice(0, 80)}{l.inflammationNote.length > 80 ? "…" : ""}</div>}
-                    {l.suppsTaken?.length > 0 && (
-                      <div style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 4 }}>
-                        {l.suppsTaken.map((k) => {
-                          const d = allSuppsList.find((s) => s.key === k);
-                          return d ? <span key={k} style={{ fontSize: 14 }}>{d.icon}</span> : null;
-                        })}
+        {tab === "history" && (() => {
+          const [openLog, setOpenLog] = useState(null); // date string of expanded entry
+          const moodEmojis = ["😣","😟","😐","🙂","😊","😄","🤩"];
+          return (
+            <div style={S.card}>
+              <div style={S.cardTitle}>{t.history.title}</div>
+              {logs.length === 0 ? (
+                <p style={{ color: C.creamMuted, fontSize: 14 }}>{t.history.empty}</p>
+              ) : (
+                [...logs].reverse().map((l, i) => {
+                  const isOpen = openLog === l.date;
+                  return (
+                    <div key={i} style={{ borderBottom: `1px solid ${C.border}`, overflow:"hidden" }}>
+                      {/* ── Row header — always visible, clickable ── */}
+                      <div onClick={() => setOpenLog(isOpen ? null : l.date)}
+                        style={{ padding:"12px 4px", display:"flex", justifyContent:"space-between", alignItems:"center", cursor:"pointer", userSelect:"none" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                          {/* Mood emoji */}
+                          <span style={{ fontSize:18 }}>{moodEmojis[l.mood ?? 2]}</span>
+                          <div>
+                            <div style={{ fontWeight:700, fontSize:13, color:C.cream }}>{l.date}</div>
+                            {/* Supp icons */}
+                            {l.suppsTaken?.length > 0 && (
+                              <div style={{ display:"flex", gap:2, marginTop:2 }}>
+                                {l.suppsTaken.slice(0,5).map(k => {
+                                  const d = allSuppsList.find(s => s.key === k);
+                                  return d ? <span key={k} style={{ fontSize:12 }}>{d.icon}</span> : null;
+                                })}
+                                {l.suppsTaken.length > 5 && <span style={{ fontSize:10, color:C.creamMuted }}>+{l.suppsTaken.length-5}</span>}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                          {l.weight && <span style={S.tag(C.cream)}>{l.weight}kg</span>}
+                          <span style={S.tag("#ef4444")}>dolor {l.pain}</span>
+                          <span style={S.tag(C.sage)}>energía {l.energy}</span>
+                          <span style={{ fontSize:13, color:C.creamMuted, marginLeft:4, transition:"transform 0.2s", display:"inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                    {l.weight && <span style={S.tag("#6366f1")}>{l.weight}kg</span>}
-                    <span style={S.tag("#ef4444")}>⚡{l.pain}</span>
-                    <span style={S.tag("#22c55e")}>🔋{l.energy}</span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+
+                      {/* ── Expanded detail ── */}
+                      {isOpen && (
+                        <div style={{ background:C.bg, borderTop:`1px solid ${C.border}`, padding:"14px 12px 16px", display:"flex", flexDirection:"column", gap:12 }}>
+
+                          {/* Stats row */}
+                          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                            {[
+                              { label: lang==="es"?"Peso":"Weight",  value: l.weight ? `${l.weight} kg` : "—" },
+                              { label: lang==="es"?"Dolor":"Pain",    value: `${l.pain} / 6` },
+                              { label: lang==="es"?"Energía":"Energy",value: `${l.energy} / 6` },
+                              { label: lang==="es"?"Estado":"Mood",   value: moodEmojis[l.mood ?? 2] },
+                            ].map(s => (
+                              <div key={s.label} style={{ flex:1, minWidth:60, background:"white", borderRadius:10, padding:"8px 10px", border:`1px solid ${C.border}`, textAlign:"center" }}>
+                                <div style={{ fontSize:9, color:C.creamMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.4px", marginBottom:3 }}>{s.label}</div>
+                                <div style={{ fontSize:14, fontWeight:800, color:C.cream }}>{s.value}</div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Inflammation zones */}
+                          {l.inflammationZones && Object.keys(l.inflammationZones).length > 0 && (
+                            <div>
+                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
+                                {lang==="es"?"Inflamación por zonas":"Inflammation by zone"}
+                              </div>
+                              <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                                {Object.entries(l.inflammationZones).map(([zone, val]) => (
+                                  <div key={zone} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                                    <div style={{ fontSize:11, color:C.creamMuted, width:110, flexShrink:0 }}>{t.today.zoneNames[zone] || zone}</div>
+                                    <div style={{ flex:1, height:6, background:C.border, borderRadius:4, overflow:"hidden" }}>
+                                      <div style={{ width:`${(val/5)*100}%`, height:"100%", borderRadius:4, background: val >= 4 ? "#c06080" : val >= 2 ? C.accent : C.sage, transition:"width 0.3s" }}/>
+                                    </div>
+                                    <div style={{ fontSize:11, fontWeight:700, color:C.cream, width:20 }}>{val}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Body measures */}
+                          {l.measures && Object.values(l.measures).some(v => v) && (
+                            <div>
+                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
+                                {lang==="es"?"Medidas":"Measurements"}
+                              </div>
+                              <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                                {Object.entries(l.measures).filter(([,v]) => v).map(([zone, val]) => (
+                                  <div key={zone} style={{ background:"white", border:`1px solid ${C.border}`, borderRadius:8, padding:"5px 10px", fontSize:11 }}>
+                                    <span style={{ color:C.creamMuted }}>{t.today.zoneNames[zone] || zone}: </span>
+                                    <span style={{ fontWeight:700, color:C.cream }}>{val} cm</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Supplements taken */}
+                          {l.suppsTaken?.length > 0 && (
+                            <div>
+                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
+                                {lang==="es"?"Suplementos tomados":"Supplements taken"}
+                              </div>
+                              <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                                {l.suppsTaken.map(k => {
+                                  const d = allSuppsList.find(s => s.key === k);
+                                  return d ? (
+                                    <span key={k} style={{ fontSize:11, background:C.creamFaint, border:`1px solid ${C.border}`, borderRadius:20, padding:"3px 9px", color:C.sage, fontWeight:600 }}>
+                                      {d.icon} {lang==="es" ? d.es : d.en}
+                                    </span>
+                                  ) : null;
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Notes */}
+                          {(l.inflammationNote || l.notes) && (
+                            <div>
+                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>
+                                {lang==="es"?"Notas":"Notes"}
+                              </div>
+                              <div style={{ fontSize:12, color:C.cream, lineHeight:1.6, background:"white", borderRadius:8, padding:"8px 10px", border:`1px solid ${C.border}` }}>
+                                {l.inflammationNote || l.notes}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── CHARTS ── */}
         {tab === "charts" && (
