@@ -1736,19 +1736,19 @@ export default function App() {
                     { key:"period",    color:"#c06080", bg:"#f5d0dc", label: lang==="es" ? "Menstruación" : "Period",   emoji:"🩸" },
                     { key:"spm",       color:"#8a6c3a", bg:"#f5ecd5", label: "SPM / PMS",                               emoji:"🟡" },
                     { key:"retention", color:"#5080a0", bg:"#d0e4f0", label: lang==="es" ? "Retención" : "Retention",   emoji:"💧" },
-                  ].map(t => (
-                    <button key={t.key}
-                      onClick={() => setCycleActiveType(prev => prev === t.key ? null : t.key)}
+                  ].map(ctype => (
+                    <button key={ctype.key}
+                      onClick={() => setCycleActiveType(prev => prev === ctype.key ? null : ctype.key)}
                       style={{
                         flex:1, padding:"8px 4px", borderRadius:10,
-                        border:`2px solid ${cycleActiveType === t.key ? t.color : C.border}`,
-                        background: cycleActiveType === t.key ? t.bg : "white",
+                        border:`2px solid ${cycleActiveType === ctype.key ? ctype.color : C.border}`,
+                        background: cycleActiveType === ctype.key ? ctype.bg : "white",
                         fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit",
-                        color: cycleActiveType === t.key ? t.color : C.creamMuted,
+                        color: cycleActiveType === ctype.key ? ctype.color : C.creamMuted,
                         transition:"all 0.15s", display:"flex", flexDirection:"column", alignItems:"center", gap:3,
                       }}>
-                      <span style={{ fontSize:16 }}>{t.emoji}</span>
-                      <span>{t.label}</span>
+                      <span style={{ fontSize:16 }}>{ctype.emoji}</span>
+                      <span>{ctype.label}</span>
                     </button>
                   ))}
                 </div>
@@ -1845,10 +1845,10 @@ export default function App() {
                   { color:"#c06080", bg:"#f5d0dc", label: lang==="es" ? "Menstruación" : "Period" },
                   { color:"#8a6c3a", bg:"#f5ecd5", label:"SPM / PMS" },
                   { color:"#5080a0", bg:"#d0e4f0", label: lang==="es" ? "Retención" : "Retention" },
-                ].map(l => (
-                  <div key={l.label} style={{ display:"flex", alignItems:"center", gap:5 }}>
-                    <div style={{ width:12, height:12, borderRadius:3, background:l.bg, border:`1.5px solid ${l.color}` }}/>
-                    <span style={{ fontSize:11, color:C.creamMuted, fontWeight:600 }}>{l.label}</span>
+                ].map(leg => (
+                  <div key={leg.label} style={{ display:"flex", alignItems:"center", gap:5 }}>
+                    <div style={{ width:12, height:12, borderRadius:3, background:leg.bg, border:`1.5px solid ${leg.color}` }}/>
+                    <span style={{ fontSize:11, color:C.creamMuted, fontWeight:600 }}>{leg.label}</span>
                   </div>
                 ))}
               </div>
@@ -2452,7 +2452,98 @@ export default function App() {
           return null;
         })()}
 
-        
+        {/* ── INFO ── */}
+        {tab === "info" && (
+          <>
+            {/* Visual Guide shortcut */}
+            <div
+              onClick={() => setShowWelcome(true)}
+              style={{ background: "linear-gradient(135deg, #fdf4ff, #f0f9ff)", borderRadius: 14, padding: "16px 18px", marginBottom: 14, border: "1.5px solid #e9d5ff", cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
+            >
+              <div style={{ fontSize: 36 }}>🩺</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: 14, color: C.cream, marginBottom: 2 }}>
+                  {lang === "es" ? "Guía visual del lipedema" : "Visual Lipedema Guide"}
+                </div>
+                <div style={{ fontSize: 12, color: C.creamMuted }}>
+                  {lang === "es" ? "Tipos, estadios, síntomas visuales explicados con ilustraciones →" : "Types, stages, visual symptoms explained with illustrations →"}
+                </div>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <div style={{ background: "#fefce8", borderRadius: 10, padding: "10px 14px", marginBottom: 16, border: "1px solid #fde047", fontSize: 12, color: "#854d0e" }}>
+              {t.info.disclaimer}
+            </div>
+
+            {/* Language filter */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+              {[["all", t.info.filterAll], ["es", t.info.filterEs], ["en", t.info.filterEn]].map(([val, label]) => (
+                <button key={val} onClick={() => setInfoFilter(val)}
+                  style={{ padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: infoFilter === val ? C.sage : C.creamFaint, color: infoFilter === val ? "#fff" : C.creamMuted, transition: "all 0.2s" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sections */}
+            {Object.entries(INFO_RESOURCES).map(([sectionKey, section]) => {
+              const sectionName = lang === "es" ? section.es : section.en;
+              const filtered = section.items.filter(item =>
+                infoFilter === "all" ? true : item.lang === infoFilter
+              );
+              if (filtered.length === 0) return null;
+              return (
+                <div key={sectionKey} style={S.card}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                    <span style={{ fontSize: 20 }}>{section.icon}</span>
+                    <div style={S.cardTitle}>{sectionName}</div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {filtered.map((item, i) => {
+                      const desc = lang === "es" ? item.desc_es : item.desc_en;
+                      const typeLabel = t.info.tagTypes[item.type] || item.type;
+                      const langColor = item.lang === "es" ? "#6366f1" : "#0ea5e9";
+                      const typeColors = {
+                        review: "#8b5cf6", guideline: "#ef4444", research: "#f97316",
+                        guide: "#22c55e", clinical: "#14b8a6", association: "#6366f1",
+                        forum: "#f59e0b", influencer: "#ec4899", article: "#64748b", platform: "#0ea5e9",
+                      };
+                      return (
+                        <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
+                          style={{ display: "block", textDecoration: "none", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, background: C.bgInput, transition: "border-color 0.2s, background 0.2s" }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = C.sage; e.currentTarget.style.background = C.bgCardHov; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bgInput; }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontWeight: 700, fontSize: 13, color: C.cream, marginBottom: 3, lineHeight: 1.4 }}>
+                                {item.platform && <span style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}>{item.platform}</span>}
+                                {item.title}
+                              </div>
+                              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 6 }}>{item.authors}{item.year ? ` · ${item.year}` : ""}</div>
+                              <div style={{ fontSize: 12, color: C.cream, lineHeight: 1.5 }}>{desc}</div>
+                            </div>
+                            <span style={{ fontSize: 14, color: C.creamMuted, flexShrink: 0, marginTop: 2 }}>↗</span>
+                          </div>
+                          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: langColor + "18", color: langColor }}>
+                              {item.lang === "es" ? "ES" : "EN"}
+                            </span>
+                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (typeColors[item.type] || C.creamMuted) + "28", color: typeColors[item.type] || C.creamMuted }}>
+                              {typeLabel}
+                            </span>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
+
         {/* ── PROFILE ── */}
         {tab === "profile" && (
           <div style={S.card}>
