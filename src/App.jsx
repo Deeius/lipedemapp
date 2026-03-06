@@ -702,6 +702,15 @@ export default function App() {
   const [recipeExpanded, setRecipeExpanded] = useState(false);
   const [openLog, setOpenLog] = useState(null);
   const [avatarMenu, setAvatarMenu] = useState(false);
+  const [centersView, setCentersView] = useState("list");   // "list" | "propose" | "pending"
+  const [centerForm, setCenterForm] = useState({ name:"", address:"", city:"", mapsUrl:"", specialty:"", notes:"", type:"" });
+  const [centerFilter, setCenterFilter] = useState("all");
+  const [userCenters, setUserCenters] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("lt_centers") || "[]"); } catch { return []; }
+  });
+  const [pendingCenters, setPendingCenters] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("lt_centers_pending") || "[]"); } catch { return []; }
+  });
   const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
   const [customSuppName, setCustomSuppName] = useState("");
   const [infoFilter, setInfoFilter] = useState("all");
@@ -803,6 +812,36 @@ export default function App() {
       try { localStorage.setItem("lt_cycle", JSON.stringify(next)); } catch {}
       return next;
     });
+  };
+
+  const saveCenterProposal = () => {
+    if (!centerForm.name.trim() || !centerForm.city.trim()) return;
+    const proposal = { ...centerForm, id: Date.now(), status:"pending", proposedAt: new Date().toISOString() };
+    const updated = [...pendingCenters, proposal];
+    setPendingCenters(updated);
+    try { localStorage.setItem("lt_centers_pending", JSON.stringify(updated)); } catch {}
+    setCenterForm({ name:"", address:"", city:"", mapsUrl:"", specialty:"", notes:"", type:"" });
+    setCentersView("list");
+  };
+
+  const approveCenter = (id) => {
+    const center = pendingCenters.find(c => c.id === id);
+    if (!center) return;
+    const approved = { ...center, status:"approved", verified: false };
+    const newUser = [...userCenters, approved];
+    const newPending = pendingCenters.filter(c => c.id !== id);
+    setUserCenters(newUser);
+    setPendingCenters(newPending);
+    try {
+      localStorage.setItem("lt_centers", JSON.stringify(newUser));
+      localStorage.setItem("lt_centers_pending", JSON.stringify(newPending));
+    } catch {}
+  };
+
+  const rejectCenter = (id) => {
+    const updated = pendingCenters.filter(c => c.id !== id);
+    setPendingCenters(updated);
+    try { localStorage.setItem("lt_centers_pending", JSON.stringify(updated)); } catch {}
   };
 
   const removeFood = (id) => {
@@ -2207,209 +2246,213 @@ export default function App() {
         )}
 
         {/* ── CENTERS ── */}
-        {tab === "centers" && (
-          <div style={S.card}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.creamFaint, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon name="mappin" size={20} color={C.sage} />
-              </div>
-              <div>
-                <div style={S.cardTitle}>{lang === "es" ? "Centros especializados" : "Specialized Centers"}</div>
-                <div style={{ fontSize: 12, color: C.creamMuted, marginTop: -10 }}>
-                  {lang === "es" ? "Próximamente — fisioterapeutas y especialistas en lipedema cerca de ti" : "Coming soon — lipedema physiotherapists and specialists near you"}
-                </div>
-              </div>
-            </div>
-            <div style={{ background: C.creamFaint, borderRadius: 10, padding: "16px", textAlign: "center", border: `1px dashed ${C.border}` }}>
-              <Icon name="mappin" size={32} color={C.border} />
-              <div style={{ fontSize: 13, color: C.creamMuted, marginTop: 10, lineHeight: 1.6 }}>
-                {lang === "es"
-                  ? "Esta sección mostrará centros de drenaje linfático, fisioterapeutas especializados y cirujanos vasculares según tu ubicación."
-                  : "This section will show lymphatic drainage centers, specialized physiotherapists and vascular surgeons based on your location."}
-              </div>
-            </div>
-          </div>
-        )}
+        {tab === "centers" && (() => {
+          const SAMPLE_CENTERS = [
+            { id:"s1", name:"Clínica Linfovascular Madrid", address:"C/ Velázquez 12, Madrid", city:"Madrid", type: lang==="es"?"Cirugía linfática":"Lymphatic surgery", specialty: lang==="es"?"Cirugía linfática · Liposucción especializada":"Lymphatic surgery · Specialist liposuction", mapsUrl:"https://maps.google.com/?q=Clinica+Linfovascular+Madrid", notes:"", verified:true, status:"approved" },
+            { id:"s2", name:"Fisioterapia Integral Barcelona", address:"Av. Diagonal 200, Barcelona", city:"Barcelona", type: lang==="es"?"Fisioterapia / DLM":"Physiotherapy / MLD", specialty: lang==="es"?"Drenaje linfático manual · Presoterapia":"Manual lymphatic drainage · Pressotherapy", mapsUrl:"https://maps.google.com/?q=Fisioterapia+Integral+Barcelona", notes:"", verified:true, status:"approved" },
+            { id:"s3", name:"Centro Dermatológico Valencia", address:"C/ Colón 5, Valencia", city:"Valencia", type: lang==="es"?"Diagnóstico":"Diagnosis", specialty: lang==="es"?"Diagnóstico · Tratamiento conservador":"Diagnosis · Conservative treatment", mapsUrl:"https://maps.google.com/?q=Centro+Dermatologico+Valencia", notes:"", verified:false, status:"approved" },
+          ];
+          const allApproved = [...SAMPLE_CENTERS, ...userCenters.filter(c => c.status === "approved")];
+          const cities = ["all", ...new Set(allApproved.map(c => c.city))];
+          const filtered = centerFilter === "all" ? allApproved : allApproved.filter(c => c.city === centerFilter);
+          const TYPES_ES = ["Fisioterapia / DLM","Cirugía linfática","Nutrición","Diagnóstico","Endocrinología","Psicología","Otro"];
+          const TYPES_EN = ["Physiotherapy / MLD","Lymphatic surgery","Nutrition","Diagnosis","Endocrinology","Psychology","Other"];
+          const TYPES = lang==="es" ? TYPES_ES : TYPES_EN;
 
-        {/* ── INFO ── */}
-        {tab === "info" && (
-          <>
-            {/* Visual Guide shortcut */}
-            <div
-              onClick={() => setShowWelcome(true)}
-              style={{ background: "linear-gradient(135deg, #fdf4ff, #f0f9ff)", borderRadius: 14, padding: "16px 18px", marginBottom: 14, border: "1.5px solid #e9d5ff", cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
-            >
-              <div style={{ fontSize: 36 }}>🩺</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, color: C.cream, marginBottom: 2 }}>
-                  {lang === "es" ? "Guía visual del lipedema" : "Visual Lipedema Guide"}
+          // ── LIST VIEW ──
+          if (centersView === "list") return (
+            <>
+              {/* Header */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+                <div>
+                  <div style={{ fontSize:16, fontWeight:800, color:C.cream, letterSpacing:"-0.3px" }}>
+                    {lang==="es" ? "Centros especializados" : "Specialist centres"}
+                  </div>
+                  <div style={{ fontSize:12, color:C.creamMuted, marginTop:2 }}>
+                    {allApproved.length} {lang==="es"?"centros en el directorio":"centres in directory"}
+                    {pendingCenters.length > 0 && (
+                      <button onClick={() => setCentersView("pending")}
+                        style={{ marginLeft:8, background:"#f5ecd5", border:`1px solid ${C.accent}`, borderRadius:20, padding:"1px 8px", fontSize:10, fontWeight:700, color:C.accent, cursor:"pointer", fontFamily:"inherit" }}>
+                        {pendingCenters.length} {lang==="es"?"pendientes":"pending"}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: C.creamMuted }}>
-                  {lang === "es" ? "Tipos, estadios, síntomas visuales explicados con ilustraciones →" : "Types, stages, visual symptoms explained with illustrations →"}
-                </div>
-              </div>
-            </div>
-
-            {/* Disclaimer */}
-            <div style={{ background: "#fefce8", borderRadius: 10, padding: "10px 14px", marginBottom: 16, border: "1px solid #fde047", fontSize: 12, color: "#854d0e" }}>
-              {t.info.disclaimer}
-            </div>
-
-            {/* Language filter */}
-            <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-              {[["all", t.info.filterAll], ["es", t.info.filterEs], ["en", t.info.filterEn]].map(([val, label]) => (
-                <button key={val} onClick={() => setInfoFilter(val)}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: infoFilter === val ? C.sage : C.creamFaint, color: infoFilter === val ? "#fff" : C.creamMuted, transition: "all 0.2s" }}>
-                  {label}
+                <button onClick={() => setCentersView("propose")}
+                  style={{ padding:"8px 14px", borderRadius:10, border:`1.5px solid ${C.sage}`, background:C.sage, color:"white", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:6 }}>
+                  <span>+</span> {lang==="es"?"Proponer centro":"Propose centre"}
                 </button>
-              ))}
-            </div>
-
-            {/* Sections */}
-            {Object.entries(INFO_RESOURCES).map(([sectionKey, section]) => {
-              const sectionName = lang === "es" ? section.es : section.en;
-              const filtered = section.items.filter(item =>
-                infoFilter === "all" ? true : item.lang === infoFilter
-              );
-              if (filtered.length === 0) return null;
-              return (
-                <div key={sectionKey} style={S.card}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                    <span style={{ fontSize: 20 }}>{section.icon}</span>
-                    <div style={S.cardTitle}>{sectionName}</div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {filtered.map((item, i) => {
-                      const desc = lang === "es" ? item.desc_es : item.desc_en;
-                      const typeLabel = t.info.tagTypes[item.type] || item.type;
-                      const langColor = item.lang === "es" ? "#6366f1" : "#0ea5e9";
-                      const typeColors = {
-                        review: "#8b5cf6", guideline: "#ef4444", research: "#f97316",
-                        guide: "#22c55e", clinical: "#14b8a6", association: "#6366f1",
-                        forum: "#f59e0b", influencer: "#ec4899", article: "#64748b", platform: "#0ea5e9",
-                      };
-                      return (
-                        <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
-                          style={{ display: "block", textDecoration: "none", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, background: C.bgInput, transition: "border-color 0.2s, background 0.2s" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = C.sage; e.currentTarget.style.background = C.bgCardHov; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bgInput; }}
-                        >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: C.cream, marginBottom: 3, lineHeight: 1.4 }}>
-                                {item.platform && <span style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}>{item.platform}</span>}
-                                {item.title}
-                              </div>
-                              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 6 }}>{item.authors}{item.year ? ` · ${item.year}` : ""}</div>
-                              <div style={{ fontSize: 12, color: C.cream, lineHeight: 1.5 }}>{desc}</div>
-                            </div>
-                            <span style={{ fontSize: 14, color: C.creamMuted, flexShrink: 0, marginTop: 2 }}>↗</span>
-                          </div>
-                          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: langColor + "18", color: langColor }}>
-                              {item.lang === "es" ? "ES" : "EN"}
-                            </span>
-                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (typeColors[item.type] || C.creamMuted) + "28", color: typeColors[item.type] || C.creamMuted }}>
-                              {typeLabel}
-                            </span>
-                          </div>
-                        </a>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </>
-        )}
-
-        {/* ── CENTERS ── */}
-        {tab === "centers" && (
-          <>
-            <div style={S.card}>
-              <div style={S.cardTitle}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Icon name="mappin" size={18} color={C.sage} />
-                  {lang === "es" ? "Centros especializados en lipedema" : "Lipedema specialist centres"}
-                </div>
               </div>
 
-              {/* Location context */}
-              {(profile.country || profile.region) ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", background: C.creamFaint, borderRadius: 10, marginBottom: 16, border: `1px solid ${C.border}` }}>
-                  <Icon name="mappin" size={14} color={C.sage} />
-                  <span style={{ fontSize: 13, color: C.cream, fontWeight: 600 }}>
-                    {[profile.region, profile.country].filter(Boolean).join(", ")}
-                  </span>
-                  <button onClick={() => setTab("profile")} style={{ marginLeft: "auto", fontSize: 11, color: C.creamMuted, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-                    {lang === "es" ? "Cambiar" : "Change"}
+              {/* Location pill */}
+              {(profile.country || profile.region) && (
+                <div style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 12px", background:C.creamFaint, borderRadius:10, marginBottom:14, border:`1px solid ${C.border}` }}>
+                  <Icon name="mappin" size={13} color={C.sage} />
+                  <span style={{ fontSize:12, color:C.cream, fontWeight:600 }}>{[profile.region, profile.country].filter(Boolean).join(", ")}</span>
+                  <button onClick={() => setTab("profile")} style={{ marginLeft:"auto", fontSize:11, color:C.creamMuted, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>
+                    {lang==="es"?"Cambiar":"Change"}
                   </button>
-                </div>
-              ) : (
-                <div style={{ padding: "10px 12px", background: "#fffbe6", borderRadius: 10, marginBottom: 16, border: "1px solid #f0d060", fontSize: 12, color: "#7a6020" }}>
-                  {lang === "es"
-                    ? "💡 Añade tu ubicación en Perfil para ver centros cercanos."
-                    : "💡 Add your location in Profile to see nearby centres."}
                 </div>
               )}
 
-              <p style={{ fontSize: 13, color: C.creamMuted, lineHeight: 1.65, marginBottom: 16 }}>
-                {lang === "es"
-                  ? "Directorio de clínicas, fisioterapeutas especializados y cirujanos linfáticos con experiencia en lipedema."
-                  : "Directory of clinics, specialist physiotherapists and lymphatic surgeons with lipedema expertise."}
-              </p>
-
-              {/* City filter chips */}
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                {["Madrid","Barcelona","Valencia","Sevilla","Bilbao"].map(city => (
-                  <button key={city} style={{ padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${C.border}`, background: C.bgInput, fontSize: 12, fontWeight: 600, color: C.creamMuted, cursor: "pointer", fontFamily: "inherit" }}>
-                    {city}
+              {/* City filter */}
+              <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:14 }}>
+                {cities.map(city => (
+                  <button key={city} onClick={() => setCenterFilter(city)}
+                    style={{ padding:"5px 12px", borderRadius:20, border:`1.5px solid ${centerFilter===city ? C.sage : C.border}`, background: centerFilter===city ? C.creamFaint : "white", fontSize:11, fontWeight:600, color: centerFilter===city ? C.sage : C.creamMuted, cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" }}>
+                    {city === "all" ? (lang==="es"?"Todos":"All") : city}
                   </button>
                 ))}
               </div>
 
-              {/* Coming soon */}
-              <div style={{ background: C.creamFaint, borderRadius: 12, padding: "20px 18px", border: `1px solid ${C.border}`, textAlign: "center" }}>
-                <Icon name="mappin" size={28} color={C.border} />
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.cream, margin: "10px 0 4px" }}>
-                  {lang === "es" ? "Directorio en construcción" : "Directory coming soon"}
-                </div>
-                <div style={{ fontSize: 12, color: C.creamMuted, lineHeight: 1.6 }}>
-                  {lang === "es"
-                    ? "Estamos verificando centros y especialistas. Podrás filtrar por ubicación, tipo de tratamiento y especialidad."
-                    : "We're verifying centres and specialists. You'll be able to filter by location, treatment type and specialty."}
-                </div>
-              </div>
-            </div>
-
-            {/* Sample cards */}
-            {[
-              { name: "Clínica Linfovascular Madrid", specialty: lang === "es" ? "Cirugía linfática · Liposucción especializada" : "Lymphatic surgery · Specialist liposuction", city: "Madrid", type: lang === "es" ? "Cirugía" : "Surgery", verified: true },
-              { name: "Fisioterapia Integral Barcelona", specialty: lang === "es" ? "Drenaje linfático manual · Presoterapia" : "Manual lymphatic drainage · Pressotherapy", city: "Barcelona", type: lang === "es" ? "Fisioterapia" : "Physiotherapy", verified: true },
-              { name: "Centro Dermatológico Valencia", specialty: lang === "es" ? "Diagnóstico · Tratamiento conservador" : "Diagnosis · Conservative treatment", city: "Valencia", type: lang === "es" ? "Diagnóstico" : "Diagnosis", verified: false },
-            ].map((c, i) => (
-              <div key={i} style={{ ...S.card, marginBottom: 10 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: C.cream }}>{c.name}</span>
-                      {c.verified && <span style={{ fontSize: 10, fontWeight: 700, color: C.sage, background: C.creamFaint, padding: "2px 6px", borderRadius: 20 }}>✓ {lang === "es" ? "Verificado" : "Verified"}</span>}
+              {/* Center cards */}
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                {filtered.map(c => (
+                  <div key={c.id} style={{ background:"white", borderRadius:14, padding:"14px 16px", border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10, marginBottom:8 }}>
+                      <div style={{ flex:1 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:3 }}>
+                          <span style={{ fontSize:13, fontWeight:800, color:C.cream }}>{c.name}</span>
+                          {c.verified && <span style={{ fontSize:9, fontWeight:700, color:C.sage, background:C.creamFaint, padding:"2px 6px", borderRadius:20 }}>✓ {lang==="es"?"Verificado":"Verified"}</span>}
+                        </div>
+                        {c.address && <div style={{ fontSize:11, color:C.creamMuted, marginBottom:5 }}>📍 {c.address}</div>}
+                        <div style={{ fontSize:11, color:C.creamMuted, lineHeight:1.5 }}>{c.specialty}</div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: 12, color: C.creamMuted, marginBottom: 6 }}>{c.specialty}</div>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: C.sageLight, background: C.creamFaint, padding: "2px 8px", borderRadius: 20 }}>📍 {c.city}</span>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: C.accent, background: `${C.accent}15`, padding: "2px 8px", borderRadius: 20 }}>{c.type}</span>
+                    <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+                      <span style={{ fontSize:10, fontWeight:700, color:C.sage, background:C.creamFaint, padding:"2px 8px", borderRadius:20 }}>{c.city}</span>
+                      <span style={{ fontSize:10, fontWeight:700, color:C.accent, background:`${C.accent}15`, padding:"2px 8px", borderRadius:20 }}>{c.type}</span>
+                    </div>
+                    {c.notes && <div style={{ fontSize:11, color:C.creamMuted, fontStyle:"italic", marginBottom:10 }}>{c.notes}</div>}
+                    {/* Action buttons */}
+                    <div style={{ display:"flex", gap:8 }}>
+                      {c.mapsUrl && (
+                        <a href={c.mapsUrl} target="_blank" rel="noopener noreferrer"
+                          style={{ flex:1, padding:"8px 0", borderRadius:8, border:`1.5px solid ${C.sage}`, background:C.sage, color:"white", fontSize:11, fontWeight:700, textAlign:"center", textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
+                          <Icon name="mappin" size={13} color="white" />
+                          {lang==="es"?"Ver en Google Maps":"Open in Google Maps"}
+                        </a>
+                      )}
+                      {c.mapsUrl && (
+                        <a href={`${c.mapsUrl}&reviews`} target="_blank" rel="noopener noreferrer"
+                          style={{ padding:"8px 12px", borderRadius:8, border:`1.5px solid ${C.border}`, background:"white", color:C.creamMuted, fontSize:11, fontWeight:700, textAlign:"center", textDecoration:"none", display:"flex", alignItems:"center", gap:4 }}>
+                          ⭐ {lang==="es"?"Reseñas":"Reviews"}
+                        </a>
+                      )}
                     </div>
                   </div>
-                  <button style={{ padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${C.border}`, background: "white", fontSize: 12, fontWeight: 600, color: C.sage, cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}>
-                    {lang === "es" ? "Ver más" : "View"}
-                  </button>
+                ))}
+                {filtered.length === 0 && (
+                  <div style={{ textAlign:"center", padding:"30px 20px", color:C.creamMuted, fontSize:13 }}>
+                    {lang==="es"?"No hay centros en esta ciudad todavía.":"No centres in this city yet."}
+                  </div>
+                )}
+              </div>
+            </>
+          );
+
+          // ── PROPOSE VIEW ──
+          if (centersView === "propose") return (
+            <>
+              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
+                <button onClick={() => setCentersView("list")} style={{ background:"none", border:"none", cursor:"pointer", color:C.creamMuted, fontSize:18, lineHeight:1, fontFamily:"inherit" }}>←</button>
+                <div style={{ fontSize:15, fontWeight:800, color:C.cream }}>{lang==="es"?"Proponer un centro":"Propose a centre"}</div>
+              </div>
+              <div style={{ background:"#fffbe6", borderRadius:10, padding:"10px 14px", marginBottom:16, border:"1px solid #f0d060", fontSize:12, color:"#7a6020", lineHeight:1.5 }}>
+                {lang==="es"
+                  ? "Tu propuesta será revisada antes de aparecer en el directorio. Solo centros con experiencia real en lipedema serán aprobados."
+                  : "Your proposal will be reviewed before appearing in the directory. Only centres with real lipedema experience will be approved."}
+              </div>
+              <div style={S.card}>
+                {/* Name */}
+                <label style={S.label}>{lang==="es"?"Nombre del centro *":"Centre name *"}</label>
+                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"Clínica / Consulta / Centro…":"Clinic / Practice / Centre…"}
+                  value={centerForm.name} onChange={e => setCenterForm({...centerForm, name:e.target.value})} />
+                {/* City */}
+                <label style={S.label}>{lang==="es"?"Ciudad *":"City *"}</label>
+                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"Madrid, Barcelona…":"Madrid, Barcelona…"}
+                  value={centerForm.city} onChange={e => setCenterForm({...centerForm, city:e.target.value})} />
+                {/* Address */}
+                <label style={S.label}>{lang==="es"?"Dirección":"Address"}</label>
+                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"Calle, número…":"Street, number…"}
+                  value={centerForm.address} onChange={e => setCenterForm({...centerForm, address:e.target.value})} />
+                {/* Maps URL */}
+                <label style={S.label}>{lang==="es"?"Enlace a Google Maps":"Google Maps link"}</label>
+                <input style={{ ...S.input, marginBottom:4 }} placeholder="https://maps.google.com/…"
+                  value={centerForm.mapsUrl} onChange={e => setCenterForm({...centerForm, mapsUrl:e.target.value})} />
+                <div style={{ fontSize:10, color:C.creamMuted, marginBottom:12 }}>
+                  {lang==="es"?"Busca el centro en Google Maps y copia el enlace de compartir":"Search the centre in Google Maps and paste the share link"}
+                </div>
+                {/* Type */}
+                <label style={S.label}>{lang==="es"?"Tipo de especialidad":"Specialty type"}</label>
+                <select style={{ ...S.input, marginBottom:12 }} value={centerForm.type} onChange={e => setCenterForm({...centerForm, type:e.target.value})}>
+                  <option value="">{lang==="es"?"Selecciona…":"Select…"}</option>
+                  {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                {/* Specialty description */}
+                <label style={S.label}>{lang==="es"?"Descripción de la especialidad":"Specialty description"}</label>
+                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"DLM, presoterapia, cirugía…":"MLD, pressotherapy, surgery…"}
+                  value={centerForm.specialty} onChange={e => setCenterForm({...centerForm, specialty:e.target.value})} />
+                {/* Notes */}
+                <label style={S.label}>{lang==="es"?"Notas adicionales":"Additional notes"}</label>
+                <textarea style={{ ...S.textarea, marginBottom:20 }} placeholder={lang==="es"?"Experiencia con lipedema, info de cita, precios orientativos…":"Lipedema experience, booking info, approximate prices…"}
+                  value={centerForm.notes} onChange={e => setCenterForm({...centerForm, notes:e.target.value})} />
+                <button onClick={saveCenterProposal}
+                  disabled={!centerForm.name.trim() || !centerForm.city.trim()}
+                  style={{ ...S.btn, opacity: (!centerForm.name.trim() || !centerForm.city.trim()) ? 0.5 : 1 }}>
+                  {lang==="es"?"Enviar propuesta":"Submit proposal"}
+                </button>
+              </div>
+            </>
+          );
+
+          // ── PENDING VIEW (admin) ──
+          if (centersView === "pending") return (
+            <>
+              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
+                <button onClick={() => setCentersView("list")} style={{ background:"none", border:"none", cursor:"pointer", color:C.creamMuted, fontSize:18, lineHeight:1, fontFamily:"inherit" }}>←</button>
+                <div style={{ fontSize:15, fontWeight:800, color:C.cream }}>
+                  {lang==="es"?"Propuestas pendientes":"Pending proposals"} ({pendingCenters.length})
                 </div>
               </div>
-            ))}
-          </>
-        )}
+              {pendingCenters.length === 0 ? (
+                <div style={{ textAlign:"center", padding:"30px 20px", color:C.creamMuted, fontSize:13 }}>
+                  {lang==="es"?"No hay propuestas pendientes":"No pending proposals"}
+                </div>
+              ) : (
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  {pendingCenters.map(c => (
+                    <div key={c.id} style={{ background:"white", borderRadius:14, padding:"14px 16px", border:`1.5px solid ${C.accent}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
+                      <div style={{ fontSize:10, fontWeight:700, color:C.accent, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>
+                        ⏳ {lang==="es"?"Pendiente de revisión":"Pending review"} · {new Date(c.proposedAt).toLocaleDateString()}
+                      </div>
+                      <div style={{ fontSize:13, fontWeight:800, color:C.cream, marginBottom:4 }}>{c.name}</div>
+                      <div style={{ fontSize:11, color:C.creamMuted, marginBottom:3 }}>📍 {c.address} — {c.city}</div>
+                      {c.type && <div style={{ fontSize:11, color:C.creamMuted, marginBottom:3 }}>🏥 {c.type}</div>}
+                      {c.specialty && <div style={{ fontSize:11, color:C.creamMuted, marginBottom:3 }}>{c.specialty}</div>}
+                      {c.mapsUrl && <div style={{ fontSize:11, color:C.sage, marginBottom:3, wordBreak:"break-all" }}>🗺 {c.mapsUrl}</div>}
+                      {c.notes && <div style={{ fontSize:11, color:C.creamMuted, fontStyle:"italic", marginBottom:8 }}>{c.notes}</div>}
+                      <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                        <button onClick={() => approveCenter(c.id)}
+                          style={{ flex:1, padding:"8px 0", borderRadius:8, border:"none", background:C.sage, color:"white", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                          ✓ {lang==="es"?"Aprobar":"Approve"}
+                        </button>
+                        <button onClick={() => rejectCenter(c.id)}
+                          style={{ flex:1, padding:"8px 0", borderRadius:8, border:`1px solid #c06080`, background:"white", color:"#c06080", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                          ✕ {lang==="es"?"Rechazar":"Reject"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          );
 
+          return null;
+        })()}
+
+        
         {/* ── PROFILE ── */}
         {tab === "profile" && (
           <div style={S.card}>
