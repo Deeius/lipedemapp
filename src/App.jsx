@@ -1543,7 +1543,7 @@ export default function App() {
           </>
         )}
 
-        {/* ── PROFILE ── */
+        {/* ── PROFILE ── */}
         {tab === "profile" && (
           <div style={S.card}>
             <div style={S.cardTitle}>{t.profile.title}</div>
