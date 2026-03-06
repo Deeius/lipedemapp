@@ -792,7 +792,18 @@ export default function App() {
   // ─── STYLES ───────────────────────────────────────────────────────────────
   const S = {
     app:       { fontFamily: "'DM Sans','Segoe UI',sans-serif", minHeight: "100vh", background: C.bg, color: C.cream },
-    header:    { background: C.bgCard, borderBottom: `1px solid ${C.border}`, padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 100 },
+    header:    {
+      background: C.bgCard,
+      borderBottom: `1px solid ${C.border}`,
+      padding: "0 20px",
+      height: 56,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      position: "sticky",
+      top: 0,
+      zIndex: 100,
+    },
     title:     { fontSize: 18, fontWeight: 800, color: C.sageLight, letterSpacing: "-0.5px" },
     subtitle:  { fontSize: 11, color: C.creamMuted, marginTop: 1 },
     langBtn:   (a) => ({ padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: a ? C.sage : C.creamFaint, color: a ? "#fff" : C.creamMuted, transition: "all 0.2s" }),
@@ -820,15 +831,53 @@ export default function App() {
 
   return (
     <div style={S.app}>
-      {/* Header */}
+      {/* ── HEADER ── */}
       <div style={S.header}>
-        <div>
-          <div style={S.title}>🌿 {t.appTitle}</div>
-          <div style={S.subtitle}>{t.appSubtitle}</div>
+
+        {/* Left: logo mark + wordmark */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Logo SVG — leaf + circle mark */}
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1"/>
+            {/* Leaf shape */}
+            <path d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z"
+              fill="none" stroke={C.sage} strokeWidth="1.4" strokeLinejoin="round"/>
+            {/* Vein */}
+            <line x1="14" y1="6" x2="14" y2="22" stroke={C.sage} strokeWidth="0.9" strokeLinecap="round"/>
+            <line x1="14" y1="13" x2="18" y2="11" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
+            <line x1="14" y1="16" x2="18" y2="14" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
+            <line x1="14" y1="13" x2="10" y2="11" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
+            <line x1="14" y1="16" x2="10" y2="14" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
+          </svg>
+
+          {/* Wordmark */}
+          <div>
+            <span style={{ fontSize: 15, fontWeight: 800, color: C.cream, letterSpacing: "-0.4px" }}>
+              lipedema
+            </span>
+            <span style={{ fontSize: 15, fontWeight: 300, color: C.sageLight, letterSpacing: "-0.2px" }}>
+              {" "}tracker
+            </span>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 4 }}>
-          <button style={S.langBtn(lang === "es")} onClick={() => switchLang("es")}>ES</button>
-          <button style={S.langBtn(lang === "en")} onClick={() => switchLang("en")}>EN</button>
+
+        {/* Right: lang toggle + avatar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", gap: 2, background: C.creamFaint, borderRadius: 8, padding: 2 }}>
+            <button style={{ padding: "3px 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: lang === "es" ? C.bgCard : "transparent", color: lang === "es" ? C.sageLight : C.creamMuted, transition: "all 0.2s" }} onClick={() => switchLang("es")}>ES</button>
+            <button style={{ padding: "3px 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: lang === "en" ? C.bgCard : "transparent", color: lang === "en" ? C.sageLight : C.creamMuted, transition: "all 0.2s" }} onClick={() => switchLang("en")}>EN</button>
+          </div>
+
+          {/* Avatar */}
+          <div
+            onClick={() => setTab("profile")}
+            title={profile.name || (lang === "es" ? "Mi perfil" : "My profile")}
+            style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg, ${C.sage}, ${C.sageDark})`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, border: `2px solid ${C.creamFaint}` }}
+          >
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#fff", lineHeight: 1 }}>
+              {profile.name ? profile.name.trim()[0].toUpperCase() : "?"}
+            </span>
+          </div>
         </div>
       </div>
 
