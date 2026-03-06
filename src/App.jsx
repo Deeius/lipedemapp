@@ -646,6 +646,7 @@ const textareaStyle = {
 
 // ─── NAV ITEMS & ICONS ────────────────────────────────────────────────────────
 const NAV_ITEMS = [
+  { key: "home",     icon: "home",      es: "Inicio",    en: "Home"        },
   { key: "today",    icon: "calendar",  es: "Hoy",       en: "Today"       },
   { key: "history",  icon: "clock",     es: "Historial", en: "History"     },
   { key: "charts",   icon: "trending",  es: "Gráficas",  en: "Charts"      },
@@ -671,6 +672,7 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
     user:     <svg style={s} viewBox="0 0 24 24" {...p}><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
     menu:     <svg style={s} viewBox="0 0 24 24" {...p}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
     x:        <svg style={s} viewBox="0 0 24 24" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    home:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>,
     leaf:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
   };
   return icons[name] || null;
@@ -681,7 +683,7 @@ export default function App() {
   const [lang, setLang] = useState("es");
   const [showWelcome, setShowWelcome] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [tab, setTab] = useState("today");
+  const [tab, setTab] = useState("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [entry, setEntry] = useState(defaultEntry());
   const [logs, setLogs] = useState([]);
@@ -940,11 +942,11 @@ export default function App() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const BOTTOM_NAV_KEYS = ["today", "history", "charts", "centers", "profile"];
+  const BOTTOM_NAV_KEYS = ["home", "today", "history", "charts", "profile"];
 
   // Nav sections for sidebar grouping
   const NAV_GROUPS = [
-    { label: lang === "es" ? "Seguimiento" : "Tracking", keys: ["today","history","charts"] },
+    { label: lang === "es" ? "Seguimiento" : "Tracking", keys: ["home","today","history","charts"] },
     { label: lang === "es" ? "Salud"       : "Health",   keys: ["foods","supps"] },
     { label: lang === "es" ? "Recursos"    : "Resources",keys: ["centers","info"] },
     { label: lang === "es" ? "Cuenta"      : "Account",  keys: ["profile"] },
@@ -1024,13 +1026,13 @@ export default function App() {
       {isDesktop && (
         <aside style={S.sidebar(true)}>
           {/* Mini logo in sidebar */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px 16px", borderBottom: `1px solid ${C.border}`, marginBottom: 8, cursor: "pointer" }} onClick={() => setTab("today")}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px 16px", borderBottom: `1px solid ${C.border}`, marginBottom: 8, cursor: "pointer" }} onClick={() => setTab("home")}>
             <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1"/>
               <path d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z" fill="none" stroke={C.sage} strokeWidth="1.4" strokeLinejoin="round"/>
               <line x1="14" y1="6" x2="14" y2="22" stroke={C.sage} strokeWidth="0.9" strokeLinecap="round"/>
             </svg>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.creamMuted, cursor: "pointer" }} onClick={() => setTab("today")}>{lang === "es" ? "Navegación" : "Navigation"}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.creamMuted, cursor: "pointer" }} onClick={() => setTab("home")}>{lang === "es" ? "Inicio" : "Home"}</span>
           </div>
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
@@ -1091,7 +1093,273 @@ export default function App() {
       {/* ── PAGE CONTENT ── */}
       <div style={S.page}>
 
-        {/* ── TODAY ── */}
+        {/* ══ HOME DASHBOARD ══ */}
+        {tab === "home" && (() => {
+          // ── derived data ──
+          const last7 = logs.slice(-7);
+          const lastLog = logs[logs.length - 1];
+          const avgPain   = last7.length ? (last7.reduce((s,l) => s + l.pain, 0) / last7.length).toFixed(1) : null;
+          const avgEnergy = last7.length ? (last7.reduce((s,l) => s + l.energy, 0) / last7.length).toFixed(1) : null;
+          const lastWeight = logs.slice().reverse().find(l => l.weight)?.weight || null;
+
+          // cycle summary
+          const today = new Date().toISOString().slice(0,10);
+          const [cy, cm] = today.slice(0,7).split("-").map(Number);
+          const periodThisMonth = Object.entries(cycleData)
+            .filter(([k,v]) => k.startsWith(`${cy}-${String(cm).padStart(2,"0")}`) && v === "period")
+            .map(([k]) => k).sort();
+          const spmThisMonth = Object.entries(cycleData)
+            .filter(([k,v]) => k.startsWith(`${cy}-${String(cm).padStart(2,"0")}`) && v === "spm").length;
+          const retentionThisMonth = Object.entries(cycleData)
+            .filter(([k,v]) => k.startsWith(`${cy}-${String(cm).padStart(2,"0")}`) && v === "retention").length;
+
+          // last period start across all data
+          const allPeriodDays = Object.entries(cycleData).filter(([,v]) => v==="period").map(([k])=>k).sort();
+          let lastPeriodStart = null;
+          for (let i = 0; i < allPeriodDays.length; i++) {
+            const prev = i > 0 ? new Date(allPeriodDays[i-1]) : null;
+            if (!prev || (new Date(allPeriodDays[i]) - prev) > 86400000*2) lastPeriodStart = allPeriodDays[i];
+          }
+
+          // supplements
+          const recentSupps = activeSupps.slice(0, 4);
+
+          // motivational phrases
+          const phrases_es = [
+            "Tu cuerpo merece cuidado, no castigo. Pequeños pasos cuentan.",
+            "Registrar es un acto de amor propio. Lo estás haciendo genial.",
+            "El lipedema no te define — tu constancia sí.",
+            "Cada dato que guardas es un paso más hacia entenderte mejor.",
+            "Hoy es un buen día para cuidarte un poco más.",
+            "La inflamación fluctúa, tu fuerza no.",
+            "Conocer tu cuerpo es el primer paso para aliviarlo.",
+          ];
+          const phrases_en = [
+            "Your body deserves care, not punishment. Small steps count.",
+            "Tracking is an act of self-love. You're doing great.",
+            "Lipedema doesn't define you — your consistency does.",
+            "Every data point is a step toward understanding yourself better.",
+            "Today is a great day to take care of yourself a little more.",
+            "Inflammation fluctuates, your strength does not.",
+            "Knowing your body is the first step to easing it.",
+          ];
+          const dayIdx = new Date().getDay();
+          const phrase = lang === "es" ? phrases_es[dayIdx] : phrases_en[dayIdx];
+
+          // anti-inflammatory recipes
+          const recipes = lang === "es" ? [
+            { name: "Batido antiinflamatorio de cúrcuma", time:"5 min", ingredients:["1 taza leche vegetal","1 cdta cúrcuma","½ cdta jengibre","1 cdta miel","pizca de pimienta negra"], tip:"La pimienta negra aumenta la absorción de curcumina hasta un 2000%." },
+            { name: "Ensalada de salmón y aguacate", time:"10 min", ingredients:["150g salmón","1 aguacate","espinacas","limón","AOVE","semillas de chía"], tip:"Omega-3 del salmón + grasas saludables del aguacate = combinación antiinflamatoria potente." },
+            { name: "Sopa de miso con algas", time:"15 min", ingredients:["2 cdas miso blanco","alga wakame","tofu firme","cebollino","1L agua caliente"], tip:"Los probióticos del miso apoyan la microbiota, clave en la respuesta inflamatoria." },
+            { name: "Smoothie de frutos rojos y espinacas", time:"5 min", ingredients:["1 taza arándanos","½ taza fresas","1 puñado espinacas","leche de avena","1 cdta chía"], tip:"Los antioxidantes de los arándanos combaten el estrés oxidativo asociado al lipedema." },
+            { name: "Té de jengibre y limón", time:"5 min", ingredients:["2cm raíz jengibre","½ limón","1 cdta miel cruda","500ml agua caliente"], tip:"El gingerol del jengibre inhibe las mismas vías inflamatorias que el ibuprofeno." },
+            { name: "Bowl de quinoa con verduras asadas", time:"25 min", ingredients:["½ taza quinoa","calabacín","pimiento rojo","cebolla morada","AOVE","romero"], tip:"La quinoa es proteína completa sin gluten, con perfil aminoacídico que favorece la reparación tisular." },
+            { name: "Crema de brócoli y almendras", time:"20 min", ingredients:["2 tazas brócoli","½ taza almendras","ajo","caldo vegetal","nuez moscada"], tip:"El sulforafano del brócoli activa las defensas antioxidantes naturales del organismo." },
+          ] : [
+            { name:"Anti-inflammatory turmeric smoothie", time:"5 min", ingredients:["1 cup plant milk","1 tsp turmeric","½ tsp ginger","1 tsp honey","pinch black pepper"], tip:"Black pepper increases curcumin absorption by up to 2000%." },
+            { name:"Salmon & avocado salad", time:"10 min", ingredients:["150g salmon","1 avocado","spinach","lemon","olive oil","chia seeds"], tip:"Salmon omega-3 + avocado healthy fats = powerful anti-inflammatory combination." },
+            { name:"Miso soup with seaweed", time:"15 min", ingredients:["2 tbsp white miso","wakame seaweed","firm tofu","spring onion","1L hot water"], tip:"Miso probiotics support the gut microbiome, key to inflammation response." },
+            { name:"Red berry & spinach smoothie", time:"5 min", ingredients:["1 cup blueberries","½ cup strawberries","1 handful spinach","oat milk","1 tsp chia"], tip:"Blueberry antioxidants combat the oxidative stress associated with lipedema." },
+            { name:"Ginger & lemon tea", time:"5 min", ingredients:["2cm ginger root","½ lemon","1 tsp raw honey","500ml hot water"], tip:"Gingerol in ginger inhibits the same inflammatory pathways as ibuprofen." },
+            { name:"Quinoa bowl with roasted vegetables", time:"25 min", ingredients:["½ cup quinoa","courgette","red pepper","red onion","olive oil","rosemary"], tip:"Quinoa is gluten-free complete protein with an amino acid profile that supports tissue repair." },
+            { name:"Broccoli & almond cream soup", time:"20 min", ingredients:["2 cups broccoli","½ cup almonds","garlic","vegetable stock","nutmeg"], tip:"Broccoli sulforaphane activates the body's natural antioxidant defences." },
+          ];
+          const recipe = recipes[new Date().getDate() % recipes.length];
+
+          const statCard = (label, value, unit, color, icon) => (
+            <div style={{ flex:1, background:C.bgCard, borderRadius:12, padding:"14px 16px", border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
+              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>{label}</div>
+              <div style={{ fontSize:22, fontWeight:800, color: color || C.cream, letterSpacing:"-0.5px" }}>
+                {value ?? <span style={{ fontSize:14, color:C.creamMuted, fontWeight:500 }}>{lang==="es"?"Sin datos":"No data"}</span>}
+                {value && <span style={{ fontSize:12, fontWeight:500, color:C.creamMuted, marginLeft:3 }}>{unit}</span>}
+              </div>
+            </div>
+          );
+
+          return (
+            <>
+              {/* Greeting */}
+              <div style={{ marginBottom:20 }}>
+                <h2 style={{ fontSize:20, fontWeight:800, color:C.cream, letterSpacing:"-0.5px", marginBottom:2 }}>
+                  {lang==="es" ? `Hola${profile.name ? `, ${profile.name}` : ""}` : `Hello${profile.name ? `, ${profile.name}` : ""}`} 👋
+                </h2>
+                <div style={{ fontSize:13, color:C.creamMuted }}>
+                  {new Date().toLocaleDateString(lang==="es"?"es-ES":"en-GB", { weekday:"long", day:"numeric", month:"long" })}
+                </div>
+              </div>
+
+              {/* 1. SALUD RECIENTE */}
+              <div style={{ marginBottom:6 }}>
+                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <span>{lang==="es" ? "Salud — últimos 7 días" : "Health — last 7 days"}</span>
+                  <button onClick={() => setTab("today")} style={{ background:"none", border:"none", fontSize:11, color:C.sage, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                    {lang==="es" ? "Registrar hoy →" : "Log today →"}
+                  </button>
+                </div>
+                <div style={{ display:"flex", gap:8, marginBottom:8 }}>
+                  {statCard(lang==="es"?"Dolor medio":"Avg pain", avgPain, "/6", avgPain >= 4 ? "#c06080" : avgPain >= 2 ? C.accent : C.sage)}
+                  {statCard(lang==="es"?"Energía media":"Avg energy", avgEnergy, "/6", avgEnergy >= 4 ? C.sage : avgEnergy >= 2 ? C.accent : "#c06080")}
+                  {statCard(lang==="es"?"Último peso":"Last weight", lastWeight, "kg", C.cream)}
+                </div>
+                {last7.length === 0 && (
+                  <div style={{ background:C.creamFaint, borderRadius:10, padding:"12px 14px", border:`1px solid ${C.border}`, fontSize:12, color:C.creamMuted, textAlign:"center" }}>
+                    {lang==="es" ? "Aún no hay registros. ¡Empieza hoy!" : "No entries yet. Start today!"}
+                  </div>
+                )}
+                {last7.length > 0 && (
+                  <div style={{ display:"flex", gap:4 }}>
+                    {last7.map((l,i) => {
+                      const painH = Math.round((l.pain/6)*100);
+                      const energyH = Math.round((l.energy/6)*100);
+                      return (
+                        <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", gap:2, alignItems:"center" }}>
+                          <div style={{ width:"100%", height:48, background:C.creamFaint, borderRadius:4, display:"flex", flexDirection:"column", justifyContent:"flex-end", overflow:"hidden", position:"relative" }}>
+                            <div style={{ position:"absolute", bottom:0, left:0, right:0, height:`${painH}%`, background:"#f5d0dc", borderRadius:4 }}/>
+                            <div style={{ position:"absolute", bottom:0, left:"30%", right:"30%", height:`${energyH}%`, background:`${C.sage}60`, borderRadius:4 }}/>
+                          </div>
+                          <div style={{ fontSize:9, color:C.creamMuted }}>{l.date.slice(8)}</div>
+                        </div>
+                      );
+                    })}
+                    <div style={{ display:"flex", flexDirection:"column", justifyContent:"center", gap:4, paddingLeft:6 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:4 }}><div style={{ width:8, height:8, borderRadius:2, background:"#f5d0dc" }}/><span style={{ fontSize:9, color:C.creamMuted }}>{lang==="es"?"Dolor":"Pain"}</span></div>
+                      <div style={{ display:"flex", alignItems:"center", gap:4 }}><div style={{ width:8, height:8, borderRadius:2, background:`${C.sage}60` }}/><span style={{ fontSize:9, color:C.creamMuted }}>{lang==="es"?"Energía":"Energy"}</span></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 2. CICLO */}
+              <div style={{ background:C.bgCard, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
+                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10, display:"flex", justifyContent:"space-between" }}>
+                  <span>{lang==="es" ? "Ciclo menstrual" : "Menstrual cycle"}</span>
+                  <button onClick={() => setTab("today")} style={{ background:"none", border:"none", fontSize:11, color:C.sage, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                    {lang==="es" ? "Ver calendario →" : "View calendar →"}
+                  </button>
+                </div>
+                {allPeriodDays.length === 0 ? (
+                  <div style={{ fontSize:12, color:C.creamMuted, fontStyle:"italic" }}>
+                    {lang==="es" ? "Aún no has marcado ningún día de período." : "You haven't marked any period days yet."}
+                  </div>
+                ) : (
+                  <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+                    {lastPeriodStart && (
+                      <div>
+                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Último inicio":"Last start"}</div>
+                        <div style={{ fontSize:15, fontWeight:800, color:"#c06080" }}>{lastPeriodStart.slice(8)}/{lastPeriodStart.slice(5,7)}</div>
+                      </div>
+                    )}
+                    <div>
+                      <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Días regla este mes":"Period days this month"}</div>
+                      <div style={{ fontSize:15, fontWeight:800, color:"#c06080" }}>{periodThisMonth.length}</div>
+                    </div>
+                    {spmThisMonth > 0 && (
+                      <div>
+                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Días SPM":"PMS days"}</div>
+                        <div style={{ fontSize:15, fontWeight:800, color:C.accent }}>{spmThisMonth}</div>
+                      </div>
+                    )}
+                    {retentionThisMonth > 0 && (
+                      <div>
+                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Días retención":"Retention days"}</div>
+                        <div style={{ fontSize:15, fontWeight:800, color:"#5080a0" }}>{retentionThisMonth}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 3. SUPLEMENTOS */}
+              <div style={{ background:C.bgCard, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
+                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10, display:"flex", justifyContent:"space-between" }}>
+                  <span>{lang==="es" ? "Mis suplementos activos" : "My active supplements"}</span>
+                  <button onClick={() => setTab("supps")} style={{ background:"none", border:"none", fontSize:11, color:C.sage, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                    {lang==="es" ? "Gestionar →" : "Manage →"}
+                  </button>
+                </div>
+                {recentSupps.length === 0 ? (
+                  <div style={{ fontSize:12, color:C.creamMuted, fontStyle:"italic" }}>
+                    {lang==="es" ? "No tienes suplementos activos aún." : "No active supplements yet."}
+                  </div>
+                ) : (
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                    {recentSupps.map(a => {
+                      const def = allSuppsList.find(s => s.key === a.key);
+                      if (!def) return null;
+                      const takenToday = (lastLog?.suppsTaken || []).includes(a.key);
+                      return (
+                        <div key={a.key} style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 10px", borderRadius:20, border:`1.5px solid ${takenToday ? C.sage : C.border}`, background: takenToday ? C.creamFaint : "white" }}>
+                          <span style={{ fontSize:14 }}>{def.icon}</span>
+                          <span style={{ fontSize:11, fontWeight:600, color: takenToday ? C.sage : C.creamMuted }}>{lang==="es" ? def.es : def.en}</span>
+                          {takenToday && <span style={{ fontSize:10, color:C.sage }}>✓</span>}
+                        </div>
+                      );
+                    })}
+                    {activeSupps.length > 4 && (
+                      <div style={{ padding:"6px 10px", borderRadius:20, border:`1px solid ${C.border}`, fontSize:11, color:C.creamMuted }}>
+                        +{activeSupps.length - 4} {lang==="es"?"más":"more"}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 4. FRASE MOTIVACIONAL */}
+              <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
+                <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
+                  {lang==="es" ? "✨ Reflexión del día" : "✨ Daily reflection"}
+                </div>
+                <p style={{ fontSize:14, color:C.cream, lineHeight:1.6, fontStyle:"italic", margin:0, fontWeight:500 }}>
+                  "{phrase}"
+                </p>
+              </div>
+
+              {/* 5. RECETA DEL DÍA */}
+              <div style={{ background:C.bgCard, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
+                <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10 }}>
+                  {lang==="es" ? "🥗 Receta antiinflamatoria del día" : "🥗 Anti-inflammatory recipe of the day"}
+                </div>
+                <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:10 }}>
+                  <div style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px", flex:1 }}>{recipe.name}</div>
+                  <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, background:C.creamFaint, padding:"3px 8px", borderRadius:20, flexShrink:0 }}>⏱ {recipe.time}</div>
+                </div>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:10 }}>
+                  {recipe.ingredients.map((ing,i) => (
+                    <span key={i} style={{ fontSize:11, background:C.creamFaint, border:`1px solid ${C.border}`, borderRadius:20, padding:"3px 9px", color:C.cream }}>
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ fontSize:11, color:C.sage, lineHeight:1.5, padding:"8px 10px", background:`${C.sage}0d`, borderRadius:8, borderLeft:`3px solid ${C.sage}` }}>
+                  💡 {recipe.tip}
+                </div>
+              </div>
+
+              {/* 6. ACCESOS RÁPIDOS */}
+              <div style={{ marginTop:4 }}>
+                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10 }}>
+                  {lang==="es" ? "Accesos rápidos" : "Quick links"}
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                  {[
+                    { key:"today",   label: lang==="es"?"Registro de hoy":"Log today",    emoji:"📅" },
+                    { key:"history", label: lang==="es"?"Historial":"History",             emoji:"📋" },
+                    { key:"charts",  label: lang==="es"?"Gráficas":"Charts",               emoji:"📊" },
+                    { key:"foods",   label: lang==="es"?"Alimentos":"Foods",               emoji:"🍽️" },
+                  ].map(q => (
+                    <button key={q.key} onClick={() => setTab(q.key)}
+                      style={{ padding:"12px 14px", borderRadius:12, border:`1px solid ${C.border}`, background:"white", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, textAlign:"left", transition:"all 0.15s" }}>
+                      <span style={{ fontSize:20 }}>{q.emoji}</span>
+                      <span style={{ fontSize:12, fontWeight:700, color:C.cream }}>{q.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          );
+        })()}
+
+                {/* ── TODAY ── */
         {tab === "today" && (
           <>
             <div style={S.card}>
