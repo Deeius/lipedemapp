@@ -697,6 +697,7 @@ export default function App() {
   const [cycleMonth, setCycleMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`; });
   const [cycleActiveType, setCycleActiveType] = useState(null); // "period"|"spm"|"retention"|null
   const [recipeExpanded, setRecipeExpanded] = useState(false);
+  const [openLog, setOpenLog] = useState(null);
   const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
   const [customSuppName, setCustomSuppName] = useState("");
   const [infoFilter, setInfoFilter] = useState("all");
@@ -1785,7 +1786,6 @@ export default function App() {
 
         {/* ── HISTORY ── */}
         {tab === "history" && (() => {
-          const [openLog, setOpenLog] = useState(null); // date string of expanded entry
           const moodEmojis = ["😣","😟","😐","🙂","😊","😄","🤩"];
           return (
             <div style={S.card}>
