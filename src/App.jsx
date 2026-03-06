@@ -4,6 +4,7 @@ import {
   ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis,
   BarChart, Bar, Legend,
 } from "recharts";
+import WelcomeGuide from "./WelcomeGuide";
 
 // ─── INFO RESOURCES ──────────────────────────────────────────────────────────
 const INFO_RESOURCES = {
@@ -507,7 +508,7 @@ function SliderInput({ value, onChange, max = 6, labels, color = "#6366f1" }) {
       />
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
         {labels.map((l, i) => (
-          <span key={i} style={{ fontSize: 10, color: i === value ? color : "#9ca3af", fontWeight: i === value ? 700 : 400, transition: "color 0.2s" }}>
+          <span key={i} style={{ fontSize: 10, color: i === value ? color : C.creamMuted, fontWeight: i === value ? 700 : 400, transition: "color 0.2s" }}>
             {i === value ? l : "·"}
           </span>
         ))}
@@ -518,18 +519,18 @@ function SliderInput({ value, onChange, max = 6, labels, color = "#6366f1" }) {
 }
 
 function ZoneCard({ zone, zoneName, value, onChange }) {
-  const colors = ["#e5e7eb","#fde68a","#fcd34d","#fb923c","#ef4444","#b91c1c"];
+  const colors = [C.creamFaint, "#5a7a4a", "#7aad5a", "#d4a84b", C.danger, "#b03030"];
   const lv = value || 0;
   return (
-    <div style={{ background: "#f9fafb", borderRadius: 10, padding: "10px 14px", border: `1.5px solid ${lv > 0 ? colors[Math.min(lv,5)] : "#e5e7eb"}`, transition: "border-color 0.3s" }}>
+    <div style={{ background: C.bgInput, borderRadius: 10, padding: "10px 14px", border: `1.5px solid ${lv > 0 ? colors[Math.min(lv,5)] : C.border}`, transition: "border-color 0.3s" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>{zoneName}</span>
-        <span style={{ fontSize: 12, color: "#6b7280" }}>{lv}/5</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.cream }}>{zoneName}</span>
+        <span style={{ fontSize: 12, color: C.creamMuted }}>{lv}/5</span>
       </div>
       <div style={{ display: "flex", gap: 6 }}>
         {[0,1,2,3,4,5].map((v) => (
           <div key={v} onClick={() => onChange(v)}
-            style={{ flex: 1, height: 18, borderRadius: 4, background: v <= lv ? colors[lv] : "#e5e7eb", cursor: "pointer", transition: "background 0.2s", opacity: v <= lv ? 1 : 0.4 }}
+            style={{ flex: 1, height: 18, borderRadius: 4, background: v <= lv ? colors[lv] : C.border, cursor: "pointer", transition: "background 0.2s", opacity: v <= lv ? 1 : 0.5 }}
           />
         ))}
       </div>
@@ -544,65 +545,55 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
 
   return (
     <div style={{
-      borderRadius: 12, border: `1.5px solid ${isActive ? "#111827" : "#e5e7eb"}`,
-      background: isActive ? "#f9fafb" : "#fff", transition: "all 0.2s", overflow: "hidden"
+      borderRadius: 12,
+      border: `1.5px solid ${isActive ? C.sage : C.border}`,
+      background: isActive ? C.bgCardHov : C.bgCard,
+      transition: "all 0.2s", overflow: "hidden"
     }}>
-      <div
-        onClick={onToggle}
-        style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer" }}
-      >
+      <div onClick={onToggle} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer" }}>
         <span style={{ fontSize: 22 }}>{supp.icon}</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{name}</div>
-          <div style={{ fontSize: 11, color: "#9ca3af" }}>{note}</div>
+          <div style={{ fontWeight: 700, fontSize: 14, color: C.cream }}>{name}</div>
+          <div style={{ fontSize: 11, color: C.creamMuted }}>{note}</div>
         </div>
         <div style={{
           width: 22, height: 22, borderRadius: "50%",
-          border: `2px solid ${isActive ? "#111827" : "#d1d5db"}`,
-          background: isActive ? "#111827" : "transparent",
-          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+          border: `2px solid ${isActive ? C.sage : C.border}`,
+          background: isActive ? C.sage : "transparent",
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         }}>
           {isActive && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
         </div>
       </div>
 
       {isActive && (
-        <div style={{ padding: "0 14px 14px", borderTop: "1px solid #f3f4f6" }}>
+        <div style={{ padding: "0 14px 14px", borderTop: `1px solid ${C.border}` }}>
           <div style={{ paddingTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
             <div>
               <label style={labelStyle}>{t.dose}</label>
-              <input
-                style={inputStyle}
-                placeholder={t.dosePlaceholder}
-                value={suppData?.dose || ""}
-                onChange={(e) => onUpdate({ dose: e.target.value })}
-              />
+              <input style={inputStyle} placeholder={t.dosePlaceholder}
+                value={suppData?.dose || ""} onChange={(e) => onUpdate({ dose: e.target.value })} />
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>{t.startDate}</label>
-                <input
-                  type="date" style={inputStyle}
-                  value={suppData?.startDate || ""}
-                  onChange={(e) => onUpdate({ startDate: e.target.value })}
-                />
+                <input type="date" style={inputStyle}
+                  value={suppData?.startDate || ""} onChange={(e) => onUpdate({ startDate: e.target.value })} />
               </div>
             </div>
             <div>
               <label style={labelStyle}>{t.effect}</label>
               <div style={{ display: "flex", gap: 6 }}>
                 {Object.entries(t.effectOptions).map(([k, v]) => (
-                  <button key={k}
-                    onClick={() => onUpdate({ effect: k })}
+                  <button key={k} onClick={() => onUpdate({ effect: k })}
                     style={{
                       flex: 1, padding: "6px 4px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600,
                       background: suppData?.effect === k
-                        ? (k === "good" ? "#34d399" : k === "bad" ? "#f87171" : "#94a3b8")
-                        : "#f3f4f6",
-                      color: suppData?.effect === k ? "#fff" : "#6b7280",
-                      transition: "all 0.2s"
-                    }}
-                  >{v}</button>
+                        ? (k === "good" ? C.success : k === "bad" ? C.danger : C.creamMuted)
+                        : C.creamFaint,
+                      color: suppData?.effect === k ? "#fff" : C.creamMuted,
+                      transition: "all 0.2s",
+                    }}>{v}</button>
                 ))}
               </div>
             </div>
@@ -613,14 +604,47 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
   );
 }
 
-const labelStyle = { fontSize: 11, fontWeight: 600, color: "#6b7280", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: "0.5px" };
-const inputStyle = { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1.5px solid #e5e7eb", fontSize: 13, outline: "none", background: "#fff", boxSizing: "border-box", fontFamily: "inherit" };
-const textareaStyle = { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1.5px solid #e5e7eb", fontSize: 13, outline: "none", background: "#f9fafb", boxSizing: "border-box", resize: "vertical", minHeight: 70, fontFamily: "inherit" };
+const C = {
+  bg:         "#1a1f1e",   // fondo principal dark
+  bgCard:     "#232a28",   // tarjetas
+  bgCardHov:  "#2a3330",   // hover tarjetas
+  bgInput:    "#1e2523",   // inputs
+  border:     "#2e3a37",   // bordes suaves
+  borderFoc:  "#6aad8f",   // bordes activos
+  sage:       "#6aad8f",   // verde salvia principal
+  sageDark:   "#4d8a6e",   // sage oscuro (botones)
+  sageLight:  "#a8d5bc",   // sage claro (texto acento)
+  cream:      "#e8e0d0",   // crema principal (texto)
+  creamMuted: "#9da89f",   // crema apagado (secundario)
+  creamFaint: "#3a4440",   // superficies muy sutiles
+  accent:     "#c5a97d",   // dorado/tierra acento cálido
+  danger:     "#e07070",   // error/dolor
+  success:    "#6aad8f",   // éxito/bien
+  warn:       "#d4a84b",   // warning/neutral
+};
+
+const labelStyle = {
+  fontSize: 11, fontWeight: 600, color: C.creamMuted, marginBottom: 5,
+  display: "block", textTransform: "uppercase", letterSpacing: "0.6px",
+};
+const inputStyle = {
+  width: "100%", padding: "9px 12px", borderRadius: 8,
+  border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none",
+  background: C.bgInput, boxSizing: "border-box", fontFamily: "inherit",
+  color: C.cream, transition: "border-color 0.2s",
+};
+const textareaStyle = {
+  width: "100%", padding: "9px 12px", borderRadius: 8,
+  border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none",
+  background: C.bgInput, boxSizing: "border-box", resize: "vertical",
+  minHeight: 70, fontFamily: "inherit", color: C.cream,
+};
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [lang, setLang] = useState("es");
+  const [showWelcome, setShowWelcome] = useState(true);
   const [tab, setTab] = useState("today");
   const [entry, setEntry] = useState(defaultEntry());
   const [logs, setLogs] = useState([]);
@@ -643,12 +667,19 @@ export default function App() {
       const sp = localStorage.getItem("lt_profile");
       const ss = localStorage.getItem("lt_supps");
       const sl2 = localStorage.getItem("lt_lang");
+      const sw = localStorage.getItem("lt_welcome_seen");
       if (sl) setLogs(JSON.parse(sl));
       if (sf) setFoods(JSON.parse(sf));
       if (sp) setProfile(JSON.parse(sp));
       if (ss) setSupps(JSON.parse(ss));
       if (sl2) setLang(sl2);
+      if (sw) setShowWelcome(false);
     } catch {}
+  }, []);
+
+  const handleEnterApp = useCallback(() => {
+    try { localStorage.setItem("lt_welcome_seen", "1"); } catch {}
+    setShowWelcome(false);
   }, []);
 
   const persist = useCallback((key, val) => {
@@ -760,29 +791,33 @@ export default function App() {
 
   // ─── STYLES ───────────────────────────────────────────────────────────────
   const S = {
-    app: { fontFamily: "'DM Sans','Segoe UI',sans-serif", minHeight: "100vh", background: "#f8fafc", color: "#111827" },
-    header: { background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 100 },
-    title: { fontSize: 18, fontWeight: 800, color: "#111827", letterSpacing: "-0.5px" },
-    subtitle: { fontSize: 11, color: "#6b7280", marginTop: 1 },
-    langBtn: (a) => ({ padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: a ? "#111827" : "#f3f4f6", color: a ? "#fff" : "#6b7280", transition: "all 0.2s" }),
-    nav: { display: "flex", background: "#fff", borderBottom: "1px solid #e5e7eb", overflowX: "auto" },
-    navBtn: (a) => ({ flex: 1, minWidth: 54, padding: "12px 2px", border: "none", borderBottom: a ? "2px solid #111827" : "2px solid transparent", background: "none", cursor: "pointer", fontSize: 11, fontWeight: a ? 700 : 500, color: a ? "#111827" : "#6b7280", transition: "all 0.2s", whiteSpace: "nowrap" }),
-    page: { maxWidth: 600, margin: "0 auto", padding: "20px 16px 100px" },
-    card: { background: "#fff", borderRadius: 14, padding: 20, marginBottom: 16, border: "1px solid #e5e7eb" },
-    cardTitle: { fontSize: 14, fontWeight: 700, color: "#374151", marginBottom: 14, letterSpacing: "-0.3px" },
-    label: labelStyle,
-    input: inputStyle,
-    textarea: textareaStyle,
-    btn: { padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, background: "#111827", color: "#fff", width: "100%", transition: "background 0.2s" },
-    btnSm: (col) => ({ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: col || "#f3f4f6", color: col ? "#fff" : "#374151" }),
-    row: { display: "flex", gap: 12 },
-    col: { flex: 1 },
-    grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
-    tag: (color) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: color + "22", color }),
-    reactionColor: { good: "#34d399", bad: "#f87171", neutral: "#94a3b8" },
+    app:       { fontFamily: "'DM Sans','Segoe UI',sans-serif", minHeight: "100vh", background: C.bg, color: C.cream },
+    header:    { background: C.bgCard, borderBottom: `1px solid ${C.border}`, padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 100 },
+    title:     { fontSize: 18, fontWeight: 800, color: C.sageLight, letterSpacing: "-0.5px" },
+    subtitle:  { fontSize: 11, color: C.creamMuted, marginTop: 1 },
+    langBtn:   (a) => ({ padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: a ? C.sage : C.creamFaint, color: a ? "#fff" : C.creamMuted, transition: "all 0.2s" }),
+    nav:       { display: "flex", background: C.bgCard, borderBottom: `1px solid ${C.border}`, overflowX: "auto" },
+    navBtn:    (a) => ({ flex: 1, minWidth: 54, padding: "12px 2px", border: "none", borderBottom: a ? `2px solid ${C.sage}` : "2px solid transparent", background: "none", cursor: "pointer", fontSize: 11, fontWeight: a ? 700 : 500, color: a ? C.sageLight : C.creamMuted, transition: "all 0.2s", whiteSpace: "nowrap" }),
+    page:      { maxWidth: 600, margin: "0 auto", padding: "20px 16px 100px" },
+    card:      { background: C.bgCard, borderRadius: 14, padding: 20, marginBottom: 16, border: `1px solid ${C.border}` },
+    cardTitle: { fontSize: 14, fontWeight: 700, color: C.cream, marginBottom: 14, letterSpacing: "-0.3px" },
+    label:     labelStyle,
+    input:     inputStyle,
+    textarea:  textareaStyle,
+    btn:       { padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, background: C.sage, color: "#fff", width: "100%", transition: "background 0.2s" },
+    btnSm:     (col) => ({ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: col || C.creamFaint, color: col ? "#fff" : C.cream }),
+    row:       { display: "flex", gap: 12 },
+    col:       { flex: 1 },
+    grid2:     { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
+    tag:       (color) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: color + "28", color }),
+    reactionColor: { good: C.success, bad: C.danger, neutral: C.creamMuted },
   };
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
+  if (showWelcome) {
+    return <WelcomeGuide lang={lang} onEnter={handleEnterApp} />;
+  }
+
   return (
     <div style={S.app}>
       {/* Header */}
@@ -846,7 +881,7 @@ export default function App() {
             <div style={S.card}>
               <div style={S.cardTitle}>{t.today.inflammation}</div>
               {activeZones.length === 0 && (
-                <p style={{ color: "#9ca3af", fontSize: 13 }}>{lang === "es" ? "Configura tus zonas en el Perfil" : "Set up your zones in Profile"}</p>
+                <p style={{ color: C.creamMuted, fontSize: 13 }}>{lang === "es" ? "Configura tus zonas en el Perfil" : "Set up your zones in Profile"}</p>
               )}
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {activeZones.map((z) => (
@@ -896,9 +931,9 @@ export default function App() {
                         const curr = entry.suppsTaken || [];
                         updateEntry("suppsTaken", taken ? curr.filter((k) => k !== a.key) : [...curr, a.key]);
                       }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, border: `1.5px solid ${taken ? "#111827" : "#e5e7eb"}`, background: taken ? "#111827" : "#fff", cursor: "pointer", transition: "all 0.2s" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, border: `1.5px solid ${taken ? C.sage : C.border}`, background: taken ? C.sage : C.bgInput, cursor: "pointer", transition: "all 0.2s" }}>
                         <span style={{ fontSize: 16 }}>{def.icon}</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: taken ? "#fff" : "#374151" }}>{name}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: taken ? "#fff" : C.cream }}>{name}</span>
                       </div>
                     );
                   })}
@@ -915,13 +950,13 @@ export default function App() {
           <div style={S.card}>
             <div style={S.cardTitle}>{t.history.title}</div>
             {logs.length === 0 ? (
-              <p style={{ color: "#9ca3af", fontSize: 14 }}>{t.history.empty}</p>
+              <p style={{ color: C.creamMuted, fontSize: 14 }}>{t.history.empty}</p>
             ) : (
               [...logs].reverse().map((l, i) => (
                 <div key={i} style={{ padding: "12px 0", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 14 }}>{l.date}</div>
-                    {l.inflammationNote && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 3, maxWidth: 260 }}>{l.inflammationNote.slice(0, 80)}{l.inflammationNote.length > 80 ? "…" : ""}</div>}
+                    {l.inflammationNote && <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 3, maxWidth: 260 }}>{l.inflammationNote.slice(0, 80)}{l.inflammationNote.length > 80 ? "…" : ""}</div>}
                     {l.suppsTaken?.length > 0 && (
                       <div style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {l.suppsTaken.map((k) => {
@@ -948,7 +983,7 @@ export default function App() {
             {logs.length < 2 ? (
               <div style={{ ...S.card, textAlign: "center", padding: 40 }}>
                 <div style={{ fontSize: 40 }}>📊</div>
-                <div style={{ color: "#9ca3af", marginTop: 8 }}>{t.charts.noData}</div>
+                <div style={{ color: C.creamMuted, marginTop: 8 }}>{t.charts.noData}</div>
               </div>
             ) : (
               <>
@@ -956,7 +991,7 @@ export default function App() {
                   <div style={S.cardTitle}>{t.charts.weight}</div>
                   <ResponsiveContainer width="100%" height={180}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} domain={["auto","auto"]} />
                       <Tooltip />
@@ -969,7 +1004,7 @@ export default function App() {
                   <div style={S.cardTitle}>{t.charts.painEnergy}</div>
                   <ResponsiveContainer width="100%" height={180}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} domain={[0,6]} />
                       <Tooltip />
@@ -1044,7 +1079,7 @@ export default function App() {
             <div style={S.card}>
               <div style={S.cardTitle}>{t.foods.list}</div>
               {foods.length === 0 ? (
-                <p style={{ color: "#9ca3af", fontSize: 13 }}>{t.foods.empty}</p>
+                <p style={{ color: C.creamMuted, fontSize: 13 }}>{t.foods.empty}</p>
               ) : (
                 foods.map((f) => (
                   <div key={f.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 0", borderBottom: "1px solid #f3f4f6" }}>
@@ -1052,11 +1087,11 @@ export default function App() {
                       <div style={{ fontWeight: 700, fontSize: 14 }}>{f.name}</div>
                       <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
                         <span style={S.tag(S.reactionColor[f.reaction])}>{t.foods[f.reaction]}</span>
-                        <span style={S.tag("#6b7280")}>{t.foods.categories[f.category]}</span>
+                        <span style={S.tag(C.creamMuted)}>{t.foods.categories[f.category]}</span>
                       </div>
-                      {f.notes && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>{f.notes}</div>}
+                      {f.notes && <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 4 }}>{f.notes}</div>}
                     </div>
-                    <button onClick={() => removeFood(f.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#d1d5db", fontSize: 20, padding: "0 4px" }}>×</button>
+                    <button onClick={() => removeFood(f.id)} style={{ background: "none", border: "none", cursor: "pointer", color: C.creamMuted, fontSize: 20, padding: "0 4px" }}>×</button>
                   </div>
                 ))
               )}
@@ -1069,7 +1104,7 @@ export default function App() {
           <>
             <div style={S.card}>
               <div style={S.cardTitle}>{t.supps.title}</div>
-              <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 16 }}>{t.supps.subtitle}</p>
+              <p style={{ fontSize: 13, color: C.creamMuted, marginBottom: 16 }}>{t.supps.subtitle}</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {SUPPLEMENT_OPTIONS.map((supp) => {
                   const isActive = activeSupps.some((a) => a.key === supp.key);
@@ -1118,6 +1153,22 @@ export default function App() {
         {/* ── INFO ── */}
         {tab === "info" && (
           <>
+            {/* Visual Guide shortcut */}
+            <div
+              onClick={() => setShowWelcome(true)}
+              style={{ background: "linear-gradient(135deg, #fdf4ff, #f0f9ff)", borderRadius: 14, padding: "16px 18px", marginBottom: 14, border: "1.5px solid #e9d5ff", cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
+            >
+              <div style={{ fontSize: 36 }}>🩺</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: 14, color: C.cream, marginBottom: 2 }}>
+                  {lang === "es" ? "Guía visual del lipedema" : "Visual Lipedema Guide"}
+                </div>
+                <div style={{ fontSize: 12, color: C.creamMuted }}>
+                  {lang === "es" ? "Tipos, estadios, síntomas visuales explicados con ilustraciones →" : "Types, stages, visual symptoms explained with illustrations →"}
+                </div>
+              </div>
+            </div>
+
             {/* Disclaimer */}
             <div style={{ background: "#fefce8", borderRadius: 10, padding: "10px 14px", marginBottom: 16, border: "1px solid #fde047", fontSize: 12, color: "#854d0e" }}>
               {t.info.disclaimer}
@@ -1127,7 +1178,7 @@ export default function App() {
             <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
               {[["all", t.info.filterAll], ["es", t.info.filterEs], ["en", t.info.filterEn]].map(([val, label]) => (
                 <button key={val} onClick={() => setInfoFilter(val)}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: infoFilter === val ? "#111827" : "#f3f4f6", color: infoFilter === val ? "#fff" : "#6b7280", transition: "all 0.2s" }}>
+                  style={{ padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: infoFilter === val ? C.sage : C.creamFaint, color: infoFilter === val ? "#fff" : C.creamMuted, transition: "all 0.2s" }}>
                   {label}
                 </button>
               ))}
@@ -1158,26 +1209,26 @@ export default function App() {
                       };
                       return (
                         <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
-                          style={{ display: "block", textDecoration: "none", padding: "12px 14px", borderRadius: 10, border: "1.5px solid #e5e7eb", background: "#f9fafb", transition: "border-color 0.2s, background 0.2s" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = "#111827"; e.currentTarget.style.background = "#fff"; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#f9fafb"; }}
+                          style={{ display: "block", textDecoration: "none", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, background: C.bgInput, transition: "border-color 0.2s, background 0.2s" }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = C.sage; e.currentTarget.style.background = C.bgCardHov; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bgInput; }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: "#111827", marginBottom: 3, lineHeight: 1.4 }}>
-                                {item.platform && <span style={{ fontSize: 11, color: "#9ca3af", marginRight: 6 }}>{item.platform}</span>}
+                              <div style={{ fontWeight: 700, fontSize: 13, color: C.cream, marginBottom: 3, lineHeight: 1.4 }}>
+                                {item.platform && <span style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}>{item.platform}</span>}
                                 {item.title}
                               </div>
-                              <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6 }}>{item.authors}{item.year ? ` · ${item.year}` : ""}</div>
-                              <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.5 }}>{desc}</div>
+                              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 6 }}>{item.authors}{item.year ? ` · ${item.year}` : ""}</div>
+                              <div style={{ fontSize: 12, color: C.cream, lineHeight: 1.5 }}>{desc}</div>
                             </div>
-                            <span style={{ fontSize: 14, color: "#9ca3af", flexShrink: 0, marginTop: 2 }}>↗</span>
+                            <span style={{ fontSize: 14, color: C.creamMuted, flexShrink: 0, marginTop: 2 }}>↗</span>
                           </div>
                           <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                             <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: langColor + "18", color: langColor }}>
                               {item.lang === "es" ? "ES" : "EN"}
                             </span>
-                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (typeColors[item.type] || "#6b7280") + "18", color: typeColors[item.type] || "#6b7280" }}>
+                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (typeColors[item.type] || C.creamMuted) + "28", color: typeColors[item.type] || C.creamMuted }}>
                               {typeLabel}
                             </span>
                           </div>
@@ -1212,7 +1263,7 @@ export default function App() {
                     const updated = active ? activeZones.filter((x) => x !== z) : [...activeZones, z];
                     setProfile({ ...profile, activeZones: updated });
                   }}
-                    style={{ padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${active ? "#111827" : "#e5e7eb"}`, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 400, color: active ? "#111827" : "#9ca3af", background: active ? "#f3f4f6" : "#fff", transition: "all 0.2s" }}>
+                    style={{ padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${active ? C.sage : C.border}`, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 400, color: active ? C.sageLight : C.creamMuted, background: active ? C.creamFaint : C.bgInput, transition: "all 0.2s" }}>
                     {active ? "✓ " : ""}{t.today.zoneNames[z] || z}
                   </div>
                 );
