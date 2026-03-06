@@ -15,109 +15,220 @@ const WC = {
   danger:    "#e07070",
 };
 
-// ─── FEMALE SILHOUETTE SVG BUILDER ───────────────────────────────────────────
-// Zones: hips, thighs, calves, ankles, arms, abdomen
-// Each zone can be highlighted with a color
+// ─── FEMALE BODY OUTLINE SVG ─────────────────────────────────────────────────
+// Uses anatomical outline paths. Zones highlighted with a gentle tinted overlay
+// using the body's actual regions — not floating ellipses.
+//
+// Accessibility: body outline always #a8c4b8 (sage-cream, readable on dark bg)
+// Affected zones: semi-opaque sage/warm fill + stroke, never saturated neon
 
-function FemaleSilhouette({ highlighted = [], label = "", compact = false }) {
-  const scale = compact ? 0.72 : 1;
-  const w = 120 * scale;
-  const h = 260 * scale;
+function BodyOutline({ zones = [], compact = false }) {
+  // Palette: accessible on dark — low saturation, warm tones
+  const ZONE_FILL   = "rgba(196, 154, 100, 0.28)";   // warm amber tint
+  const ZONE_STROKE = "rgba(196, 154, 100, 0.70)";   // amber border
+  const BODY_FILL   = "rgba(168, 196, 184, 0.08)";   // faint sage fill
+  const BODY_STROKE = "rgba(168, 196, 184, 0.55)";   // sage outline
+  const HEAD_FILL   = "rgba(168, 196, 184, 0.15)";
 
-  const zoneColors = {
-    hips:    "#f97316",
-    thighs:  "#ef4444",
-    calves:  "#f59e0b",
-    ankles:  "#fbbf24",
-    arms:    "#a78bfa",
-    abdomen: "#fb923c",
-    buttocks:"#f97316",
+  const s = compact ? 0.68 : 1;
+  const W = 100 * s, H = 240 * s;
+
+  // Zone clip regions as paths (viewBox 0 0 100 240)
+  const zonePaths = {
+    // Upper arms (both)
+    arms: [
+      "M14,52 Q8,54 7,68 Q7,80 12,84 Q17,80 18,68 Q18,54 14,52Z",
+      "M86,52 Q92,54 93,68 Q93,80 88,84 Q83,80 82,68 Q82,54 86,52Z",
+    ],
+    // Hip/pelvis area
+    hips: ["M30,108 Q32,100 50,98 Q68,100 70,108 Q72,120 66,126 Q50,130 34,126 Q28,120 30,108Z"],
+    buttocks: ["M30,108 Q50,115 70,108 Q72,122 66,130 Q50,134 34,130 Q28,122 30,108Z"],
+    // Thighs
+    thighs: [
+      "M30,126 Q34,124 42,124 Q46,126 46,148 Q46,164 42,168 Q36,166 30,160 Q28,148 30,126Z",
+      "M70,126 Q66,124 58,124 Q54,126 54,148 Q54,164 58,168 Q64,166 70,160 Q72,148 70,126Z",
+    ],
+    // Calves
+    calves: [
+      "M30,170 Q34,168 42,168 Q44,170 44,188 Q44,200 40,204 Q35,202 30,196 Q28,186 30,170Z",
+      "M70,170 Q66,168 58,168 Q56,170 56,188 Q56,200 60,204 Q65,202 70,196 Q72,186 70,170Z",
+    ],
+    // Ankles
+    ankles: [
+      "M30,198 Q36,202 42,200 Q44,206 42,212 Q36,214 30,210 Q28,204 30,198Z",
+      "M70,198 Q64,202 58,200 Q56,206 58,212 Q64,214 70,210 Q72,204 70,198Z",
+    ],
+    abdomen: ["M33,88 Q50,84 67,88 Q70,98 68,108 Q50,112 32,108 Q30,98 33,88Z"],
   };
 
-  const getColor = (zone) =>
-    highlighted.includes(zone) ? zoneColors[zone] || "#ef4444" : "#2e3a37";
-
-  const getOpacity = (zone) =>
-    highlighted.includes(zone) ? 0.85 : 0.5;
+  const activeZones = zones.flatMap(z => zonePaths[z] || []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-      <svg width={w} height={h} viewBox="0 0 120 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* HEAD */}
-        <ellipse cx="60" cy="14" rx="12" ry="14" fill="#3a4a46" opacity="0.7" />
-        {/* NECK */}
-        <rect x="55" y="26" width="10" height="10" rx="3" fill="#3a4a46" opacity="0.6" />
+    <svg width={W} height={H} viewBox="0 0 100 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* ── Body base fill ── */}
+      {/* Head */}
+      <ellipse cx="50" cy="13" rx="11" ry="12" fill={HEAD_FILL} stroke={BODY_STROKE} strokeWidth="1"/>
+      {/* Neck */}
+      <rect x="45" y="24" width="10" height="8" rx="2" fill={HEAD_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      {/* Torso */}
+      <path d="M32,32 Q50,28 68,32 L70,88 Q50,92 30,88 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="1"/>
+      {/* Upper arms */}
+      <path d="M14,52 Q8,54 7,68 Q7,80 12,84 Q17,80 18,68 Q18,54 14,52Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      <path d="M86,52 Q92,54 93,68 Q93,80 88,84 Q83,80 82,68 Q82,54 86,52Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      {/* Forearms */}
+      <path d="M11,86 Q7,88 6,100 Q6,110 10,112 Q15,110 16,100 Q16,88 11,86Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.7"/>
+      <path d="M89,86 Q93,88 94,100 Q94,110 90,112 Q85,110 84,100 Q84,88 89,86Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.7"/>
+      {/* Hands */}
+      <ellipse cx="10" cy="117" rx="5" ry="6" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.7"/>
+      <ellipse cx="90" cy="117" rx="5" ry="6" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.7"/>
+      {/* Hip/pelvis block */}
+      <path d="M30,88 Q50,92 70,88 L72,126 Q50,132 28,126 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="1"/>
+      {/* Thighs */}
+      <path d="M28,126 Q34,124 44,124 L44,170 Q36,172 28,168 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.9"/>
+      <path d="M72,126 Q66,124 56,124 L56,170 Q64,172 72,168 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.9"/>
+      {/* Knees */}
+      <ellipse cx="36" cy="172" rx="9" ry="5" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      <ellipse cx="64" cy="172" rx="9" ry="5" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      {/* Calves */}
+      <path d="M28,176 Q34,172 44,172 L44,204 Q37,208 28,202 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.9"/>
+      <path d="M72,176 Q66,172 56,172 L56,204 Q63,208 72,202 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.9"/>
+      {/* Ankles */}
+      <path d="M28,202 Q34,206 44,204 L44,214 Q36,216 28,212 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      <path d="M72,202 Q66,206 56,204 L56,214 Q64,216 72,212 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      {/* Feet */}
+      <path d="M24,212 Q30,216 44,214 Q46,220 42,222 Q32,222 24,218 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
+      <path d="M76,212 Q70,216 56,214 Q54,220 58,222 Q68,222 76,218 Z" fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="0.8"/>
 
-        {/* SHOULDERS */}
-        <path d="M35 40 Q27 44 24 55 L32 55 Q34 47 40 44 Z" fill="#3a4a46" opacity="0.65" />
-        <path d="M85 40 Q93 44 96 55 L88 55 Q86 47 80 44 Z" fill="#3a4a46" opacity="0.65" />
-
-        {/* UPPER ARMS */}
-        <ellipse cx="24" cy="66" rx="8" ry="16"
-          fill={getColor("arms")} opacity={getOpacity("arms")} />
-        <ellipse cx="96" cy="66" rx="8" ry="16"
-          fill={getColor("arms")} opacity={getOpacity("arms")} />
-
-        {/* FOREARMS */}
-        <ellipse cx="22" cy="96" rx="6" ry="13" fill="#3a4a46" opacity="0.55" />
-        <ellipse cx="98" cy="96" rx="6" ry="13" fill="#3a4a46" opacity="0.55" />
-
-        {/* HANDS */}
-        <ellipse cx="21" cy="114" rx="5" ry="7" fill="#3a4a46" opacity="0.45" />
-        <ellipse cx="99" cy="114" rx="5" ry="7" fill="#3a4a46" opacity="0.45" />
-
-        {/* TORSO / CHEST */}
-        <path d="M40 36 Q60 32 80 36 L84 80 Q60 88 36 80 Z"
-          fill="#3a4a46" opacity="0.6" />
-
-        {/* ABDOMEN */}
-        <ellipse cx="60" cy="92" rx="22" ry="16"
-          fill={getColor("abdomen")} opacity={getOpacity("abdomen")} />
-
-        {/* HIPS / PELVIS */}
-        <ellipse cx="60" cy="118" rx="28" ry="18"
-          fill={getColor("hips")} opacity={getOpacity("hips")} />
-
-        {/* BUTTOCKS extra volume */}
-        <ellipse cx="60" cy="126" rx="24" ry="14"
-          fill={getColor("buttocks")} opacity={highlighted.includes("buttocks") ? 0.7 : 0} />
-
-        {/* LEFT THIGH */}
-        <ellipse cx="48" cy="154" rx="14" ry="24"
-          fill={getColor("thighs")} opacity={getOpacity("thighs")} />
-        {/* RIGHT THIGH */}
-        <ellipse cx="72" cy="154" rx="14" ry="24"
-          fill={getColor("thighs")} opacity={getOpacity("thighs")} />
-
-        {/* LEFT CALF */}
-        <ellipse cx="46" cy="196" rx="10" ry="18"
-          fill={getColor("calves")} opacity={getOpacity("calves")} />
-        {/* RIGHT CALF */}
-        <ellipse cx="74" cy="196" rx="10" ry="18"
-          fill={getColor("calves")} opacity={getOpacity("calves")} />
-
-        {/* LEFT ANKLE cuff */}
-        <ellipse cx="44" cy="220" rx="8" ry="7"
-          fill={getColor("ankles")} opacity={getOpacity("ankles")} />
-        {/* RIGHT ANKLE cuff */}
-        <ellipse cx="76" cy="220" rx="8" ry="7"
-          fill={getColor("ankles")} opacity={getOpacity("ankles")} />
-
-        {/* FEET */}
-        <ellipse cx="42" cy="232" rx="9" ry="5" fill="#3a4a46" opacity="0.5" />
-        <ellipse cx="78" cy="232" rx="9" ry="5" fill="#3a4a46" opacity="0.5" />
-
-        {/* OUTLINE subtle */}
-        <ellipse cx="60" cy="14" rx="12" ry="14" stroke="#94a3b8" strokeWidth="0.5" fill="none" />
-        <path d="M40 36 Q60 32 80 36 L84 80 Q60 88 36 80 Z" stroke="#94a3b8" strokeWidth="0.5" fill="none" />
-      </svg>
-      {label && (
-        <div style={{ fontSize: 11, fontWeight: 700, color: WC.cream, textAlign: "center", lineHeight: 1.3 }}>
-          {label}
-        </div>
-      )}
-    </div>
+      {/* ── Zone highlights — rendered on top ── */}
+      {activeZones.map((d, i) => (
+        <path key={i} d={d} fill={ZONE_FILL} stroke={ZONE_STROKE} strokeWidth="1.2"/>
+      ))}
+    </svg>
   );
+}
+
+// ─── SYMPTOM ILLUSTRATION SVG ─────────────────────────────────────────────────
+// Clean line-art style, monochromatic + one accent color per symptom
+// All on transparent bg, readable on dark
+
+function SymptomIllustration({ type, accent = "#c5a97d" }) {
+  const stroke = "#a8c4b8";  // body outline color
+  const sw = 1.2;
+
+  if (type === "bruising") return (
+    <svg width="72" height="56" viewBox="0 0 72 56" fill="none">
+      {/* Skin cross-section */}
+      <rect x="4" y="4" width="64" height="48" rx="10" fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
+      {/* Skin surface layer */}
+      <rect x="4" y="4" width="64" height="10" rx="10" fill="rgba(168,196,184,0.12)" stroke="none"/>
+      <line x1="4" y1="14" x2="68" y2="14" stroke={stroke} strokeWidth="0.5" strokeDasharray="3 2"/>
+      {/* Bruise pools */}
+      <ellipse cx="26" cy="32" rx="12" ry="8" fill={`${accent}33`} stroke={`${accent}88`} strokeWidth="1"/>
+      <ellipse cx="26" cy="32" rx="6" ry="4" fill={`${accent}55`} stroke="none"/>
+      <ellipse cx="50" cy="28" rx="8" ry="5" fill={`${accent}28`} stroke={`${accent}66`} strokeWidth="1"/>
+      {/* Label */}
+      <text x="36" y="50" textAnchor="middle" fontSize="7" fill={accent} fontWeight="600">hematoma espontáneo</text>
+    </svg>
+  );
+
+  if (type === "cuffing") return (
+    <svg width="72" height="80" viewBox="0 0 72 80" fill="none">
+      {/* Leg outline */}
+      <path d="M22,4 Q28,4 32,8 L34,54 Q34,62 28,66 Q22,66 18,62 L16,10 Q18,4 22,4Z"
+        fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
+      {/* Normal calf */}
+      <path d="M16,14 Q22,12 34,16 L34,36 Q22,38 16,36Z"
+        fill="rgba(168,196,184,0.1)" stroke="none"/>
+      {/* Fat cuff accumulation — swollen area just above ankle */}
+      <path d="M14,46 Q20,42 36,44 Q38,50 36,56 Q20,58 14,54 Z"
+        fill={`${accent}35`} stroke={`${accent}80`} strokeWidth="1.2"/>
+      {/* Foot — normal, no swelling */}
+      <path d="M14,64 Q18,68 32,66 Q34,70 30,72 Q20,72 14,68Z"
+        fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth="0.9"/>
+      {/* Arrow + label */}
+      <line x1="44" y1="50" x2="38" y2="50" stroke={accent} strokeWidth="1.2" markerEnd="none"/>
+      <polyline points="44,50 42,48 44,50 42,52" stroke={accent} strokeWidth="1.2" fill="none"/>
+      <text x="46" y="46" fontSize="7" fill={accent} fontWeight="700">cuff</text>
+      <text x="46" y="55" fontSize="6" fill={stroke}>↑ pie normal</text>
+    </svg>
+  );
+
+  if (type === "nodules") return (
+    <svg width="72" height="56" viewBox="0 0 72 56" fill="none">
+      {/* Skin section */}
+      <rect x="4" y="4" width="64" height="48" rx="10" fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
+      <line x1="4" y1="16" x2="68" y2="16" stroke={stroke} strokeWidth="0.5" strokeDasharray="3 2"/>
+      <text x="8" y="12" fontSize="6" fill={stroke}>piel</text>
+      {/* Subcutaneous nodules */}
+      {[{x:16,y:30,r:5},{x:28,y:26,r:4},{x:40,y:32,r:6},{x:52,y:27,r:4.5},{x:22,y:40,r:4},{x:46,y:42,r:5},{x:60,y:36,r:3.5}].map((n,i) => (
+        <circle key={i} cx={n.x} cy={n.y} r={n.r} fill={`${accent}30`} stroke={`${accent}75`} strokeWidth="1"/>
+      ))}
+      <text x="36" y="51" textAnchor="middle" fontSize="7" fill={accent} fontWeight="600">nódulos subcutáneos</text>
+    </svg>
+  );
+
+  if (type === "disproportion") return (
+    <svg width="80" height="72" viewBox="0 0 80 72" fill="none">
+      {/* Torso — normal sized */}
+      <rect x="28" y="4" width="24" height="22" rx="8" fill="rgba(168,196,184,0.1)" stroke={stroke} strokeWidth={sw}/>
+      <text x="40" y="36" textAnchor="middle" fontSize="6" fill={stroke}>talla S</text>
+      {/* Hip/leg area — much larger */}
+      <path d="M14,38 Q20,36 40,35 Q60,36 66,38 Q70,50 64,58 Q52,62 40,62 Q28,62 16,58 Q10,50 14,38Z"
+        fill={`${accent}22`} stroke={`${accent}70`} strokeWidth="1.2"/>
+      <text x="40" y="68" textAnchor="middle" fontSize="6" fill={accent} fontWeight="600">talla XL–XXL</text>
+      {/* Size markers */}
+      <line x1="8" y1="4" x2="8" y2="26" stroke={stroke} strokeWidth="0.8"/>
+      <line x1="4" y1="4" x2="12" y2="4" stroke={stroke} strokeWidth="0.8"/>
+      <line x1="4" y1="26" x2="12" y2="26" stroke={stroke} strokeWidth="0.8"/>
+      <line x1="4" y1="36" x2="4" y2="62" stroke={accent} strokeWidth="0.8"/>
+      <line x1="0" y1="36" x2="8" y2="36" stroke={accent} strokeWidth="0.8"/>
+      <line x1="0" y1="62" x2="8" y2="62" stroke={accent} strokeWidth="0.8"/>
+    </svg>
+  );
+
+  if (type === "edema") return (
+    <svg width="72" height="80" viewBox="0 0 72 80" fill="none">
+      {/* Leg outline — swollen at bottom */}
+      <path d="M20,4 Q26,4 30,8 L34,48 Q36,58 30,64 Q24,68 18,64 Q12,58 12,48 L14,10 Q16,4 20,4Z"
+        fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
+      {/* Swelling overlay — lower leg */}
+      <path d="M10,44 Q14,40 36,42 Q40,52 38,62 Q28,70 16,66 Q8,56 10,44Z"
+        fill="rgba(96,165,250,0.20)" stroke="rgba(96,165,250,0.55)" strokeWidth="1"/>
+      {/* Pitting fovea dot */}
+      <circle cx="24" cy="56" r="3" fill="rgba(168,196,184,0.3)" stroke={stroke} strokeWidth="0.8"/>
+      <text x="30" y="58" fontSize="6" fill={stroke}>fóvea</text>
+      {/* Water drops */}
+      <text x="44" y="34" fontSize="11">💧</text>
+      <text x="50" y="46" fontSize="8">💧</text>
+      <text x="42" y="52" fontSize="7">💧</text>
+    </svg>
+  );
+
+  if (type === "pain") return (
+    <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+      {/* Hand pressing — simplified */}
+      <path d="M20,20 Q36,16 52,20 Q56,30 54,44 Q36,50 18,44 Q14,30 20,20Z"
+        fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
+      {/* Pain radiation lines */}
+      {[
+        [36,32, 36,8],   // up
+        [36,32, 58,20],  // top right
+        [36,32, 60,36],  // right
+        [36,32, 14,20],  // top left
+        [36,32, 12,36],  // left
+      ].map(([x1,y1,x2,y2],i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+          stroke={`${accent}90`} strokeWidth="1.2" strokeLinecap="round"
+          strokeDasharray="2 2"/>
+      ))}
+      {/* Center pulse */}
+      <circle cx="36" cy="32" r="7" fill={`${accent}25`} stroke={`${accent}80`} strokeWidth="1.2"/>
+      <circle cx="36" cy="32" r="3" fill={`${accent}55`} stroke="none"/>
+      <text x="36" y="62" textAnchor="middle" fontSize="7" fill={accent} fontWeight="600">dolor a la palpación</text>
+    </svg>
+  );
+
+  return null;
 }
 
 // ─── CONTENT DATA ─────────────────────────────────────────────────────────────
@@ -449,11 +560,27 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
   const sections = ["hero","types","stages","symptoms"];
   const totalSections = sections.length;
 
+  // Glassmorphism helpers
+  const glass = (alpha = 0.12, blur = 16) => ({
+    background: `rgba(106, 173, 143, ${alpha})`,
+    backdropFilter: `blur(${blur}px)`,
+    WebkitBackdropFilter: `blur(${blur}px)`,
+    border: "1px solid rgba(168, 213, 188, 0.18)",
+    borderRadius: 18,
+  });
+  const glassStrong = {
+    background: "rgba(35, 55, 48, 0.72)",
+    backdropFilter: "blur(24px)",
+    WebkitBackdropFilter: "blur(24px)",
+    border: "1px solid rgba(106, 173, 143, 0.25)",
+    borderRadius: 18,
+  };
+
   const S = {
     wrap: {
       fontFamily: "'DM Sans','Segoe UI',sans-serif",
       minHeight: "100vh",
-      background: WC.bg,
+      background: "radial-gradient(ellipse at 20% 20%, #1e3d30 0%, #1a1f1e 45%, #0f1a16 100%)",
       color: WC.cream,
       display: "flex",
       flexDirection: "column",
@@ -547,24 +674,60 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
   const renderHero = () => (
     <>
       <div style={S.h1}>{c.hero.title}</div>
-      {/* Hero visual - lipedema silhouette vs normal */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 32, padding: "10px 0 16px", background: WC.bgInput, borderRadius: 14, marginBottom: 16 }}>
-        <div style={{ textAlign: "center" }}>
-          <FemaleSilhouette highlighted={[]} />
-          <div style={{ fontSize: 11, color: WC.creamMuted, marginTop: 4 }}>Sin lipedema</div>
+
+      {/* Hero — clean side-by-side body comparison */}
+      <div style={{ ...glassStrong, padding: "20px 16px 16px", marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 24, alignItems: "flex-end" }}>
+          {/* Left: no lipedema */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <BodyOutline zones={[]} />
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: WC.creamMuted, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 2 }}>
+                {lang === "es" ? "Sin lipedema" : "Without lipedema"}
+              </div>
+              <div style={{ fontSize: 10, color: WC.creamMuted, lineHeight: 1.4 }}>
+                {lang === "es" ? "Distribución grasa uniforme" : "Uniform fat distribution"}
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div style={{ width: 1, height: 200, background: "rgba(168,196,184,0.15)", alignSelf: "center" }} />
+
+          {/* Right: lipedema */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <BodyOutline zones={["hips","thighs","calves","arms"]} />
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: WC.accent, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 2 }}>
+                {lang === "es" ? "Con lipedema" : "With lipedema"}
+              </div>
+              <div style={{ fontSize: 10, color: WC.creamMuted, lineHeight: 1.4 }}>
+                {lang === "es" ? "Acumulación simétrica en extremidades" : "Symmetrical accumulation in limbs"}
+              </div>
+            </div>
+          </div>
         </div>
-        <div style={{ textAlign: "center" }}>
-          <FemaleSilhouette highlighted={["hips","thighs","calves","arms"]} />
-          <div style={{ fontSize: 11, color: "#f97316", fontWeight: 700, marginTop: 4 }}>Con lipedema</div>
+
+        {/* Legend */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(168,196,184,0.12)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 14, height: 8, borderRadius: 3, background: "rgba(168,196,184,0.2)", border: "1px solid rgba(168,196,184,0.5)" }}/>
+            <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Tejido normal" : "Normal tissue"}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 14, height: 8, borderRadius: 3, background: "rgba(196,154,100,0.3)", border: "1px solid rgba(196,154,100,0.7)" }}/>
+            <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Zona afectada" : "Affected zone"}</span>
+          </div>
         </div>
       </div>
 
-      <p style={{ fontSize: 14, color: WC.cream, lineHeight: 1.7, marginBottom: 16 }}>{c.hero.intro}</p>
+      <p style={{ fontSize: 13, color: WC.creamMuted, lineHeight: 1.75, marginBottom: 18 }}>{c.hero.intro}</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      {/* Fact pills */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {c.hero.facts.map((f, i) => (
-          <div key={i} style={{ background: WC.bgCard, borderRadius: 12, padding: "12px 14px", border: "1px solid #e5e7eb", display: "flex", alignItems: "flex-start", gap: 10 }}>
-            <span style={{ fontSize: 22 }}>{f.icon}</span>
+          <div key={i} style={{ ...glassStrong, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 22, flexShrink: 0 }}>{f.icon}</span>
             <span style={{ fontSize: 12, color: WC.cream, fontWeight: 500, lineHeight: 1.4 }}>{f.text}</span>
           </div>
         ))}
@@ -576,24 +739,40 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
     <>
       <div style={S.h1}>{c.types.title}</div>
       <div style={S.sub}>{c.types.subtitle}</div>
-      {/* All 5 silhouettes in a row */}
-      <div style={{ background: WC.bgCard, borderRadius: 14, padding: "16px 8px", border: "1px solid #e5e7eb", marginBottom: 16, overflowX: "auto" }}>
+
+      {/* 5 silhouettes — single glass strip, consistent amber highlights */}
+      <div style={{ ...glassStrong, padding: "18px 12px 14px", marginBottom: 20, overflowX: "auto" }}>
         <div style={{ display: "flex", gap: 8, justifyContent: "center", minWidth: 320 }}>
           {c.types.list.map((tp) => (
-            <FemaleSilhouette key={tp.num} highlighted={tp.zones} label={`Tipo ${tp.num}`} compact />
+            <div key={tp.num} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flex: 1 }}>
+              <BodyOutline zones={tp.zones} compact />
+              <div style={{ fontSize: 10, fontWeight: 800, color: WC.accent, letterSpacing: "0.4px", textAlign: "center" }}>
+                {lang === "es" ? `Tipo ${tp.num}` : `Type ${tp.num}`}
+              </div>
+            </div>
           ))}
         </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(168,196,184,0.12)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(168,196,184,0.2)", border: "1px solid rgba(168,196,184,0.4)" }}/>
+            <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Normal" : "Normal"}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(196,154,100,0.3)", border: "1px solid rgba(196,154,100,0.7)" }}/>
+            <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Zona afectada" : "Affected zone"}</span>
+          </div>
+        </div>
       </div>
-      {/* Detail cards */}
+
       {c.types.list.map((tp) => (
-        <div key={tp.num} style={S.card}>
-          <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: WC.sage, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, flexShrink: 0 }}>
+        <div key={tp.num} style={{ ...glassStrong, padding: "14px 16px", marginBottom: 10, borderLeft: "3px solid rgba(196,154,100,0.7)" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(196,154,100,0.12)", border: "1.5px solid rgba(196,154,100,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, color: WC.accent, flexShrink: 0 }}>
               {tp.num}
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: WC.cream, marginBottom: 4 }}>{tp.label}</div>
-              <div style={{ fontSize: 13, color: WC.creamMuted, lineHeight: 1.5 }}>{tp.desc}</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: WC.cream, marginBottom: 3 }}>{tp.label}</div>
+              <div style={{ fontSize: 12, color: WC.creamMuted, lineHeight: 1.5 }}>{tp.desc}</div>
             </div>
           </div>
         </div>
@@ -601,62 +780,86 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
     </>
   );
 
+    const stageAccents = [WC.sage, WC.accent, "#c07070"];
   const renderStages = () => (
     <>
       <div style={S.h1}>{c.stages.title}</div>
       <div style={S.sub}>{c.stages.subtitle}</div>
       {c.stages.list.map((st, i) => (
-        <div key={i} style={{ ...S.card, borderLeft: `4px solid ${st.color}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: st.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 16, color: st.textColor, flexShrink: 0 }}>
+        <div key={i} style={{
+          ...glassStrong,
+          marginBottom: 14,
+          overflow: "hidden",
+          borderTop: `3px solid ${stageAccents[i]}`,
+        }}>
+          {/* Header bar */}
+          <div style={{ background: `${stageAccents[i]}18`, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${stageAccents[i]}30`, border: `2px solid ${stageAccents[i]}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 18, color: stageAccents[i], flexShrink: 0 }}>
               {st.num}
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: WC.cream }}>{st.title}</div>
+            <div style={{ fontWeight: 800, fontSize: 15, color: WC.cream }}>{st.title}</div>
           </div>
-          {/* Stage silhouette side by side with bullets */}
-          <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-            <FemaleSilhouette
-              highlighted={i === 0 ? ["hips"] : i === 1 ? ["hips","thighs"] : ["hips","thighs","calves","ankles"]}
-              compact
-            />
+          {/* Body */}
+          <div style={{ padding: "14px 16px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <div style={{ background: `${stageAccents[i]}12`, border: `1px solid ${stageAccents[i]}30`, borderRadius: 12, padding: "8px 4px", flexShrink: 0 }}>
+              <BodyOutline
+                zones={i === 0 ? ["hips"] : i === 1 ? ["hips","thighs"] : ["hips","thighs","calves","ankles"]}
+                compact
+              />
+            </div>
             <div style={{ flex: 1 }}>
               {st.bullets.map((b, j) => (
-                <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 6 }}>
-                  <span style={{ color: st.textColor, fontWeight: 700, fontSize: 14, flexShrink: 0 }}>·</span>
-                  <span style={{ fontSize: 12, color: WC.cream, lineHeight: 1.5 }}>{b}</span>
+                <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 7 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: stageAccents[i], marginTop: 5, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: WC.cream, lineHeight: 1.55 }}>{b}</span>
                 </div>
               ))}
+              <div style={{ marginTop: 10, padding: "8px 10px", background: `${stageAccents[i]}18`, border: `1px solid ${stageAccents[i]}30`, borderRadius: 8, fontSize: 11, color: stageAccents[i], fontWeight: 700, lineHeight: 1.4 }}>
+                💡 {st.tip}
+              </div>
             </div>
-          </div>
-          <div style={{ marginTop: 10, padding: "8px 12px", background: st.color + "44", borderRadius: 8, fontSize: 12, color: st.textColor, fontWeight: 600 }}>
-            💡 {st.tip}
           </div>
         </div>
       ))}
     </>
   );
 
+    const symptomAccents = [WC.accent, WC.sage, WC.accent, WC.sage, WC.accent, WC.sage];
   const renderSymptoms = () => (
     <>
       <div style={S.h1}>{c.symptoms.title}</div>
       <div style={S.sub}>{c.symptoms.subtitle}</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {c.symptoms.list.map((s, i) => (
-          <div key={i} style={{ ...S.card, padding: 14 }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
-              <SymptomVisual type={s.visual} />
+          <div key={i} style={{
+            ...glassStrong,
+            display: "flex",
+            gap: 14,
+            padding: "14px 16px",
+            alignItems: "center",
+            borderLeft: `3px solid ${symptomAccents[i]}`,
+          }}>
+            {/* Visual + icon column */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0 }}>
+              <div style={{ background: `${symptomAccents[i]}18`, border: `1px solid ${symptomAccents[i]}40`, borderRadius: 12, padding: "6px 8px" }}>
+                <SymptomIllustration type={s.visual} accent={symptomAccents[i]} />
+              </div>
+              <span style={{ fontSize: 20 }}>{s.icon}</span>
             </div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: WC.cream, marginBottom: 4, textAlign: "center" }}>
-              {s.icon} {s.title}
+            {/* Text */}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 800, fontSize: 13, color: symptomAccents[i], marginBottom: 5, lineHeight: 1.3 }}>
+                {s.title}
+              </div>
+              <div style={{ fontSize: 12, color: WC.creamMuted, lineHeight: 1.6 }}>{s.desc}</div>
             </div>
-            <div style={{ fontSize: 11, color: WC.creamMuted, lineHeight: 1.5, textAlign: "center" }}>{s.desc}</div>
           </div>
         ))}
       </div>
     </>
   );
 
-  const renders = [renderHero, renderTypes, renderStages, renderSymptoms];
+    const renders = [renderHero, renderTypes, renderStages, renderSymptoms];
   const isLast = section === totalSections - 1;
 
   return (
