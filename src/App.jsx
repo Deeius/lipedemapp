@@ -519,7 +519,7 @@ function SliderInput({ value, onChange, max = 6, labels, color = "#6366f1" }) {
 }
 
 function ZoneCard({ zone, zoneName, value, onChange }) {
-  const colors = [C.creamFaint, "#5a7a4a", "#7aad5a", "#d4a84b", C.danger, "#b03030"];
+  const colors = [C.border, "#8ab89a", "#5a9a72", "#c5a040", C.danger, "#8a2020"];
   const lv = value || 0;
   return (
     <div style={{ background: C.bgInput, borderRadius: 10, padding: "10px 14px", border: `1.5px solid ${lv > 0 ? colors[Math.min(lv,5)] : C.border}`, transition: "border-color 0.3s" }}>
@@ -547,8 +547,9 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
     <div style={{
       borderRadius: 12,
       border: `1.5px solid ${isActive ? C.sage : C.border}`,
-      background: isActive ? C.bgCardHov : C.bgCard,
-      transition: "all 0.2s", overflow: "hidden"
+      background: isActive ? "#f2f8f5" : C.bgCard,
+      transition: "all 0.2s", overflow: "hidden",
+      boxShadow: isActive ? "0 1px 6px rgba(77,138,110,0.1)" : "none",
     }}>
       <div onClick={onToggle} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer" }}>
         <span style={{ fontSize: 22 }}>{supp.icon}</span>
@@ -587,10 +588,10 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
                 {Object.entries(t.effectOptions).map(([k, v]) => (
                   <button key={k} onClick={() => onUpdate({ effect: k })}
                     style={{
-                      flex: 1, padding: "6px 4px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600,
+                      flex: 1, padding: "6px 4px", borderRadius: 7, border: `1px solid ${C.border}`, cursor: "pointer", fontSize: 11, fontWeight: 600,
                       background: suppData?.effect === k
                         ? (k === "good" ? C.success : k === "bad" ? C.danger : C.creamMuted)
-                        : C.creamFaint,
+                        : C.bgInput,
                       color: suppData?.effect === k ? "#fff" : C.creamMuted,
                       transition: "all 0.2s",
                     }}>{v}</button>
@@ -605,32 +606,32 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
 }
 
 const C = {
-  bg:         "#1a1f1e",   // fondo principal dark
-  bgCard:     "#232a28",   // tarjetas
-  bgCardHov:  "#2a3330",   // hover tarjetas
-  bgInput:    "#1e2523",   // inputs
-  border:     "#2e3a37",   // bordes suaves
-  borderFoc:  "#6aad8f",   // bordes activos
-  sage:       "#6aad8f",   // verde salvia principal
-  sageDark:   "#4d8a6e",   // sage oscuro (botones)
-  sageLight:  "#a8d5bc",   // sage claro (texto acento)
-  cream:      "#e8e0d0",   // crema principal (texto)
-  creamMuted: "#9da89f",   // crema apagado (secundario)
-  creamFaint: "#3a4440",   // superficies muy sutiles
-  accent:     "#c5a97d",   // dorado/tierra acento cálido
-  danger:     "#e07070",   // error/dolor
-  success:    "#6aad8f",   // éxito/bien
-  warn:       "#d4a84b",   // warning/neutral
+  bg:         "#f0f5f2",   // fondo principal — verde pálido
+  bgCard:     "#ffffff",   // tarjetas — blanco puro
+  bgCardHov:  "#f7faf8",   // hover tarjetas
+  bgInput:    "#f7faf8",   // inputs — blanco roto muy suave
+  border:     "#d6e5dd",   // bordes — sage muy suave
+  borderFoc:  "#4d8a6e",   // bordes activos
+  sage:       "#4d8a6e",   // verde salvia principal (oscurecido para contraste en claro)
+  sageDark:   "#3a6e57",   // sage oscuro (botones hover)
+  sageLight:  "#3a6e57",   // sage texto (mismo, contraste ≥4.5:1 sobre blanco)
+  cream:      "#1c2b24",   // texto principal — verde muy oscuro casi negro
+  creamMuted: "#5a7568",   // texto secundario — sage medio
+  creamFaint: "#e4eeea",   // superficies muy sutiles
+  accent:     "#8a6c3a",   // dorado/tierra acento (oscurecido para legibilidad)
+  danger:     "#b84040",   // error/dolor
+  success:    "#4d8a6e",   // éxito/bien
+  warn:       "#a07830",   // warning/neutral
 };
 
 const labelStyle = {
-  fontSize: 11, fontWeight: 600, color: C.creamMuted, marginBottom: 5,
+  fontSize: 11, fontWeight: 700, color: C.creamMuted, marginBottom: 5,
   display: "block", textTransform: "uppercase", letterSpacing: "0.6px",
 };
 const inputStyle = {
   width: "100%", padding: "9px 12px", borderRadius: 8,
   border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none",
-  background: C.bgInput, boxSizing: "border-box", fontFamily: "inherit",
+  background: C.bgCard, boxSizing: "border-box", fontFamily: "inherit",
   color: C.cream, transition: "border-color 0.2s",
 };
 const textareaStyle = {
@@ -642,10 +643,44 @@ const textareaStyle = {
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
+// ─── NAV ITEMS & ICONS ────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { key: "today",    icon: "calendar",  es: "Hoy",       en: "Today"       },
+  { key: "history",  icon: "clock",     es: "Historial", en: "History"     },
+  { key: "charts",   icon: "trending",  es: "Gráficas",  en: "Charts"      },
+  { key: "foods",    icon: "utensils",  es: "Alimentos", en: "Foods"       },
+  { key: "supps",    icon: "pill",      es: "Suplementos",en: "Supplements"},
+  { key: "centers",  icon: "mappin",    es: "Centros",   en: "Centers"     },
+  { key: "info",     icon: "book",      es: "Información",en: "Info"       },
+  { key: "profile",  icon: "user",      es: "Perfil",    en: "Profile"     },
+];
+
+// Lucide-style SVG icons — 20×20 viewBox, stroke-based
+function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
+  const s = { width: size, height: size, display: "block", flexShrink: 0 };
+  const p = { fill: "none", stroke: color, strokeWidth, strokeLinecap: "round", strokeLinejoin: "round" };
+  const icons = {
+    calendar: <svg style={s} viewBox="0 0 24 24" {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="14" width="3" height="3" rx="0.5" fill={color} stroke="none"/></svg>,
+    clock:    <svg style={s} viewBox="0 0 24 24" {...p}><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>,
+    trending: <svg style={s} viewBox="0 0 24 24" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
+    utensils: <svg style={s} viewBox="0 0 24 24" {...p}><line x1="3" y1="2" x2="3" y2="22"/><path d="M7 2v7a4 4 0 0 1-4 4"/><path d="M21 2v20M21 2a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4"/></svg>,
+    pill:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M10.5 20H4a2 2 0 0 1-2-2v-2.5a2 2 0 0 1 2-2h6.5"/><path d="M13.5 4H20a2 2 0 0 1 2 2v2.5a2 2 0 0 1-2 2h-6.5"/><circle cx="12" cy="12" r="7"/><path d="M7.5 12h9"/></svg>,
+    mappin:   <svg style={s} viewBox="0 0 24 24" {...p}><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>,
+    book:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="6" x2="16" y2="6"/><line x1="12" y1="10" x2="16" y2="10"/></svg>,
+    user:     <svg style={s} viewBox="0 0 24 24" {...p}><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
+    menu:     <svg style={s} viewBox="0 0 24 24" {...p}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+    x:        <svg style={s} viewBox="0 0 24 24" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    leaf:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
+  };
+  return icons[name] || null;
+}
+
+
 export default function App() {
   const [lang, setLang] = useState("es");
   const [showWelcome, setShowWelcome] = useState(true);
   const [tab, setTab] = useState("today");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [entry, setEntry] = useState(defaultEntry());
   const [logs, setLogs] = useState([]);
   const [foods, setFoods] = useState([]);
@@ -791,38 +826,95 @@ export default function App() {
 
   // ─── STYLES ───────────────────────────────────────────────────────────────
   const S = {
-    app:       { fontFamily: "'DM Sans','Segoe UI',sans-serif", minHeight: "100vh", background: C.bg, color: C.cream },
+    app:       { fontFamily: "'DM Sans','Segoe UI',sans-serif", minHeight: "100vh", background: C.bg, color: C.cream, display: "flex", flexDirection: "column" },
+    layout:    { display: "flex", flex: 1 },
     header:    {
-      background: C.bgCard,
-      borderBottom: `1px solid ${C.border}`,
-      padding: "0 20px",
-      height: 56,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      position: "sticky",
-      top: 0,
-      zIndex: 100,
+      background: C.bgCard, borderBottom: `1px solid ${C.border}`,
+      padding: "0 16px", height: 56, display: "flex", alignItems: "center",
+      justifyContent: "space-between", position: "sticky", top: 0, zIndex: 200,
+      boxShadow: "0 1px 8px rgba(74,110,87,0.07)", flexShrink: 0,
     },
-    title:     { fontSize: 18, fontWeight: 800, color: C.sageLight, letterSpacing: "-0.5px" },
-    subtitle:  { fontSize: 11, color: C.creamMuted, marginTop: 1 },
-    langBtn:   (a) => ({ padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: a ? C.sage : C.creamFaint, color: a ? "#fff" : C.creamMuted, transition: "all 0.2s" }),
-    nav:       { display: "flex", background: C.bgCard, borderBottom: `1px solid ${C.border}`, overflowX: "auto" },
-    navBtn:    (a) => ({ flex: 1, minWidth: 54, padding: "12px 2px", border: "none", borderBottom: a ? `2px solid ${C.sage}` : "2px solid transparent", background: "none", cursor: "pointer", fontSize: 11, fontWeight: a ? 700 : 500, color: a ? C.sageLight : C.creamMuted, transition: "all 0.2s", whiteSpace: "nowrap" }),
-    page:      { maxWidth: 600, margin: "0 auto", padding: "20px 16px 100px" },
-    card:      { background: C.bgCard, borderRadius: 14, padding: 20, marginBottom: 16, border: `1px solid ${C.border}` },
+    // Sidebar — shown on desktop (≥768px) via inline media workaround
+    sidebar: (visible) => ({
+      width: visible ? 220 : 0,
+      minWidth: visible ? 220 : 0,
+      background: C.bgCard,
+      borderRight: `1px solid ${C.border}`,
+      display: visible ? "flex" : "none",
+      flexDirection: "column",
+      padding: visible ? "16px 10px 24px" : 0,
+      gap: 2,
+      flexShrink: 0,
+      overflowY: "auto",
+      position: "sticky",
+      top: 56,
+      height: "calc(100vh - 56px)",
+    }),
+    // Mobile drawer
+    drawerOverlay: {
+      position: "fixed", inset: 0, zIndex: 300,
+      background: "rgba(28,43,36,0.35)", backdropFilter: "blur(3px)",
+    },
+    drawer: {
+      position: "fixed", top: 0, left: 0, bottom: 0, width: 248, zIndex: 301,
+      background: C.bgCard, borderRight: `1px solid ${C.border}`,
+      boxShadow: "6px 0 32px rgba(28,43,36,0.12)",
+      display: "flex", flexDirection: "column", overflowY: "auto",
+    },
+    sbItem: (active) => ({
+      display: "flex", alignItems: "center", gap: 10, padding: "9px 12px",
+      borderRadius: 10, cursor: "pointer", transition: "all 0.15s",
+      background: active ? C.creamFaint : "transparent",
+      color: active ? C.sage : C.creamMuted,
+      fontWeight: active ? 700 : 500, fontSize: 13,
+      border: "none", width: "100%", textAlign: "left",
+    }),
+    sbSection: {
+      fontSize: 10, fontWeight: 800, textTransform: "uppercase",
+      letterSpacing: "0.7px", color: C.creamMuted, padding: "12px 12px 4px",
+    },
+    // Bottom nav — mobile only
+    bottomNav: {
+      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
+      background: C.bgCard, borderTop: `1px solid ${C.border}`,
+      display: "flex", boxShadow: "0 -2px 12px rgba(28,43,36,0.06)",
+    },
+    bnItem: (active) => ({
+      flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+      gap: 3, padding: "8px 2px 6px", cursor: "pointer",
+      border: "none", background: "none",
+      color: active ? C.sage : C.creamMuted, transition: "color 0.15s",
+    }),
+    page:      { flex: 1, overflowY: "auto", padding: "24px 24px 90px", maxWidth: 800, width: "100%", margin: "0 auto" },
+    card:      { background: C.bgCard, borderRadius: 14, padding: 20, marginBottom: 16, border: `1px solid ${C.border}`, boxShadow: "0 1px 4px rgba(74,110,87,0.06)" },
     cardTitle: { fontSize: 14, fontWeight: 700, color: C.cream, marginBottom: 14, letterSpacing: "-0.3px" },
-    label:     labelStyle,
-    input:     inputStyle,
-    textarea:  textareaStyle,
+    label:     labelStyle, input: inputStyle, textarea: textareaStyle,
     btn:       { padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, background: C.sage, color: "#fff", width: "100%", transition: "background 0.2s" },
     btnSm:     (col) => ({ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: col || C.creamFaint, color: col ? "#fff" : C.cream }),
-    row:       { display: "flex", gap: 12 },
-    col:       { flex: 1 },
+    row:       { display: "flex", gap: 12 }, col: { flex: 1 },
     grid2:     { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
-    tag:       (color) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: color + "28", color }),
+    tag:       (color) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: color + "18", color }),
     reactionColor: { good: C.success, bad: C.danger, neutral: C.creamMuted },
   };
+
+  // Responsive breakpoint
+  const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" && window.innerWidth >= 768);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const handler = (e) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const BOTTOM_NAV_KEYS = ["today", "history", "charts", "centers", "profile"];
+
+  // Nav sections for sidebar grouping
+  const NAV_GROUPS = [
+    { label: lang === "es" ? "Seguimiento" : "Tracking", keys: ["today","history","charts"] },
+    { label: lang === "es" ? "Salud"       : "Health",   keys: ["foods","supps"] },
+    { label: lang === "es" ? "Recursos"    : "Resources",keys: ["centers","info"] },
+    { label: lang === "es" ? "Cuenta"      : "Account",  keys: ["profile"] },
+  ];
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
   if (showWelcome) {
@@ -834,8 +926,13 @@ export default function App() {
       {/* ── HEADER ── */}
       <div style={S.header}>
 
-        {/* Left: logo mark + wordmark */}
+        {/* Left: hamburger (mobile only) + logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {!isDesktop && (
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", alignItems: "center" }}>
+              <Icon name="menu" size={22} color={C.cream} />
+            </button>
+          )}
           {/* Logo SVG — leaf + circle mark */}
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1"/>
@@ -881,13 +978,78 @@ export default function App() {
         </div>
       </div>
 
-      {/* Nav */}
-      <nav style={S.nav}>
-        {Object.entries(t.nav).map(([key, label]) => (
-          <button key={key} style={S.navBtn(tab === key)} onClick={() => setTab(key)}>{label}</button>
-        ))}
-      </nav>
+      {/* ── LAYOUT: sidebar + content ── */}
+      <div style={S.layout}>
 
+      {/* ── SIDEBAR (desktop) ── */}
+      {isDesktop && (
+        <aside style={S.sidebar(true)}>
+          {/* Mini logo in sidebar */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px 16px", borderBottom: `1px solid ${C.border}`, marginBottom: 8 }}>
+            <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+              <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1"/>
+              <path d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z" fill="none" stroke={C.sage} strokeWidth="1.4" strokeLinejoin="round"/>
+              <line x1="14" y1="6" x2="14" y2="22" stroke={C.sage} strokeWidth="0.9" strokeLinecap="round"/>
+            </svg>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.creamMuted }}>{lang === "es" ? "Navegación" : "Navigation"}</span>
+          </div>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label}>
+              <div style={S.sbSection}>{group.label}</div>
+              {group.keys.map((key) => {
+                const item = NAV_ITEMS.find(n => n.key === key);
+                if (!item) return null;
+                const active = tab === key;
+                return (
+                  <button key={key} style={S.sbItem(active)} onClick={() => setTab(key)}>
+                    <Icon name={item.icon} size={16} color={active ? C.sage : C.creamMuted} />
+                    {lang === "es" ? item.es : item.en}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </aside>
+      )}
+
+      {/* ── MOBILE DRAWER ── */}
+      {!isDesktop && sidebarOpen && (
+        <>
+          <div style={S.drawerOverlay} onClick={() => setSidebarOpen(false)} />
+          <div style={S.drawer}>
+            {/* Drawer header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 12px", borderBottom: `1px solid ${C.border}` }}>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 14, color: C.cream }}>lipedema <span style={{ fontWeight: 300, color: C.creamMuted }}>tracker</span></div>
+                {profile.name && <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 2 }}>{profile.name}</div>}
+              </div>
+              <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.creamMuted, padding: 4 }}>
+                <Icon name="x" size={18} color={C.creamMuted} />
+              </button>
+            </div>
+            <div style={{ padding: "8px 10px 24px", display: "flex", flexDirection: "column", gap: 2 }}>
+              {NAV_GROUPS.map((group) => (
+                <div key={group.label}>
+                  <div style={S.sbSection}>{group.label}</div>
+                  {group.keys.map((key) => {
+                    const item = NAV_ITEMS.find(n => n.key === key);
+                    if (!item) return null;
+                    const active = tab === key;
+                    return (
+                      <button key={key} style={S.sbItem(active)} onClick={() => { setTab(key); setSidebarOpen(false); }}>
+                        <Icon name={item.icon} size={16} color={active ? C.sage : C.creamMuted} />
+                        {lang === "es" ? item.es : item.en}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── PAGE CONTENT ── */}
       <div style={S.page}>
 
         {/* ── TODAY ── */}
@@ -1199,6 +1361,31 @@ export default function App() {
           </>
         )}
 
+        {/* ── CENTERS ── */}
+        {tab === "centers" && (
+          <div style={S.card}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.creamFaint, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon name="mappin" size={20} color={C.sage} />
+              </div>
+              <div>
+                <div style={S.cardTitle}>{lang === "es" ? "Centros especializados" : "Specialized Centers"}</div>
+                <div style={{ fontSize: 12, color: C.creamMuted, marginTop: -10 }}>
+                  {lang === "es" ? "Próximamente — fisioterapeutas y especialistas en lipedema cerca de ti" : "Coming soon — lipedema physiotherapists and specialists near you"}
+                </div>
+              </div>
+            </div>
+            <div style={{ background: C.creamFaint, borderRadius: 10, padding: "16px", textAlign: "center", border: `1px dashed ${C.border}` }}>
+              <Icon name="mappin" size={32} color={C.border} />
+              <div style={{ fontSize: 13, color: C.creamMuted, marginTop: 10, lineHeight: 1.6 }}>
+                {lang === "es"
+                  ? "Esta sección mostrará centros de drenaje linfático, fisioterapeutas especializados y cirujanos vasculares según tu ubicación."
+                  : "This section will show lymphatic drainage centers, specialized physiotherapists and vascular surgeons based on your location."}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── INFO ── */}
         {tab === "info" && (
           <>
@@ -1291,7 +1478,72 @@ export default function App() {
           </>
         )}
 
-        {/* ── PROFILE ── */}
+        {/* ── CENTERS ── */}
+        {tab === "centers" && (
+          <>
+            <div style={S.card}>
+              <div style={S.cardTitle}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Icon name="mappin" size={18} color={C.sage} />
+                  {lang === "es" ? "Centros especializados en lipedema" : "Lipedema specialist centres"}
+                </div>
+              </div>
+              <p style={{ fontSize: 13, color: C.creamMuted, lineHeight: 1.65, marginBottom: 16 }}>
+                {lang === "es"
+                  ? "Directorio de clínicas, fisioterapeutas especializados y cirujanos linfáticos con experiencia en lipedema en España."
+                  : "Directory of clinics, specialist physiotherapists and lymphatic surgeons with lipedema expertise in Spain."}
+              </p>
+              {/* Location filter */}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                {["Madrid","Barcelona","Valencia","Sevilla","Bilbao"].map(city => (
+                  <button key={city} style={{ padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${C.border}`, background: C.bgInput, fontSize: 12, fontWeight: 600, color: C.creamMuted, cursor: "pointer" }}>
+                    {city}
+                  </button>
+                ))}
+              </div>
+              {/* Coming soon notice */}
+              <div style={{ background: C.creamFaint, borderRadius: 12, padding: "16px 18px", border: `1px solid ${C.border}`, textAlign: "center" }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🗺️</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.cream, marginBottom: 4 }}>
+                  {lang === "es" ? "Próximamente" : "Coming soon"}
+                </div>
+                <div style={{ fontSize: 12, color: C.creamMuted, lineHeight: 1.6 }}>
+                  {lang === "es"
+                    ? "Estamos construyendo el directorio de centros verificados. Podrás filtrar por ubicación, tipo de tratamiento y especialidad."
+                    : "We're building the verified centre directory. You'll be able to filter by location, treatment type and specialty."}
+                </div>
+              </div>
+            </div>
+
+            {/* Sample centre cards */}
+            {[
+              { name: "Clínica Linfovascular Madrid", specialty: lang === "es" ? "Cirugía linfática · Liposucción especializada" : "Lymphatic surgery · Specialist liposuction", city: "Madrid", type: lang === "es" ? "Cirugía" : "Surgery", verified: true },
+              { name: "Fisioterapia Integral Barcelona", specialty: lang === "es" ? "Drenaje linfático manual · Presoterapia" : "Manual lymphatic drainage · Pressotherapy", city: "Barcelona", type: lang === "es" ? "Fisioterapia" : "Physiotherapy", verified: true },
+              { name: "Centro Dermatológico Valencia", specialty: lang === "es" ? "Diagnóstico · Tratamiento conservador" : "Diagnosis · Conservative treatment", city: "Valencia", type: lang === "es" ? "Diagnóstico" : "Diagnosis", verified: false },
+            ].map((c, i) => (
+              <div key={i} style={{ ...S.card, marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: C.cream }}>{c.name}</span>
+                      {c.verified && <span style={{ fontSize: 10, fontWeight: 700, color: C.sage, background: C.creamFaint, padding: "2px 6px", borderRadius: 20 }}>✓ {lang === "es" ? "Verificado" : "Verified"}</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: C.creamMuted, marginBottom: 6 }}>{c.specialty}</div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: C.sageLight, background: C.creamFaint, padding: "2px 8px", borderRadius: 20 }}>📍 {c.city}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: C.accent, background: `${C.accent}15`, padding: "2px 8px", borderRadius: 20 }}>{c.type}</span>
+                    </div>
+                  </div>
+                  <button style={{ padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${C.border}`, background: "white", fontSize: 12, fontWeight: 600, color: C.sage, cursor: "pointer", flexShrink: 0 }}>
+                    {lang === "es" ? "Ver más" : "View"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* ── PROFILE ── */
         {tab === "profile" && (
           <div style={S.card}>
             <div style={S.cardTitle}>{t.profile.title}</div>
@@ -1325,6 +1577,28 @@ export default function App() {
         )}
 
       </div>
+      </div>{/* /layout */}
+
+      {/* ── BOTTOM NAV (mobile) ── */}
+      {!isDesktop && (
+        <nav style={S.bottomNav}>
+          {BOTTOM_NAV_KEYS.map((key) => {
+            const item = NAV_ITEMS.find(n => n.key === key);
+            if (!item) return null;
+            const active = tab === key;
+            return (
+              <button key={key} style={S.bnItem(active)} onClick={() => setTab(key)}>
+                <Icon name={item.icon} size={20} color={active ? C.sage : C.creamMuted} />
+                <span style={{ fontSize: 9, fontWeight: active ? 700 : 500 }}>{lang === "es" ? item.es : item.en}</span>
+              </button>
+            );
+          })}
+          <button style={S.bnItem(false)} onClick={() => setSidebarOpen(true)}>
+            <Icon name="menu" size={20} color={C.creamMuted} />
+            <span style={{ fontSize: 9, fontWeight: 500 }}>{lang === "es" ? "Más" : "More"}</span>
+          </button>
+        </nav>
+      )}
     </div>
   );
 }

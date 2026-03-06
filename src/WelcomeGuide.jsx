@@ -2,17 +2,17 @@ import { useState } from "react";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const WC = {
-  bg:        "#1a1f1e",
-  bgCard:    "#232a28",
-  bgInput:   "#1e2523",
-  border:    "#2e3a37",
-  sage:      "#6aad8f",
-  sageLight: "#a8d5bc",
-  cream:     "#e8e0d0",
-  creamMuted:"#9da89f",
-  creamFaint:"#3a4440",
-  accent:    "#c5a97d",
-  danger:    "#e07070",
+  bg:        "#f0f5f2",   // fondo verde pálido
+  bgCard:    "#ffffff",   // tarjetas blanco
+  bgInput:   "#f7faf8",   // inputs blanco roto
+  border:    "#d6e5dd",   // bordes sage suave
+  sage:      "#4d8a6e",   // sage principal
+  sageLight: "#3a6e57",   // sage texto
+  cream:     "#1c2b24",   // texto principal
+  creamMuted:"#5a7568",   // texto secundario
+  creamFaint:"#e4eeea",   // superficies sutiles
+  accent:    "#8a6c3a",   // dorado tierra
+  danger:    "#b84040",   // error
 };
 
 // ─── FEMALE BODY OUTLINE SVG ─────────────────────────────────────────────────
@@ -24,11 +24,11 @@ const WC = {
 
 function BodyOutline({ zones = [], compact = false }) {
   // Palette: accessible on dark — low saturation, warm tones
-  const ZONE_FILL   = "rgba(196, 154, 100, 0.28)";   // warm amber tint
-  const ZONE_STROKE = "rgba(196, 154, 100, 0.70)";   // amber border
-  const BODY_FILL   = "rgba(168, 196, 184, 0.08)";   // faint sage fill
-  const BODY_STROKE = "rgba(168, 196, 184, 0.55)";   // sage outline
-  const HEAD_FILL   = "rgba(168, 196, 184, 0.15)";
+  const ZONE_FILL   = "rgba(138, 108, 58, 0.15)";    // warm amber tint — light mode
+  const ZONE_STROKE = "rgba(138, 108, 58, 0.55)";    // amber border
+  const BODY_FILL   = "rgba(77, 138, 110, 0.07)";    // faint sage fill
+  const BODY_STROKE = "rgba(58, 110, 87, 0.45)";     // sage outline
+  const HEAD_FILL   = "rgba(77, 138, 110, 0.10)";
 
   const s = compact ? 0.68 : 1;
   const W = 100 * s, H = 240 * s;
@@ -112,7 +112,7 @@ function BodyOutline({ zones = [], compact = false }) {
 // All on transparent bg, readable on dark
 
 function SymptomIllustration({ type, accent = "#c5a97d" }) {
-  const stroke = "#a8c4b8";  // body outline color
+  const stroke = "#4d8a6e";  // body outline color
   const sw = 1.2;
 
   if (type === "bruising") return (
@@ -120,7 +120,7 @@ function SymptomIllustration({ type, accent = "#c5a97d" }) {
       {/* Skin cross-section */}
       <rect x="4" y="4" width="64" height="48" rx="10" fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
       {/* Skin surface layer */}
-      <rect x="4" y="4" width="64" height="10" rx="10" fill="rgba(168,196,184,0.12)" stroke="none"/>
+      <rect x="4" y="4" width="64" height="10" rx="10" fill="rgba(77,138,110,0.1)" stroke="none"/>
       <line x1="4" y1="14" x2="68" y2="14" stroke={stroke} strokeWidth="0.5" strokeDasharray="3 2"/>
       {/* Bruise pools */}
       <ellipse cx="26" cy="32" rx="12" ry="8" fill={`${accent}33`} stroke={`${accent}88`} strokeWidth="1"/>
@@ -193,7 +193,7 @@ function SymptomIllustration({ type, accent = "#c5a97d" }) {
         fill="rgba(168,196,184,0.07)" stroke={stroke} strokeWidth={sw}/>
       {/* Swelling overlay — lower leg */}
       <path d="M10,44 Q14,40 36,42 Q40,52 38,62 Q28,70 16,66 Q8,56 10,44Z"
-        fill="rgba(96,165,250,0.20)" stroke="rgba(96,165,250,0.55)" strokeWidth="1"/>
+        fill="rgba(77,138,110,0.12)" stroke="rgba(77,138,110,0.5)" strokeWidth="1"/>
       {/* Pitting fovea dot */}
       <circle cx="24" cy="56" r="3" fill="rgba(168,196,184,0.3)" stroke={stroke} strokeWidth="0.8"/>
       <text x="30" y="58" fontSize="6" fill={stroke}>fóvea</text>
@@ -560,27 +560,24 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
   const sections = ["hero","types","stages","symptoms"];
   const totalSections = sections.length;
 
-  // Glassmorphism helpers
-  const glass = (alpha = 0.12, blur = 16) => ({
-    background: `rgba(106, 173, 143, ${alpha})`,
-    backdropFilter: `blur(${blur}px)`,
-    WebkitBackdropFilter: `blur(${blur}px)`,
-    border: "1px solid rgba(168, 213, 188, 0.18)",
-    borderRadius: 18,
+  // Light card styles (replaces dark glassmorphism)
+  const glass = (alpha = 0.06) => ({
+    background: `rgba(77, 138, 110, ${alpha})`,
+    border: `1px solid rgba(77, 138, 110, 0.18)`,
+    borderRadius: 16,
   });
   const glassStrong = {
-    background: "rgba(35, 55, 48, 0.72)",
-    backdropFilter: "blur(24px)",
-    WebkitBackdropFilter: "blur(24px)",
-    border: "1px solid rgba(106, 173, 143, 0.25)",
-    borderRadius: 18,
+    background: "#ffffff",
+    border: `1px solid ${WC.border}`,
+    borderRadius: 16,
+    boxShadow: "0 1px 6px rgba(58,110,87,0.07)",
   };
 
   const S = {
     wrap: {
       fontFamily: "'DM Sans','Segoe UI',sans-serif",
       minHeight: "100vh",
-      background: "radial-gradient(ellipse at 20% 20%, #1e3d30 0%, #1a1f1e 45%, #0f1a16 100%)",
+      background: "linear-gradient(160deg, #eaf2ee 0%, #f0f5f2 60%, #f5f8f4 100%)",
       color: WC.cream,
       display: "flex",
       flexDirection: "column",
@@ -692,7 +689,7 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
           </div>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 200, background: "rgba(168,196,184,0.15)", alignSelf: "center" }} />
+          <div style={{ width: 1, height: 200, background: "rgba(77,138,110,0.12)", alignSelf: "center" }} />
 
           {/* Right: lipedema */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
@@ -709,13 +706,13 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
         </div>
 
         {/* Legend */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(168,196,184,0.12)" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(77,138,110,0.1)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 14, height: 8, borderRadius: 3, background: "rgba(168,196,184,0.2)", border: "1px solid rgba(168,196,184,0.5)" }}/>
+            <div style={{ width: 14, height: 8, borderRadius: 3, background: "rgba(77,138,110,0.15)", border: "1px solid rgba(168,196,184,0.5)" }}/>
             <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Tejido normal" : "Normal tissue"}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 14, height: 8, borderRadius: 3, background: "rgba(196,154,100,0.3)", border: "1px solid rgba(196,154,100,0.7)" }}/>
+            <div style={{ width: 14, height: 8, borderRadius: 3, background: "rgba(138,108,58,0.18)", border: "1px solid rgba(138,108,58,0.6)" }}/>
             <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Zona afectada" : "Affected zone"}</span>
           </div>
         </div>
@@ -752,22 +749,22 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(168,196,184,0.12)" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(77,138,110,0.1)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(168,196,184,0.2)", border: "1px solid rgba(168,196,184,0.4)" }}/>
+            <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(77,138,110,0.15)", border: "1px solid rgba(77,138,110,0.35)" }}/>
             <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Normal" : "Normal"}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(196,154,100,0.3)", border: "1px solid rgba(196,154,100,0.7)" }}/>
+            <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(138,108,58,0.18)", border: "1px solid rgba(138,108,58,0.6)" }}/>
             <span style={{ fontSize: 10, color: WC.creamMuted }}>{lang === "es" ? "Zona afectada" : "Affected zone"}</span>
           </div>
         </div>
       </div>
 
       {c.types.list.map((tp) => (
-        <div key={tp.num} style={{ ...glassStrong, padding: "14px 16px", marginBottom: 10, borderLeft: "3px solid rgba(196,154,100,0.7)" }}>
+        <div key={tp.num} style={{ ...glassStrong, padding: "14px 16px", marginBottom: 10, borderLeft: "3px solid rgba(138,108,58,0.6)" }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(196,154,100,0.12)", border: "1.5px solid rgba(196,154,100,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, color: WC.accent, flexShrink: 0 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(138,108,58,0.1)", border: "1.5px solid rgba(196,154,100,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, color: WC.accent, flexShrink: 0 }}>
               {tp.num}
             </div>
             <div>
