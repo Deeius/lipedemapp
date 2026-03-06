@@ -701,6 +701,7 @@ export default function App() {
   const [cycleActiveType, setCycleActiveType] = useState(null); // "period"|"spm"|"retention"|null
   const [recipeExpanded, setRecipeExpanded] = useState(false);
   const [openLog, setOpenLog] = useState(null);
+  const [avatarMenu, setAvatarMenu] = useState(false);
   const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
   const [customSuppName, setCustomSuppName] = useState("");
   const [infoFilter, setInfoFilter] = useState("all");
@@ -753,6 +754,17 @@ export default function App() {
   }, []);
 
   const updateEntry = (field, val) => setEntry((e) => ({ ...e, [field]: val }));
+
+  const handleLogout = () => {
+    if (!window.confirm(lang === "es"
+      ? "¿Segura que quieres cerrar sesión? Tus datos se mantendrán guardados."
+      : "Sure you want to log out? Your data will remain saved.")) return;
+    localStorage.removeItem("lt_welcome_seen");
+    localStorage.removeItem("lt_onboarding_done");
+    setShowWelcome(true);
+    setShowOnboarding(false);
+    setAvatarMenu(false);
+  };
 
   const saveLog = () => {
     const updated = logs.filter((l) => l.date !== entry.date).concat(entry);
@@ -1011,15 +1023,60 @@ export default function App() {
             <button style={{ padding: "3px 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: lang === "en" ? C.bgCard : "transparent", color: lang === "en" ? C.sageLight : C.creamMuted, transition: "all 0.2s" }} onClick={() => switchLang("en")}>EN</button>
           </div>
 
-          {/* Avatar */}
-          <div
-            onClick={() => setTab("profile")}
-            title={profile.name || (lang === "es" ? "Mi perfil" : "My profile")}
-            style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg, ${C.sage}, ${C.sageDark})`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, border: `2px solid ${C.creamFaint}` }}
-          >
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#fff", lineHeight: 1 }}>
-              {profile.name ? profile.name.trim()[0].toUpperCase() : "?"}
-            </span>
+          {/* Avatar + dropdown */}
+          <div style={{ position:"relative" }}>
+            <div
+              onClick={() => setAvatarMenu(m => !m)}
+              title={profile.name || (lang === "es" ? "Mi perfil" : "My profile")}
+              style={{ width:32, height:32, borderRadius:"50%", background:`linear-gradient(135deg, ${C.sage}, ${C.sageDark})`, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", flexShrink:0, border:`2px solid ${avatarMenu ? C.sage : C.creamFaint}`, transition:"border 0.15s" }}
+            >
+              <span style={{ fontSize:13, fontWeight:800, color:"#fff", lineHeight:1 }}>
+                {profile.name ? profile.name.trim()[0].toUpperCase() : "?"}
+              </span>
+            </div>
+
+            {/* Dropdown */}
+            {avatarMenu && (
+              <>
+                {/* Backdrop — click outside to close */}
+                <div onClick={() => setAvatarMenu(false)} style={{ position:"fixed", inset:0, zIndex:299 }} />
+                <div style={{ position:"absolute", top:40, right:0, zIndex:300, background:"white", borderRadius:14, border:`1px solid ${C.border}`, boxShadow:"0 8px 32px rgba(74,110,87,0.15)", minWidth:200, overflow:"hidden" }}>
+                  {/* User info */}
+                  <div style={{ padding:"14px 16px 10px", borderBottom:`1px solid ${C.border}` }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                      <div style={{ width:36, height:36, borderRadius:"50%", background:`linear-gradient(135deg, ${C.sage}, ${C.sageDark})`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                        <span style={{ fontSize:15, fontWeight:800, color:"#fff" }}>{profile.name ? profile.name.trim()[0].toUpperCase() : "?"}</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize:13, fontWeight:800, color:C.cream }}>{profile.name || (lang==="es"?"Sin nombre":"No name")}</div>
+                        <div style={{ fontSize:11, color:C.creamMuted }}>{lang==="es" ? `Estadio ${profile.stage === "unknown" ? "—" : profile.stage}` : `Stage ${profile.stage === "unknown" ? "—" : profile.stage}`}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Menu items */}
+                  <div style={{ padding:"6px 0" }}>
+                    <button onClick={() => { setTab("profile"); setAvatarMenu(false); }}
+                      style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.cream, fontWeight:600, textAlign:"left" }}>
+                      <Icon name="user" size={16} color={C.creamMuted} />
+                      {lang==="es" ? "Mi perfil" : "My profile"}
+                    </button>
+                    <button onClick={() => { setTab("home"); setAvatarMenu(false); }}
+                      style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.cream, fontWeight:600, textAlign:"left" }}>
+                      <Icon name="home" size={16} color={C.creamMuted} />
+                      {lang==="es" ? "Inicio" : "Home"}
+                    </button>
+                    <div style={{ margin:"4px 12px", borderTop:`1px solid ${C.border}` }} />
+                    <button onClick={handleLogout}
+                      style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:"#c06080", fontWeight:700, textAlign:"left" }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c06080" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                      </svg>
+                      {lang==="es" ? "Cerrar sesión" : "Log out"}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
