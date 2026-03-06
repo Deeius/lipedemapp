@@ -554,7 +554,7 @@ function SymptomVisual({ type }) {
 }
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function WelcomeGuide({ lang = "es", onEnter }) {
+export default function WelcomeGuide({ lang = "es", onEnter, isOverlay = false }) {
   const [section, setSection] = useState(0); // 0=hero, 1=types, 2=stages, 3=symptoms, 4=compare
   const c = CONTENT[lang] || CONTENT.es;
   const sections = ["hero","types","stages","symptoms"];
@@ -864,7 +864,7 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
       {/* Top bar */}
       <div style={S.topBar}>
         <div style={S.logo}>🌿 Lipedema Tracker</div>
-        <button style={S.skipBtn} onClick={onEnter}>{c.skip}</button>
+        <button style={S.skipBtn} onClick={onEnter}>{isOverlay ? (lang === "es" ? "← Volver" : "← Back") : c.skip}</button>
       </div>
 
       {/* Progress dots */}
@@ -885,7 +885,7 @@ export default function WelcomeGuide({ lang = "es", onEnter }) {
           <button style={S.btnPrev} onClick={() => setSection(s => s - 1)}>← Atrás</button>
         )}
         <button style={S.btnNext} onClick={() => isLast ? onEnter() : setSection(s => s + 1)}>
-          {isLast ? c.skip : `Siguiente →`}
+          {isLast ? (isOverlay ? (lang === "es" ? "← Volver a la app" : "← Back to app") : c.skip) : `Siguiente →`}
         </button>
       </div>
     </div>

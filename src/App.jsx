@@ -685,6 +685,7 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
 export default function App() {
   const [lang, setLang] = useState("es");
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [tab, setTab] = useState("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1019,6 +1020,12 @@ export default function App() {
 
   return (
     <div style={S.app}>
+      {/* Guide overlay — shown from Info tab, covers app without resetting state */}
+      {showGuide && (
+        <div style={{ position:"fixed", inset:0, zIndex:500, overflowY:"auto" }}>
+          <WelcomeGuide lang={lang} onEnter={() => setShowGuide(false)} isOverlay />
+        </div>
+      )}
       {/* ── HEADER ── */}
       <div style={S.header}>
 
@@ -2457,7 +2464,7 @@ export default function App() {
           <>
             {/* Visual Guide shortcut */}
             <div
-              onClick={() => setShowWelcome(true)}
+              onClick={() => setShowGuide(true)}
               style={{ background: "linear-gradient(135deg, #fdf4ff, #f0f9ff)", borderRadius: 14, padding: "16px 18px", marginBottom: 14, border: "1.5px solid #e9d5ff", cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
             >
               <div style={{ fontSize: 36 }}>🩺</div>
