@@ -4,6 +4,7 @@ import {
   ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis,
   BarChart, Bar, Legend,
 } from "recharts";
+import { Lightbulb } from "lucide-react";
 import WelcomeGuide from "./WelcomeGuide";
 import Onboarding from "./Onboarding";
 
@@ -1763,7 +1764,7 @@ export default function App() {
                 return (
                   <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
                     <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                      {lang==="es" ? "💡 Consejo personalizado" : "💡 Personalized tip"}
+                      <Lightbulb size={12} style={{ display:"inline", verticalAlign:"middle", marginRight:4 }} />{lang==="es" ? "Consejo personalizado" : "Personalized tip"}
                     </div>
                     <p style={{ fontSize:13, color:C.cream, lineHeight:1.6, margin:0, fontWeight:500 }}>
                       {tipText}
@@ -2942,17 +2943,19 @@ export default function App() {
               const hasLegs = activeZones.some(z =>
                 ["leftThigh","rightThigh","leftCalf","rightCalf","ankles","hips"].includes(z));
               if (hasArms && hasLegs) return (
-                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5 }}>
-                  {lang==="es"
-                    ? "💡 Tipo combinado (Brazos + Piernas) — El lipedema puede afectar extremidades superiores e inferiores simultáneamente. Cada zona puede progresar de forma diferente y requerir compresión y tratamiento específicos."
-                    : "💡 Combined type (Arms + Legs) — Lipedema can affect upper and lower limbs simultaneously. Each area may progress differently and require specific compression and treatment."}
+                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5, display:"flex", alignItems:"flex-start", gap:6 }}>
+                  <Lightbulb size={14} style={{ flexShrink:0, marginTop:2 }} />
+                  <span>{lang==="es"
+                    ? "Tipo combinado (Brazos + Piernas) — El lipedema puede afectar extremidades superiores e inferiores simultáneamente. Cada zona puede progresar de forma diferente y requerir compresión y tratamiento específicos."
+                    : "Combined type (Arms + Legs) — Lipedema can affect upper and lower limbs simultaneously. Each area may progress differently and require specific compression and treatment."}</span>
                 </div>
               );
               if (hasArms) return (
-                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5 }}>
-                  {lang==="es"
-                    ? "💡 Tipo 4 (Brazos) — El lipedema en brazos suele afectar del hombro al codo. Puede presentarse solo o junto con afectación en piernas."
-                    : "💡 Type 4 (Arms) — Arm lipedema typically affects shoulder to elbow. It can occur alone or alongside leg involvement."}
+                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5, display:"flex", alignItems:"flex-start", gap:6 }}>
+                  <Lightbulb size={14} style={{ flexShrink:0, marginTop:2 }} />
+                  <span>{lang==="es"
+                    ? "Tipo 4 (Brazos) — El lipedema en brazos suele afectar del hombro al codo. Puede presentarse solo o junto con afectación en piernas."
+                    : "Type 4 (Arms) — Arm lipedema typically affects shoulder to elbow. It can occur alone or alongside leg involvement."}</span>
                 </div>
               );
               return null;
