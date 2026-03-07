@@ -1704,7 +1704,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Inflammation */
+            {/* Inflammation */}
             <div style={S.card}>
               <div style={S.cardTitle}>{t.today.inflammation}</div>
               {activeZones.length === 0 && (
