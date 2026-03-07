@@ -1707,6 +1707,71 @@ export default function App() {
                 </p>
               </div>
 
+              {/* 4b. CONSEJO PERSONALIZADO POR ZONA */}
+              {(() => {
+                const hasArms = profile.activeZones?.some(z => z.includes("Arm"));
+                const hasLegs = profile.activeZones?.some(z =>
+                  ["leftThigh","rightThigh","leftCalf","rightCalf","ankles","hips"].includes(z));
+                if (!hasArms && !hasLegs) return null;
+                const zonePattern = hasArms && hasLegs ? "both" : hasArms ? "arms" : "legs";
+                const zoneTips = {
+                  both: {
+                    es: [
+                      "El lipedema en brazos y piernas requiere compresión adaptada a cada zona. Consulta con tu especialista sobre prendas de manga completa.",
+                      "Si tienes afectación en brazos y piernas, prioriza ejercicios acuáticos: la presión del agua comprime todas las zonas por igual.",
+                      "El drenaje linfático manual debe cubrir brazos y piernas por separado — no omitas los brazos en tus sesiones.",
+                      "Registra la inflamación de brazos y piernas por separado: pueden evolucionar de forma diferente.",
+                    ],
+                    en: [
+                      "Lipedema in both arms and legs requires compression tailored to each area. Ask your specialist about full-sleeve garments.",
+                      "With both arm and leg involvement, prioritise aquatic exercise: water pressure compresses all zones evenly.",
+                      "Manual lymphatic drainage should cover arms and legs separately — don't skip arms in your sessions.",
+                      "Track arm and leg inflammation separately: they can progress differently and may need different treatments.",
+                    ],
+                  },
+                  arms: {
+                    es: [
+                      "El lipedema en brazos (Tipo 4) se beneficia de mangas de compresión médica, especialmente durante el ejercicio.",
+                      "Ejercicios suaves de remo y natación fortalecen los brazos sin impacto, ideal para lipedema en miembros superiores.",
+                      "El cepillado en seco en brazos, siempre hacia el corazón, puede mejorar la circulación linfática.",
+                      "Los brazos con lipedema son propensos a hematomas: evita cargar peso excesivo y usa protección si es necesario.",
+                    ],
+                    en: [
+                      "Arm lipedema (Type 4) benefits from medical compression sleeves, especially during exercise.",
+                      "Gentle rowing and swimming strengthen arms without impact — ideal for upper limb lipedema.",
+                      "Dry brushing on arms, always toward the heart, can improve lymphatic circulation.",
+                      "Arms with lipedema bruise easily: avoid excessive weight-bearing and use protection if needed.",
+                    ],
+                  },
+                  legs: {
+                    es: [
+                      "Caminar 30 minutos al día es uno de los ejercicios más efectivos para el lipedema en piernas.",
+                      "Eleva las piernas 15 minutos antes de dormir para favorecer el retorno linfático.",
+                      "Las medias de compresión de tejido plano son las más recomendadas para lipedema en piernas.",
+                      "Evita estar de pie o sentada más de 1 hora seguida — los descansos activos reducen la hinchazón en piernas.",
+                    ],
+                    en: [
+                      "Walking 30 minutes a day is one of the most effective exercises for leg lipedema.",
+                      "Elevate your legs for 15 minutes before bed to support lymphatic return.",
+                      "Flat-knit compression stockings are the most recommended for leg lipedema.",
+                      "Avoid standing or sitting for more than 1 hour — active breaks reduce leg swelling.",
+                    ],
+                  },
+                };
+                const tips = zoneTips[zonePattern][lang] || zoneTips[zonePattern]["en"];
+                const tipText = tips[dayIdx % tips.length];
+                return (
+                  <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
+                    <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
+                      {lang==="es" ? "💡 Consejo personalizado" : "💡 Personalized tip"}
+                    </div>
+                    <p style={{ fontSize:13, color:C.cream, lineHeight:1.6, margin:0, fontWeight:500 }}>
+                      {tipText}
+                    </p>
+                  </div>
+                );
+              })()}
+
               {/* 5. RECETA DEL DÍA */}
               {(() => {
                 const [recipeOpen, setRecipeOpen] = [tab === "home" ? recipeExpanded : false, setRecipeExpanded];
@@ -2872,6 +2937,26 @@ export default function App() {
                 );
               })}
             </div>
+            {(() => {
+              const hasArms = activeZones.some(z => z.includes("Arm"));
+              const hasLegs = activeZones.some(z =>
+                ["leftThigh","rightThigh","leftCalf","rightCalf","ankles","hips"].includes(z));
+              if (hasArms && hasLegs) return (
+                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5 }}>
+                  {lang==="es"
+                    ? "💡 Tipo combinado (Brazos + Piernas) — El lipedema puede afectar extremidades superiores e inferiores simultáneamente. Cada zona puede progresar de forma diferente y requerir compresión y tratamiento específicos."
+                    : "💡 Combined type (Arms + Legs) — Lipedema can affect upper and lower limbs simultaneously. Each area may progress differently and require specific compression and treatment."}
+                </div>
+              );
+              if (hasArms) return (
+                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5 }}>
+                  {lang==="es"
+                    ? "💡 Tipo 4 (Brazos) — El lipedema en brazos suele afectar del hombro al codo. Puede presentarse solo o junto con afectación en piernas."
+                    : "💡 Type 4 (Arms) — Arm lipedema typically affects shoulder to elbow. It can occur alone or alongside leg involvement."}
+                </div>
+              );
+              return null;
+            })()}
             <button style={{ ...S.btn, marginTop: 20 }} onClick={saveProfile}>
               {profileSaved ? t.profile.saved : t.profile.save}
             </button>
