@@ -763,7 +763,13 @@ export default function App() {
       const so = localStorage.getItem("lt_onboarding_done");
       const sc = localStorage.getItem("lt_cycle");
       if (sc) setCycleData(JSON.parse(sc));
-      if (sl) setLogs(JSON.parse(sl));
+      if (sl) {
+        const parsed = JSON.parse(sl);
+        setLogs(parsed);
+        const todayStr = new Date().toISOString().split("T")[0];
+        const todayLog = parsed.find(l => l.date === todayStr);
+        if (todayLog) setEntry(todayLog);
+      }
       if (sf) setFoods(JSON.parse(sf));
       if (sp) setProfile({ ...defaultProfile, ...JSON.parse(sp) });
       if (ss) setSupps(JSON.parse(ss));
