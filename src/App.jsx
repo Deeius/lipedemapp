@@ -368,6 +368,8 @@ const LANG = {
       weight: "Evolución del Peso",
       painEnergy: "Dolor vs Energía",
       inflammation: "Mapa de Inflamación",
+      suppAdherence: "Adherencia a Suplementos",
+      suppFrequency: "Frecuencia por Suplemento",
       foods: "Alimentos: Reacciones",
       noData: "Registra datos para ver gráficos",
     },
@@ -473,6 +475,8 @@ const LANG = {
       weight: "Weight Evolution",
       painEnergy: "Pain vs Energy",
       inflammation: "Inflammation Map",
+      suppAdherence: "Supplement Adherence",
+      suppFrequency: "Supplement Frequency",
       foods: "Foods: Reactions",
       noData: "Log data to see charts",
     },
@@ -940,6 +944,20 @@ export default function App() {
       : 0;
     return { zone: t.today.zoneNames[z] || z, value: parseFloat(avg.toFixed(1)) };
   });
+
+  const suppChartData = logs.slice(-30).map((l) => ({
+    date: l.date.slice(5),
+    taken: (l.suppsTaken || []).length,
+  }));
+
+  const last30 = logs.slice(-30);
+  const suppFreqData = activeSupps.map((a) => {
+    const def = allSuppsList.find(s => s.key === a.key);
+    return {
+      name: def ? (lang === "es" ? def.es : def.en) : a.key,
+      count: last30.filter(l => (l.suppsTaken || []).includes(a.key)).length,
+    };
+  }).sort((a, b) => b.count - a.count);
 
   const foodReactions = [
     { name: t.foods.good, count: foods.filter((f) => f.reaction === "good").length, fill: "#34d399" },
@@ -2442,6 +2460,34 @@ export default function App() {
                         <PolarAngleAxis dataKey="zone" tick={{ fontSize: 11 }} />
                         <Radar dataKey="value" stroke="#f97316" fill="#f97316" fillOpacity={0.35} strokeWidth={2} />
                       </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+
+                {activeSupps.length > 0 && (
+                  <div style={S.card}>
+                    <div style={S.cardTitle}>{t.charts.suppAdherence}</div>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={suppChartData}>
+                        <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                        <Tooltip />
+                        <Bar dataKey="taken" fill={C.sage} radius={[6,6,0,0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+
+                {suppFreqData.some(d => d.count > 0) && (
+                  <div style={S.card}>
+                    <div style={S.cardTitle}>{t.charts.suppFrequency}</div>
+                    <ResponsiveContainer width="100%" height={Math.max(160, suppFreqData.length * 32)}>
+                      <BarChart data={suppFreqData} layout="vertical">
+                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10 }} />
+                        <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={120} />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#6366f1" radius={[0,6,6,0]} />
+                      </BarChart>
                     </ResponsiveContainer>
                   </div>
                 )}
