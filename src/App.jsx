@@ -6,6 +6,8 @@ import {
 } from "recharts";
 import WelcomeGuide from "./WelcomeGuide";
 import Onboarding from "./Onboarding";
+import { useAuth } from "./hooks/useAuth";
+import { getProfile, upsertProfile, getLogs, upsertLog, getSupplements, getFoods, upsertFood, deleteFood, getCycle, upsertCycle } from "./lib/db";
 
 // ─── INFO RESOURCES ──────────────────────────────────────────────────────────
 const INFO_RESOURCES = {
@@ -717,6 +719,7 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
 
 
 export default function App() {
+  const { user, loading, loginWithGoogle, logout } = useAuth();
   const [lang, setLang] = useState("es");
   const [showWelcome, setShowWelcome] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
@@ -752,33 +755,55 @@ export default function App() {
 
   const t = LANG[lang];
 
-  useEffect(() => {
+ useEffect(() => {
+  // Carga localStorage siempre (fallback y usuarios no logueados)
+  try {
+    const sl = localStorage.getItem("lt_logs");
+    const sf = localStorage.getItem("lt_foods");
+    const sp = localStorage.getItem("lt_profile");
+    const ss = localStorage.getItem("lt_supps");
+    const sl2 = localStorage.getItem("lt_lang");
+    const sw = localStorage.getItem("lt_welcome_seen");
+    const so = localStorage.getItem("lt_onboarding_done");
+    const sc = localStorage.getItem("lt_cycle");
+    if (sc) setCycleData(JSON.parse(sc));
+    if (sl) {
+      const parsed = JSON.parse(sl);
+      setLogs(parsed);
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todayLog = parsed.find(l => l.date === todayStr);
+      if (todayLog) setEntry(todayLog);
+    }
+    if (sf) setFoods(JSON.parse(sf));
+    if (sp) setProfile({ ...defaultProfile, ...JSON.parse(sp) });
+    if (ss) setSupps(JSON.parse(ss));
+    if (sl2) setLang(sl2);
+    if (sw) setShowWelcome(false);
+    if (sw && !so) setShowOnboarding(true);
+  } catch {}
+
+  // Si hay sesión activa, sobreescribe con datos de Supabase
+  if (!user) return;
+  (async () => {
     try {
-      const sl = localStorage.getItem("lt_logs");
-      const sf = localStorage.getItem("lt_foods");
-      const sp = localStorage.getItem("lt_profile");
-      const ss = localStorage.getItem("lt_supps");
-      const sl2 = localStorage.getItem("lt_lang");
-      const sw = localStorage.getItem("lt_welcome_seen");
-      const so = localStorage.getItem("lt_onboarding_done");
-      const sc = localStorage.getItem("lt_cycle");
-      if (sc) setCycleData(JSON.parse(sc));
-      if (sl) {
-        const parsed = JSON.parse(sl);
-        setLogs(parsed);
+      const [dbProfile, dbLogs, dbFoods, dbCycle] = await Promise.all([
+        getProfile(user.id),
+        getLogs(user.id),
+        getFoods(user.id),
+        getCycle(user.id),
+      ]);
+      if (dbProfile) setProfile({ ...defaultProfile, ...dbProfile });
+      if (dbLogs?.length) {
+        setLogs(dbLogs);
         const todayStr = new Date().toISOString().split("T")[0];
-        const todayLog = parsed.find(l => l.date === todayStr);
+        const todayLog = dbLogs.find(l => l.date === todayStr);
         if (todayLog) setEntry(todayLog);
       }
-      if (sf) setFoods(JSON.parse(sf));
-      if (sp) setProfile({ ...defaultProfile, ...JSON.parse(sp) });
-      if (ss) setSupps(JSON.parse(ss));
-      if (sl2) setLang(sl2);
-      if (sw) setShowWelcome(false);
-      // Show onboarding if welcome seen but not yet completed onboarding
-      if (sw && !so) setShowOnboarding(true);
-    } catch {}
-  }, []);
+      if (dbFoods?.length) setFoods(dbFoods);
+      if (dbCycle && Object.keys(dbCycle).length) setCycleData(dbCycle);
+    } catch (e) { console.error("Supabase load:", e); }
+  })();
+}, [user]);
 
   const handleEnterApp = useCallback(() => {
     try { localStorage.setItem("lt_welcome_seen", "1"); } catch {}
@@ -806,30 +831,33 @@ export default function App() {
   const updateEntry = (field, val) => setEntry((e) => ({ ...e, [field]: val }));
 
   const handleLogout = () => {
-    if (!window.confirm(lang === "es"
-      ? "¿Segura que quieres cerrar sesión? Tus datos se mantendrán guardados."
-      : "Sure you want to log out? Your data will remain saved.")) return;
-    localStorage.removeItem("lt_welcome_seen");
-    localStorage.removeItem("lt_onboarding_done");
-    setShowWelcome(true);
-    setShowOnboarding(false);
-    setAvatarMenu(false);
-  };
+  if (!window.confirm(lang === "es"
+    ? "¿Segura que quieres cerrar sesión? Tus datos están guardados en la nube."
+    : "Sure you want to log out? Your data is safely stored in the cloud.")) return;
+  logout(); // Supabase signOut
+  localStorage.removeItem("lt_welcome_seen");
+  localStorage.removeItem("lt_onboarding_done");
+  setShowWelcome(true);
+  setShowOnboarding(false);
+  setAvatarMenu(false);
+};
 
   const saveLog = () => {
-    const updated = logs.filter((l) => l.date !== entry.date).concat(entry);
-    updated.sort((a, b) => a.date.localeCompare(b.date));
-    setLogs(updated);
-    persist("lt_logs", updated);
-    setSavedMsg(t.today.saved);
-    setTimeout(() => setSavedMsg(""), 2000);
-  };
+  const updated = logs.filter((l) => l.date !== entry.date).concat(entry);
+  updated.sort((a, b) => a.date.localeCompare(b.date));
+  setLogs(updated);
+  persist("lt_logs", updated);
+  if (user) upsertLog(user.id, entry);
+  setSavedMsg(t.today.saved);
+  setTimeout(() => setSavedMsg(""), 2000);
+};
 
   const saveProfile = () => {
-    persist("lt_profile", profile);
-    setProfileSaved(true);
-    setTimeout(() => setProfileSaved(false), 2500);
-  };
+  persist("lt_profile", profile);
+  if (user) upsertProfile(user.id, profile);
+  setProfileSaved(true);
+  setTimeout(() => setProfileSaved(false), 2500);
+};
 
   const saveSupps = () => {
     persist("lt_supps", supps);
@@ -838,22 +866,25 @@ export default function App() {
   };
 
   const addFood = () => {
-    if (!newFood.name.trim()) return;
-    const updated = [...foods, { ...newFood, id: Date.now() }];
-    setFoods(updated);
-    persist("lt_foods", updated);
-    setNewFood({ name: "", reaction: "good", notes: "", category: "other" });
-  };
+  if (!newFood.name.trim()) return;
+  const food = { ...newFood, id: Date.now().toString() };
+  const updated = [...foods, food];
+  setFoods(updated);
+  persist("lt_foods", updated);
+  if (user) upsertFood(user.id, food);
+  setNewFood({ name: "", reaction: "good", notes: "", category: "other" });
+};
 
   const toggleCycleDay = (dateStr, type) => {
-    setCycleData(prev => {
-      const next = { ...prev };
-      if (next[dateStr] === type) delete next[dateStr];  // tap same → clear
-      else next[dateStr] = type;
-      try { localStorage.setItem("lt_cycle", JSON.stringify(next)); } catch {}
-      return next;
-    });
-  };
+  setCycleData(prev => {
+    const next = { ...prev };
+    if (next[dateStr] === type) delete next[dateStr];
+    else next[dateStr] = type;
+    try { localStorage.setItem("lt_cycle", JSON.stringify(next)); } catch {}
+    if (user) upsertCycle(user.id, next);
+    return next;
+  });
+};
 
   const saveCenterProposal = () => {
     if (!centerForm.name.trim() || !centerForm.city.trim()) return;
@@ -886,10 +917,11 @@ export default function App() {
   };
 
   const removeFood = (id) => {
-    const updated = foods.filter((f) => f.id !== id);
-    setFoods(updated);
-    persist("lt_foods", updated);
-  };
+  const updated = foods.filter((f) => f.id !== id);
+  setFoods(updated);
+  persist("lt_foods", updated);
+  if (user) deleteFood(user.id, id);
+};
 
   const switchLang = (l) => { setLang(l); persist("lt_lang", l); };
 
@@ -1166,6 +1198,7 @@ export default function App() {
                       {lang==="es" ? "Inicio" : "Home"}
                     </button>
                     <div style={{ margin:"4px 12px", borderTop:`1px solid ${C.border}` }} />
+                    
                     <button onClick={handleLogout}
                       style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:"#c06080", fontWeight:700, textAlign:"left" }}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c06080" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
