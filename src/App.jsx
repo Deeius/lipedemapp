@@ -4,7 +4,6 @@ import {
   ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis,
   BarChart, Bar, Legend,
 } from "recharts";
-import { Lightbulb } from "lucide-react";
 import WelcomeGuide from "./WelcomeGuide";
 import Onboarding from "./Onboarding";
 
@@ -704,6 +703,10 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
     x:        <svg style={s} viewBox="0 0 24 24" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
     home:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>,
     leaf:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
+    hand:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M18 11V6a1 1 0 0 0-2 0v5"/><path d="M14 10V4a1 1 0 0 0-2 0v6"/><path d="M10 10.5V5a1 1 0 0 0-2 0v7"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.7-2.4L3.4 16a1.5 1.5 0 0 1 2.1-2.1L8 16"/></svg>,
+    sparkles: <svg style={s} viewBox="0 0 24 24" {...p}><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg>,
+    lightbulb:<svg style={s} viewBox="0 0 24 24" {...p}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>,
+    clipboard:<svg style={s} viewBox="0 0 24 24" {...p}><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>,
   };
   return icons[name] || null;
 }
@@ -1575,7 +1578,7 @@ export default function App() {
               {/* Greeting */}
               <div style={{ marginBottom:20 }}>
                 <h2 style={{ fontSize:20, fontWeight:800, color:C.cream, letterSpacing:"-0.5px", marginBottom:2 }}>
-                  {lang==="es" ? `Hola${profile.name ? `, ${profile.name}` : ""}` : `Hello${profile.name ? `, ${profile.name}` : ""}`} 👋
+                  {lang==="es" ? `Hola${profile.name ? `, ${profile.name}` : ""}` : `Hello${profile.name ? `, ${profile.name}` : ""}`} <Icon name="hand" size={20} color={C.cream} />
                 </h2>
                 <div style={{ fontSize:13, color:C.creamMuted }}>
                   {new Date().toLocaleDateString(lang==="es"?"es-ES":"en-GB", { weekday:"long", day:"numeric", month:"long" })}
@@ -1701,7 +1704,7 @@ export default function App() {
               {/* 4. FRASE MOTIVACIONAL */}
               <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
                 <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                  {lang==="es" ? "✨ Reflexión del día" : "✨ Daily reflection"}
+                  <Icon name="sparkles" size={12} color={C.sage} />{" "}{lang==="es" ? "Reflexión del día" : "Daily reflection"}
                 </div>
                 <p style={{ fontSize:14, color:C.cream, lineHeight:1.6, fontStyle:"italic", margin:0, fontWeight:500 }}>
                   "{phrase}"
@@ -1764,7 +1767,7 @@ export default function App() {
                 return (
                   <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
                     <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                      <Lightbulb size={12} style={{ display:"inline", verticalAlign:"middle", marginRight:4 }} />{lang==="es" ? "Consejo personalizado" : "Personalized tip"}
+                      <Icon name="lightbulb" size={12} color={C.sage} />{" "}{lang==="es" ? "Consejo personalizado" : "Personalized tip"}
                     </div>
                     <p style={{ fontSize:13, color:C.cream, lineHeight:1.6, margin:0, fontWeight:500 }}>
                       {tipText}
@@ -1783,12 +1786,12 @@ export default function App() {
                     <div onClick={() => setRecipeExpanded(o => !o)}
                       style={{ padding:"16px 18px", cursor:"pointer", userSelect:"none" }}>
                       <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                        {lang==="es" ? "🥗 Receta antiinflamatoria del día" : "🥗 Anti-inflammatory recipe of the day"}
+                        <Icon name="leaf" size={12} color={C.sage} />{" "}{lang==="es" ? "Receta antiinflamatoria del día" : "Anti-inflammatory recipe of the day"}
                       </div>
                       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:10 }}>
                         <div style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px", flex:1 }}>{recipe.name}</div>
                         <div style={{ display:"flex", flexDirection:"column", gap:4, alignItems:"flex-end", flexShrink:0 }}>
-                          <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, background:C.creamFaint, padding:"3px 8px", borderRadius:20 }}>⏱ {recipe.time}</div>
+                          <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, background:C.creamFaint, padding:"3px 8px", borderRadius:20, display:"flex", alignItems:"center", gap:3 }}><Icon name="clock" size={11} color={C.creamMuted} /> {recipe.time}</div>
                           <div style={{ fontSize:10, fontWeight:700, color:diffColor, background:`${diffColor}15`, padding:"2px 7px", borderRadius:20 }}>
                             {recipe.difficulty}
                           </div>
@@ -1835,7 +1838,7 @@ export default function App() {
                           ))}
                         </div>
                         <div style={{ fontSize:11, color:C.sage, lineHeight:1.6, padding:"10px 12px", background:`${C.sage}0d`, borderRadius:8, borderLeft:`3px solid ${C.sage}` }}>
-                          💡 {recipe.tip}
+                          <span style={{ display:"flex", alignItems:"flex-start", gap:5 }}><Icon name="lightbulb" size={13} color={C.sage} />{recipe.tip}</span>
                         </div>
                       </div>
                     )}
@@ -1850,14 +1853,14 @@ export default function App() {
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                   {[
-                    { key:"today",   label: lang==="es"?"Registro de hoy":"Log today",    emoji:"📅" },
-                    { key:"history", label: lang==="es"?"Historial":"History",             emoji:"📋" },
-                    { key:"charts",  label: lang==="es"?"Gráficas":"Charts",               emoji:"📊" },
-                    { key:"foods",   label: lang==="es"?"Alimentos":"Foods",               emoji:"🍽️" },
+                    { key:"today",   label: lang==="es"?"Registro de hoy":"Log today",    icon:"calendar" },
+                    { key:"history", label: lang==="es"?"Historial":"History",             icon:"clipboard" },
+                    { key:"charts",  label: lang==="es"?"Gráficas":"Charts",               icon:"trending" },
+                    { key:"foods",   label: lang==="es"?"Alimentos":"Foods",               icon:"utensils" },
                   ].map(q => (
                     <button key={q.key} onClick={() => setTab(q.key)}
                       style={{ padding:"12px 14px", borderRadius:12, border:`1px solid ${C.border}`, background:"white", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, textAlign:"left", transition:"all 0.15s" }}>
-                      <span style={{ fontSize:20 }}>{q.emoji}</span>
+                      <Icon name={q.icon} size={20} color={C.sage} />
                       <span style={{ fontSize:12, fontWeight:700, color:C.cream }}>{q.label}</span>
                     </button>
                   ))}
@@ -2944,7 +2947,7 @@ export default function App() {
                 ["leftThigh","rightThigh","leftCalf","rightCalf","ankles","hips"].includes(z));
               if (hasArms && hasLegs) return (
                 <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5, display:"flex", alignItems:"flex-start", gap:6 }}>
-                  <Lightbulb size={14} style={{ flexShrink:0, marginTop:2 }} />
+                  <Icon name="lightbulb" size={14} color={C.sage} />
                   <span>{lang==="es"
                     ? "Tipo combinado (Brazos + Piernas) — El lipedema puede afectar extremidades superiores e inferiores simultáneamente. Cada zona puede progresar de forma diferente y requerir compresión y tratamiento específicos."
                     : "Combined type (Arms + Legs) — Lipedema can affect upper and lower limbs simultaneously. Each area may progress differently and require specific compression and treatment."}</span>
@@ -2952,7 +2955,7 @@ export default function App() {
               );
               if (hasArms) return (
                 <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5, display:"flex", alignItems:"flex-start", gap:6 }}>
-                  <Lightbulb size={14} style={{ flexShrink:0, marginTop:2 }} />
+                  <Icon name="lightbulb" size={14} color={C.sage} />
                   <span>{lang==="es"
                     ? "Tipo 4 (Brazos) — El lipedema en brazos suele afectar del hombro al codo. Puede presentarse solo o junto con afectación en piernas."
                     : "Type 4 (Arms) — Arm lipedema typically affects shoulder to elbow. It can occur alone or alongside leg involvement."}</span>
