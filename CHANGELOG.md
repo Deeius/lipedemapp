@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.7](https://github.com/Deeius/lipedemapp/compare/v1.0.6...v1.0.7) (2026-03-09)
+
+
+### Bug Fixes
+
+* prettier things ([a6afda5](https://github.com/Deeius/lipedemapp/commit/a6afda595c779e8240b6719457925a8cc1cb58d6))
+* refactor files2 ([753c27c](https://github.com/Deeius/lipedemapp/commit/753c27c8a319b30dd11a6f80194174546cf071eb))
+* refactor files2 ([7680aba](https://github.com/Deeius/lipedemapp/commit/7680aba8dff59c741b5099145ac656fe55aaa159))
+
 ### [1.0.6](https://github.com/Deeius/lipedemapp/compare/v1.0.5...v1.0.6) (2026-03-09)
 
 
