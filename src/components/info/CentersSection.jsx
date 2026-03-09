@@ -373,9 +373,16 @@ export default function CentersSection({
           ))}
           {filtered.length === 0 && (
             <div
-              style={{ textAlign: "center", padding: "30px 20px", color: C.creamMuted, fontSize: 13 }}
+              style={{
+                textAlign: "center",
+                padding: "30px 20px",
+                color: C.creamMuted,
+                fontSize: 13,
+              }}
             >
-              {lang === "es" ? "No hay centros en esta ciudad todavía." : "No centres in this city yet."}
+              {lang === "es"
+                ? "No hay centros en esta ciudad todavía."
+                : "No centres in this city yet."}
             </div>
           )}
         </div>
@@ -425,7 +432,9 @@ export default function CentersSection({
           <label style={S.label}>{lang === "es" ? "Nombre del centro *" : "Centre name *"}</label>
           <input
             style={{ ...S.input, marginBottom: 12 }}
-            placeholder={lang === "es" ? "Clínica / Consulta / Centro…" : "Clinic / Practice / Centre…"}
+            placeholder={
+              lang === "es" ? "Clínica / Consulta / Centro…" : "Clinic / Practice / Centre…"
+            }
             value={centerForm.name}
             onChange={(e) => setCenterForm({ ...centerForm, name: e.target.value })}
           />
@@ -443,7 +452,9 @@ export default function CentersSection({
             value={centerForm.address}
             onChange={(e) => setCenterForm({ ...centerForm, address: e.target.value })}
           />
-          <label style={S.label}>{lang === "es" ? "Enlace a Google Maps" : "Google Maps link"}</label>
+          <label style={S.label}>
+            {lang === "es" ? "Enlace a Google Maps" : "Google Maps link"}
+          </label>
           <input
             style={{ ...S.input, marginBottom: 4 }}
             placeholder="https://maps.google.com/…"
@@ -473,7 +484,9 @@ export default function CentersSection({
           </label>
           <input
             style={{ ...S.input, marginBottom: 12 }}
-            placeholder={lang === "es" ? "DLM, presoterapia, cirugía…" : "MLD, pressotherapy, surgery…"}
+            placeholder={
+              lang === "es" ? "DLM, presoterapia, cirugía…" : "MLD, pressotherapy, surgery…"
+            }
             value={centerForm.specialty}
             onChange={(e) => setCenterForm({ ...centerForm, specialty: e.target.value })}
           />
@@ -522,11 +535,14 @@ export default function CentersSection({
             ←
           </button>
           <div style={{ fontSize: 15, fontWeight: 800, color: C.cream }}>
-            {lang === "es" ? "Propuestas pendientes" : "Pending proposals"} ({pendingCenters?.length || 0})
+            {lang === "es" ? "Propuestas pendientes" : "Pending proposals"} (
+            {pendingCenters?.length || 0})
           </div>
         </div>
         {!pendingCenters || pendingCenters.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "30px 20px", color: C.creamMuted, fontSize: 13 }}>
+          <div
+            style={{ textAlign: "center", padding: "30px 20px", color: C.creamMuted, fontSize: 13 }}
+          >
             {lang === "es" ? "No hay propuestas pendientes" : "No pending proposals"}
           </div>
         ) : (
@@ -562,10 +578,14 @@ export default function CentersSection({
                   📍 {c.address} — {c.city}
                 </div>
                 {c.type && (
-                  <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>🏥 {c.type}</div>
+                  <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>
+                    🏥 {c.type}
+                  </div>
                 )}
                 {c.specialty && (
-                  <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>{c.specialty}</div>
+                  <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>
+                    {c.specialty}
+                  </div>
                 )}
                 {c.mapsUrl && (
                   <div
