@@ -4,6 +4,7 @@ const SEED_POSTS = {
   es: [
     {
       id: "seed-1",
+      author: "María G.",
       text: "Después de 2 años con DLM semanal y compresión, el dolor al caminar ha bajado de un 8 a un 3. No me lo creía posible.",
       stage: "2",
       country: "España",
@@ -13,6 +14,7 @@ const SEED_POSTS = {
     },
     {
       id: "seed-2",
+      author: "Laura M.",
       text: "La cirugía WAL me cambió la vida. Tardé 6 meses en recuperarme bien, pero por fin puedo hacer senderismo.",
       stage: "3",
       country: "México",
@@ -22,6 +24,7 @@ const SEED_POSTS = {
     },
     {
       id: "seed-3",
+      author: "Ana P.",
       text: "Empecé la dieta antiinflamatoria hace 4 meses. No he perdido volumen pero la sensación de pesadez ha mejorado muchísimo.",
       stage: "1",
       country: "Argentina",
@@ -31,6 +34,7 @@ const SEED_POSTS = {
     },
     {
       id: "seed-4",
+      author: "Carmen R.",
       text: "Lo más difícil fue encontrar un médico que me tomara en serio. Una vez con el diagnóstico, todo cambió.",
       stage: "2",
       country: "Colombia",
@@ -42,6 +46,7 @@ const SEED_POSTS = {
   en: [
     {
       id: "seed-1",
+      author: "María G.",
       text: "After 2 years of weekly MLD and compression, the pain when walking has gone from an 8 to a 3. I couldn't believe it was possible.",
       stage: "2",
       country: "Spain",
@@ -51,6 +56,7 @@ const SEED_POSTS = {
     },
     {
       id: "seed-2",
+      author: "Laura M.",
       text: "WAL surgery changed my life. It took 6 months to recover properly, but I can finally go hiking.",
       stage: "3",
       country: "Mexico",
@@ -60,6 +66,7 @@ const SEED_POSTS = {
     },
     {
       id: "seed-3",
+      author: "Ana P.",
       text: "I started the anti-inflammatory diet 4 months ago. I haven't lost volume but the heaviness has improved enormously.",
       stage: "1",
       country: "Argentina",
@@ -69,6 +76,7 @@ const SEED_POSTS = {
     },
     {
       id: "seed-4",
+      author: "Carmen R.",
       text: "The hardest part was finding a doctor who took me seriously. Once I had the diagnosis, everything changed.",
       stage: "2",
       country: "Colombia",
@@ -202,6 +210,7 @@ export default function CommunityForum({ lang, C, profile }) {
     if (!form.text.trim()) return;
     const newPost = {
       id: `user-${Date.now()}`,
+      author: profile?.name?.trim() || (lang === "es" ? "Anónima" : "Anonymous"),
       text: form.text.trim(),
       stage: form.stage || (lang === "es" ? "No sé" : "Unknown"),
       country: form.country.trim() || "—",
@@ -499,6 +508,22 @@ export default function CommunityForum({ lang, C, profile }) {
               border: `1px solid ${C.border}`,
             }}
           >
+            {/* Author */}
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.sage,
+                marginBottom: 6,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <span style={{ fontSize: 14 }}>🌸</span>
+              {post.author || (lang === "es" ? "Anónima" : "Anonymous")}
+            </div>
+
             {/* Text */}
             <p
               style={{
