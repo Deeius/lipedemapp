@@ -105,6 +105,10 @@ export default function InfoTab({
           </div>
         );
       })}
+      {/* TEST */}
+      <div style={{ background: "red", color: "white", padding: 20, fontSize: 16 }}>
+        TEST FORUM — CommunityForum debería aparecer aquí
+      </div>
       {/* Experiencias reales */}
       <CommunityForum lang={lang} C={C} profile={profile} />
     </>
