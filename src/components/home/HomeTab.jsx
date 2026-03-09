@@ -5,7 +5,6 @@ import DailyPhrase from "./DailyPhrase";
 import DailyRecipe from "./DailyRecipe";
 import QuickLinks from "./QuickLinks";
 import Treatments from "./Treatments";
-import Testimonials from "./Testimonials";
 
 export default function HomeTab({
   logs,
@@ -81,9 +80,6 @@ export default function HomeTab({
 
       {/* 7. Treatments */}
       <Treatments lang={lang} C={C} />
-
-      {/* 8. Testimonials */}
-      <Testimonials lang={lang} C={C} />
     </>
   );
 }

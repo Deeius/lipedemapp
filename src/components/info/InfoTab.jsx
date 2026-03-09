@@ -1,4 +1,5 @@
 import ResourceItem from "./ResourceItem";
+import Testimonials from "../home/Testimonials";
 
 export default function InfoTab({
   infoFilter,
@@ -41,17 +42,10 @@ export default function InfoTab({
       </div>
 
       {/* Disclaimer */}
-      <div
-        style={{
-          background: "#fefce8",
-          borderRadius: 10,
-          padding: "10px 14px",
-          marginBottom: 16,
-          border: "1px solid #fde047",
-          fontSize: 12,
-          color: "#854d0e",
-        }}
-      >
+      <div style={{
+        background: "#fefce8", borderRadius: 10, padding: "10px 14px",
+        marginBottom: 16, border: "1px solid #fde047", fontSize: 12, color: "#854d0e",
+      }}>
         {t.info.disclaimer}
       </div>
 
@@ -59,19 +53,15 @@ export default function InfoTab({
       <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
         {[
           ["all", t.info.filterAll],
-          ["es", t.info.filterEs],
-          ["en", t.info.filterEn],
+          ["es",  t.info.filterEs],
+          ["en",  t.info.filterEn],
         ].map(([val, label]) => (
           <button
             key={val}
             onClick={() => setInfoFilter(val)}
             style={{
-              padding: "7px 14px",
-              borderRadius: 8,
-              border: "none",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 600,
+              padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+              fontSize: 12, fontWeight: 600,
               background: infoFilter === val ? C.sage : C.creamFaint,
               color: infoFilter === val ? "#fff" : C.creamMuted,
               transition: "all 0.2s",
@@ -103,6 +93,8 @@ export default function InfoTab({
           </div>
         );
       })}
+      {/* Experiencias reales */}
+      <Testimonials lang={lang} C={C} />
     </>
   );
 }
