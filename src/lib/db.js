@@ -130,7 +130,8 @@ export async function migrateFromLocalStorage(userId) {
   try {
     const profile  = JSON.parse(localStorage.getItem("lt_profile")  || "null");
     const logs     = JSON.parse(localStorage.getItem("lt_logs")     || "[]");
-    const supps    = JSON.parse(localStorage.getItem("lt_supps")    || "[]");
+    const suppsObj = JSON.parse(localStorage.getItem("lt_supps") || "{}");
+    const supps    = [...(suppsObj.active || []), ...(suppsObj.custom || [])];
     const foods    = JSON.parse(localStorage.getItem("lt_foods")    || "[]");
     const cycle    = JSON.parse(localStorage.getItem("lt_cycle")    || "{}");
 
