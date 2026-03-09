@@ -30,26 +30,19 @@ export async function getLogs(userId) {
 }
 
 export async function upsertLog(userId, log) {
-  const { error } = await supabase
-    .from("logs")
-    .upsert({ user_id: userId, ...log });
+  const { error } = await supabase.from("logs").upsert({ user_id: userId, ...log });
   if (error) console.error("upsertLog:", error);
 }
 
 // ── SUPPLEMENTS ───────────────────────────────────────────
 export async function getSupplements(userId) {
-  const { data, error } = await supabase
-    .from("supplements")
-    .select("*")
-    .eq("user_id", userId);
+  const { data, error } = await supabase.from("supplements").select("*").eq("user_id", userId);
   if (error) console.error("getSupplements:", error);
   return data ?? [];
 }
 
 export async function upsertSupplement(userId, supp) {
-  const { error } = await supabase
-    .from("supplements")
-    .upsert({ user_id: userId, ...supp });
+  const { error } = await supabase.from("supplements").upsert({ user_id: userId, ...supp });
   if (error) console.error("upsertSupplement:", error);
 }
 
@@ -64,37 +57,24 @@ export async function deleteSupplement(userId, suppId) {
 
 // ── FOODS ─────────────────────────────────────────────────
 export async function getFoods(userId) {
-  const { data, error } = await supabase
-    .from("foods")
-    .select("*")
-    .eq("user_id", userId);
+  const { data, error } = await supabase.from("foods").select("*").eq("user_id", userId);
   if (error) console.error("getFoods:", error);
   return data ?? [];
 }
 
 export async function upsertFood(userId, food) {
-  const { error } = await supabase
-    .from("foods")
-    .upsert({ user_id: userId, ...food });
+  const { error } = await supabase.from("foods").upsert({ user_id: userId, ...food });
   if (error) console.error("upsertFood:", error);
 }
 
 export async function deleteFood(userId, foodId) {
-  const { error } = await supabase
-    .from("foods")
-    .delete()
-    .eq("user_id", userId)
-    .eq("id", foodId);
+  const { error } = await supabase.from("foods").delete().eq("user_id", userId).eq("id", foodId);
   if (error) console.error("deleteFood:", error);
 }
 
 // ── CYCLE ─────────────────────────────────────────────────
 export async function getCycle(userId) {
-  const { data, error } = await supabase
-    .from("cycle")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
+  const { data, error } = await supabase.from("cycle").select("*").eq("user_id", userId).single();
   if (error && error.code !== "PGRST116") console.error("getCycle:", error);
   return data?.data ?? {};
 }
@@ -128,18 +108,18 @@ export async function proposeCenters(userId, center) {
 // Llama esto una sola vez al hacer login si hay datos locales
 export async function migrateFromLocalStorage(userId) {
   try {
-    const profile  = JSON.parse(localStorage.getItem("lt_profile")  || "null");
-    const logs     = JSON.parse(localStorage.getItem("lt_logs")     || "[]");
+    const profile = JSON.parse(localStorage.getItem("lt_profile") || "null");
+    const logs = JSON.parse(localStorage.getItem("lt_logs") || "[]");
     const suppsObj = JSON.parse(localStorage.getItem("lt_supps") || "{}");
-    const supps    = [...(suppsObj.active || []), ...(suppsObj.custom || [])];
-    const foods    = JSON.parse(localStorage.getItem("lt_foods")    || "[]");
-    const cycle    = JSON.parse(localStorage.getItem("lt_cycle")    || "{}");
+    const supps = [...(suppsObj.active || []), ...(suppsObj.custom || [])];
+    const foods = JSON.parse(localStorage.getItem("lt_foods") || "[]");
+    const cycle = JSON.parse(localStorage.getItem("lt_cycle") || "{}");
 
-    const hasData  = profile || logs.length || supps.length || foods.length;
+    const hasData = profile || logs.length || supps.length || foods.length;
     if (!hasData) return false;
 
     if (profile) await upsertProfile(userId, profile);
-    for (const log  of logs)  await upsertLog(userId, log);
+    for (const log of logs) await upsertLog(userId, log);
     for (const supp of supps) await upsertSupplement(userId, supp);
     for (const food of foods) await upsertFood(userId, food);
     if (Object.keys(cycle).length) await upsertCycle(userId, cycle);

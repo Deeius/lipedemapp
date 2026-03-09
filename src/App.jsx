@@ -1,13 +1,35 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis,
-  BarChart, Bar, Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  BarChart,
+  Bar,
+  Legend,
 } from "recharts";
 import WelcomeGuide from "./WelcomeGuide";
 import Onboarding from "./Onboarding";
 import { useAuth } from "./hooks/useAuth";
-import { getProfile, upsertProfile, getLogs, upsertLog, getSupplements, getFoods, upsertFood, deleteFood, getCycle, upsertCycle } from "./lib/db";
+import {
+  getProfile,
+  upsertProfile,
+  getLogs,
+  upsertLog,
+  getSupplements,
+  getFoods,
+  upsertFood,
+  deleteFood,
+  getCycle,
+  upsertCycle,
+} from "./lib/db";
 
 // ─── INFO RESOURCES ──────────────────────────────────────────────────────────
 const INFO_RESOURCES = {
@@ -20,8 +42,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Lipedema: Progress, Challenges, and the Road Ahead (2025)",
         authors: "Systematic review — PubMed / PMC",
-        desc_es: "Revisión sistemática de más de 100 estudios sobre fisiopatología, diagnóstico y opciones de tratamiento.",
-        desc_en: "Systematic review of 100+ studies on pathophysiology, diagnosis and treatment options.",
+        desc_es:
+          "Revisión sistemática de más de 100 estudios sobre fisiopatología, diagnóstico y opciones de tratamiento.",
+        desc_en:
+          "Systematic review of 100+ studies on pathophysiology, diagnosis and treatment options.",
         url: "https://pubmed.ncbi.nlm.nih.gov/40425048/",
         year: 2025,
         type: "review",
@@ -30,8 +54,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Lipedema: Insights into Morphology, Pathophysiology, and Challenges",
         authors: "Biomedicines — PubMed",
-        desc_es: "Análisis en profundidad de las características morfológicas, fibrosis e inflamación del lipedema.",
-        desc_en: "In-depth analysis of morphological features, fibrosis and inflammation in lipedema.",
+        desc_es:
+          "Análisis en profundidad de las características morfológicas, fibrosis e inflamación del lipedema.",
+        desc_en:
+          "In-depth analysis of morphological features, fibrosis and inflammation in lipedema.",
         url: "https://pubmed.ncbi.nlm.nih.gov/36551837/",
         year: 2022,
         type: "review",
@@ -40,8 +66,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "S2k Guideline Lipedema (Guía clínica oficial alemana)",
         authors: "DGPL — PubMed",
-        desc_es: "Guía oficial con 60 recomendaciones sobre diagnóstico, tratamiento conservador, quirúrgico y autogestión.",
-        desc_en: "Official guideline with 60 recommendations on diagnosis, conservative & surgical treatment, and self-management.",
+        desc_es:
+          "Guía oficial con 60 recomendaciones sobre diagnóstico, tratamiento conservador, quirúrgico y autogestión.",
+        desc_en:
+          "Official guideline with 60 recommendations on diagnosis, conservative & surgical treatment, and self-management.",
         url: "https://pubmed.ncbi.nlm.nih.gov/39188170/",
         year: 2024,
         type: "guideline",
@@ -50,8 +78,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Proposed Framework for Research Case Definitions of Lipedema",
         authors: "Lipedema Simplified / Harvard — PubMed",
-        desc_es: "Marco de referencia para estandarizar el diagnóstico en investigación, con 5 características clave.",
-        desc_en: "Framework for standardizing lipedema research diagnosis, with 5 agreed-upon characteristics.",
+        desc_es:
+          "Marco de referencia para estandarizar el diagnóstico en investigación, con 5 características clave.",
+        desc_en:
+          "Framework for standardizing lipedema research diagnosis, with 5 agreed-upon characteristics.",
         url: "https://pubmed.ncbi.nlm.nih.gov/38546398/",
         year: 2024,
         type: "research",
@@ -60,8 +90,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Lipedema and Adipose Tissue: Current Understanding & Future Directions",
         authors: "Frontiers in Cell and Developmental Biology",
-        desc_es: "Estado del arte en 2025: macrófagos, fibrosis, dieta cetogénica e IA en el diagnóstico.",
-        desc_en: "2025 state of the art: macrophages, fibrosis, ketogenic diet and AI in diagnosis.",
+        desc_es:
+          "Estado del arte en 2025: macrófagos, fibrosis, dieta cetogénica e IA en el diagnóstico.",
+        desc_en:
+          "2025 state of the art: macrophages, fibrosis, ketogenic diet and AI in diagnosis.",
         url: "https://www.frontiersin.org/journals/cell-and-developmental-biology/articles/10.3389/fcell.2025.1691161/full",
         year: 2025,
         type: "review",
@@ -70,8 +102,10 @@ const INFO_RESOURCES = {
         lang: "es",
         title: "¿Qué sabemos del lipedema? Una enfermedad poco conocida",
         authors: "The Conversation — Divulgación científica",
-        desc_es: "Artículo divulgativo en español sobre causas, diagnóstico y tratamiento multidisciplinar del lipedema.",
-        desc_en: "Scientific outreach article in Spanish on causes, diagnosis and multidisciplinary treatment.",
+        desc_es:
+          "Artículo divulgativo en español sobre causas, diagnóstico y tratamiento multidisciplinar del lipedema.",
+        desc_en:
+          "Scientific outreach article in Spanish on causes, diagnosis and multidisciplinary treatment.",
         url: "https://theconversation.com/que-sabemos-del-lipedema-una-enfermedad-con-acumulacion-de-grasa-patologica-que-afecta-sobre-todo-a-las-mujeres-232179",
         year: 2025,
         type: "article",
@@ -87,8 +121,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Treating Lipedema — Lipedema Foundation",
         authors: "Lipedema Foundation (USA)",
-        desc_es: "Guía completa de tratamientos conservadores y quirúrgicos de la organización líder en investigación.",
-        desc_en: "Complete guide to conservative and surgical treatments from the leading research organization.",
+        desc_es:
+          "Guía completa de tratamientos conservadores y quirúrgicos de la organización líder en investigación.",
+        desc_en:
+          "Complete guide to conservative and surgical treatments from the leading research organization.",
         url: "https://www.lipedema.org/treating-lipedema",
         year: 2024,
         type: "guide",
@@ -97,8 +133,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Lipedema Treatment & Causes — The Lipedema Project",
         authors: "The Lipedema Project",
-        desc_es: "Explicación detallada de la Terapia Descongestiva Completa (CDT), MLD, compresión y liposucción linfática.",
-        desc_en: "Detailed explanation of Complete Decongestive Therapy (CDT), MLD, compression and lymphatic liposuction.",
+        desc_es:
+          "Explicación detallada de la Terapia Descongestiva Completa (CDT), MLD, compresión y liposucción linfática.",
+        desc_en:
+          "Detailed explanation of Complete Decongestive Therapy (CDT), MLD, compression and lymphatic liposuction.",
         url: "https://lipedemaproject.org/treatment-for-lipedema/",
         year: 2024,
         type: "guide",
@@ -107,8 +145,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Patient Guide: Treatment of Lipedema and Lipo-Lymphedema",
         authors: "Toronto Physiotherapy",
-        desc_es: "Guía para pacientes: qué puede y no puede hacer el MLD, compresión, dispositivos neumáticos y cirugía.",
-        desc_en: "Patient guide: what MLD can and cannot do, compression, pneumatic devices and surgery.",
+        desc_es:
+          "Guía para pacientes: qué puede y no puede hacer el MLD, compresión, dispositivos neumáticos y cirugía.",
+        desc_en:
+          "Patient guide: what MLD can and cannot do, compression, pneumatic devices and surgery.",
         url: "https://torontophysiotherapy.ca/patient-guide-lipedema-lipolymphedema-treatment/",
         year: 2022,
         type: "guide",
@@ -117,8 +157,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Finding a Lipedema Specialist — Lipedema Foundation",
         authors: "Lipedema Foundation",
-        desc_es: "Directorio de especialistas y guía para navegar el sistema de salud con lipedema.",
-        desc_en: "Specialist directory and guide to navigating the healthcare system with lipedema.",
+        desc_es:
+          "Directorio de especialistas y guía para navegar el sistema de salud con lipedema.",
+        desc_en:
+          "Specialist directory and guide to navigating the healthcare system with lipedema.",
         url: "https://www.lipedema.org/findspecialists",
         year: 2024,
         type: "guide",
@@ -127,8 +169,10 @@ const INFO_RESOURCES = {
         lang: "es",
         title: "Qué es el Lipedema — Lipemedical (España)",
         authors: "Lipemedical — Dr. Burgos de la Obra",
-        desc_es: "Información clínica en español sobre síntomas, estadios y tratamiento quirúrgico WAL del lipedema.",
-        desc_en: "Clinical info in Spanish on symptoms, stages and WAL surgical treatment for lipedema.",
+        desc_es:
+          "Información clínica en español sobre síntomas, estadios y tratamiento quirúrgico WAL del lipedema.",
+        desc_en:
+          "Clinical info in Spanish on symptoms, stages and WAL surgical treatment for lipedema.",
         url: "https://lipedema.es/que-es-lipedema/",
         year: 2024,
         type: "clinical",
@@ -144,8 +188,10 @@ const INFO_RESOURCES = {
         lang: "es",
         title: "ADALIPE — Asociación de Afectadas de Lipedema de España",
         authors: "Asociación española de pacientes",
-        desc_es: "La principal asociación de pacientes con lipedema en España. Foro privado, eventos y apoyo entre pares.",
-        desc_en: "Main Spanish lipedema patient association. Private forum, events and peer support.",
+        desc_es:
+          "La principal asociación de pacientes con lipedema en España. Foro privado, eventos y apoyo entre pares.",
+        desc_en:
+          "Main Spanish lipedema patient association. Private forum, events and peer support.",
         url: "https://www.adalipe.es/",
         year: 2024,
         type: "association",
@@ -154,8 +200,10 @@ const INFO_RESOURCES = {
         lang: "es",
         title: "FEDEAL — Federación Española de Asociaciones de Linfedema y Lipedema",
         authors: "Federación española",
-        desc_es: "Punto de encuentro nacional de las asociaciones regionales. Trabaja por el reconocimiento institucional.",
-        desc_en: "National federation of regional associations. Works for institutional recognition.",
+        desc_es:
+          "Punto de encuentro nacional de las asociaciones regionales. Trabaja por el reconocimiento institucional.",
+        desc_en:
+          "National federation of regional associations. Works for institutional recognition.",
         url: "https://fedeal.org/",
         year: 2024,
         type: "association",
@@ -164,7 +212,8 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "Lipedema Foundation — Comunidad & Recursos",
         authors: "Lipedema Foundation (USA)",
-        desc_es: "La mayor organización financiadora de investigación sobre lipedema. Registro de pacientes y directorio de proveedores.",
+        desc_es:
+          "La mayor organización financiadora de investigación sobre lipedema. Registro de pacientes y directorio de proveedores.",
         desc_en: "Largest lipedema research funder. Patient registry and provider directory.",
         url: "https://www.lipedema.org/",
         year: 2024,
@@ -174,8 +223,10 @@ const INFO_RESOURCES = {
         lang: "en",
         title: "r/Lipedema — Reddit Community",
         authors: "Reddit",
-        desc_es: "Comunidad activa en inglés con miles de miembros compartiendo experiencias, cirugías y consejos diarios.",
-        desc_en: "Active English community with thousands of members sharing experiences, surgeries and daily tips.",
+        desc_es:
+          "Comunidad activa en inglés con miles de miembros compartiendo experiencias, cirugías y consejos diarios.",
+        desc_en:
+          "Active English community with thousands of members sharing experiences, surgeries and daily tips.",
         url: "https://www.reddit.com/r/Lipedema/",
         year: 2024,
         type: "forum",
@@ -192,8 +243,10 @@ const INFO_RESOURCES = {
         platform: "Instagram + TikTok",
         title: "@allison.jacobsss — Allison Jacobs",
         authors: "450K Instagram · 900K TikTok",
-        desc_es: "Activista del lipedema y creadora de contenido. Baile, salud mental y visibilidad de la enfermedad.",
-        desc_en: "Lipedema activist and content creator. Dance, mental health and disease visibility.",
+        desc_es:
+          "Activista del lipedema y creadora de contenido. Baile, salud mental y visibilidad de la enfermedad.",
+        desc_en:
+          "Lipedema activist and content creator. Dance, mental health and disease visibility.",
         url: "https://www.instagram.com/allison.jacobsss/",
         type: "influencer",
       },
@@ -202,7 +255,8 @@ const INFO_RESOURCES = {
         platform: "Instagram",
         title: "@sarah.whitlow_ — Sarah Whitlow",
         authors: "182K seguidores · Lipedema Movement & Fitness",
-        desc_es: "Fundadora de Lipedema Movement & Fitness. Ejercicio adaptado y comunidad de apoyo.",
+        desc_es:
+          "Fundadora de Lipedema Movement & Fitness. Ejercicio adaptado y comunidad de apoyo.",
         desc_en: "Founder of Lipedema Movement & Fitness. Adapted exercise and support community.",
         url: "https://www.instagram.com/sarah.whitlow_/",
         type: "influencer",
@@ -212,8 +266,10 @@ const INFO_RESOURCES = {
         platform: "Instagram",
         title: "@xanthia_efthymiou — Xanthia Efthymiou",
         authors: "339K seguidores · Australia",
-        desc_es: "Concienciación sobre lipoedema desde Australia. Transparente sobre su proceso y tratamientos.",
-        desc_en: "Lipoedema awareness from Australia. Transparent about her process and treatments.",
+        desc_es:
+          "Concienciación sobre lipoedema desde Australia. Transparente sobre su proceso y tratamientos.",
+        desc_en:
+          "Lipoedema awareness from Australia. Transparent about her process and treatments.",
         url: "https://www.instagram.com/xanthia_efthymiou/",
         type: "influencer",
       },
@@ -232,8 +288,10 @@ const INFO_RESOURCES = {
         platform: "Instagram + Blog",
         title: "@lipedemadiary — Lipedema Diary (España)",
         authors: "Comunidad española",
-        desc_es: "Cuenta española que documenta el proceso, la cirugía en Barcelona y la vida diaria con lipedema.",
-        desc_en: "Spanish account documenting the process, surgery in Barcelona and daily life with lipedema.",
+        desc_es:
+          "Cuenta española que documenta el proceso, la cirugía en Barcelona y la vida diaria con lipedema.",
+        desc_en:
+          "Spanish account documenting the process, surgery in Barcelona and daily life with lipedema.",
         url: "https://www.instagram.com/lipedemadiary/",
         type: "influencer",
       },
@@ -242,8 +300,10 @@ const INFO_RESOURCES = {
         platform: "Instagram",
         title: "@lipedemafitness — Lipedema Fitness",
         authors: "9K seguidores · Desde 2013",
-        desc_es: "Dedicado al ejercicio y actividad física adaptada para personas con lipedema desde 2013.",
-        desc_en: "Dedicated to adapted exercise and physical activity for people with lipedema since 2013.",
+        desc_es:
+          "Dedicado al ejercicio y actividad física adaptada para personas con lipedema desde 2013.",
+        desc_en:
+          "Dedicated to adapted exercise and physical activity for people with lipedema since 2013.",
         url: "https://www.instagram.com/lipedemafitness/",
         type: "influencer",
       },
@@ -253,21 +313,126 @@ const INFO_RESOURCES = {
 
 // ─── SUPPLEMENTS DATA ────────────────────────────────────────────────────────
 const SUPPLEMENT_OPTIONS = [
-  { key: "omega3",       icon: "🐟", es: "Omega-3",              en: "Omega-3",              note_es: "Antiinflamatorio",             note_en: "Anti-inflammatory" },
-  { key: "vitD",         icon: "☀️", es: "Vitamina D3",          en: "Vitamin D3",           note_es: "Inmunidad y huesos",           note_en: "Immunity & bones" },
-  { key: "magnesium",    icon: "🪨", es: "Magnesio",             en: "Magnesium",            note_es: "Calambres y sueño",            note_en: "Cramps & sleep" },
-  { key: "vitC",         icon: "🍊", es: "Vitamina C",           en: "Vitamin C",            note_es: "Colágeno y antioxidante",      note_en: "Collagen & antioxidant" },
-  { key: "rutin",        icon: "🌿", es: "Rutina / Diosmina",    en: "Rutin / Diosmin",      note_es: "Circulación y linfático",      note_en: "Circulation & lymph" },
-  { key: "quercetin",    icon: "🍎", es: "Quercetina",           en: "Quercetin",            note_es: "Antiinflamatorio flavonoide",  note_en: "Flavonoid anti-inflammatory" },
-  { key: "selenium",     icon: "⚗️", es: "Selenio",              en: "Selenium",             note_es: "Tiroides y antioxidante",      note_en: "Thyroid & antioxidant" },
-  { key: "zinc",         icon: "🔩", es: "Zinc",                 en: "Zinc",                 note_es: "Inmunidad y piel",             note_en: "Immunity & skin" },
-  { key: "probiotics",   icon: "🦠", es: "Probióticos",          en: "Probiotics",           note_es: "Microbiota intestinal",        note_en: "Gut microbiome" },
-  { key: "curcumin",     icon: "🌾", es: "Cúrcuma / Curcumina",  en: "Turmeric / Curcumin",  note_es: "Antiinflamatorio potente",     note_en: "Potent anti-inflammatory" },
-  { key: "coq10",        icon: "⚡", es: "Coenzima Q10",         en: "CoQ10",                note_es: "Energía celular",              note_en: "Cellular energy" },
-  { key: "ironB12",      icon: "🩸", es: "Hierro + B12",         en: "Iron + B12",           note_es: "Anemia y fatiga",              note_en: "Anemia & fatigue" },
-  { key: "collagen",     icon: "🧬", es: "Colágeno",             en: "Collagen",             note_es: "Piel y tejido conjuntivo",     note_en: "Skin & connective tissue" },
-  { key: "berberine",    icon: "🌱", es: "Berberina",            en: "Berberine",            note_es: "Glucosa e inflamación",        note_en: "Glucose & inflammation" },
-  { key: "lymph",        icon: "💧", es: "Drenaje linfático",    en: "Lymphatic herbs",      note_es: "Árnica, rusco, castaño...",   note_en: "Arnica, butcher's broom..." },
+  {
+    key: "omega3",
+    icon: "🐟",
+    es: "Omega-3",
+    en: "Omega-3",
+    note_es: "Antiinflamatorio",
+    note_en: "Anti-inflammatory",
+  },
+  {
+    key: "vitD",
+    icon: "☀️",
+    es: "Vitamina D3",
+    en: "Vitamin D3",
+    note_es: "Inmunidad y huesos",
+    note_en: "Immunity & bones",
+  },
+  {
+    key: "magnesium",
+    icon: "🪨",
+    es: "Magnesio",
+    en: "Magnesium",
+    note_es: "Calambres y sueño",
+    note_en: "Cramps & sleep",
+  },
+  {
+    key: "vitC",
+    icon: "🍊",
+    es: "Vitamina C",
+    en: "Vitamin C",
+    note_es: "Colágeno y antioxidante",
+    note_en: "Collagen & antioxidant",
+  },
+  {
+    key: "rutin",
+    icon: "🌿",
+    es: "Rutina / Diosmina",
+    en: "Rutin / Diosmin",
+    note_es: "Circulación y linfático",
+    note_en: "Circulation & lymph",
+  },
+  {
+    key: "quercetin",
+    icon: "🍎",
+    es: "Quercetina",
+    en: "Quercetin",
+    note_es: "Antiinflamatorio flavonoide",
+    note_en: "Flavonoid anti-inflammatory",
+  },
+  {
+    key: "selenium",
+    icon: "⚗️",
+    es: "Selenio",
+    en: "Selenium",
+    note_es: "Tiroides y antioxidante",
+    note_en: "Thyroid & antioxidant",
+  },
+  {
+    key: "zinc",
+    icon: "🔩",
+    es: "Zinc",
+    en: "Zinc",
+    note_es: "Inmunidad y piel",
+    note_en: "Immunity & skin",
+  },
+  {
+    key: "probiotics",
+    icon: "🦠",
+    es: "Probióticos",
+    en: "Probiotics",
+    note_es: "Microbiota intestinal",
+    note_en: "Gut microbiome",
+  },
+  {
+    key: "curcumin",
+    icon: "🌾",
+    es: "Cúrcuma / Curcumina",
+    en: "Turmeric / Curcumin",
+    note_es: "Antiinflamatorio potente",
+    note_en: "Potent anti-inflammatory",
+  },
+  {
+    key: "coq10",
+    icon: "⚡",
+    es: "Coenzima Q10",
+    en: "CoQ10",
+    note_es: "Energía celular",
+    note_en: "Cellular energy",
+  },
+  {
+    key: "ironB12",
+    icon: "🩸",
+    es: "Hierro + B12",
+    en: "Iron + B12",
+    note_es: "Anemia y fatiga",
+    note_en: "Anemia & fatigue",
+  },
+  {
+    key: "collagen",
+    icon: "🧬",
+    es: "Colágeno",
+    en: "Collagen",
+    note_es: "Piel y tejido conjuntivo",
+    note_en: "Skin & connective tissue",
+  },
+  {
+    key: "berberine",
+    icon: "🌱",
+    es: "Berberina",
+    en: "Berberine",
+    note_es: "Glucosa e inflamación",
+    note_en: "Glucose & inflammation",
+  },
+  {
+    key: "lymph",
+    icon: "💧",
+    es: "Drenaje linfático",
+    en: "Lymphatic herbs",
+    note_es: "Árnica, rusco, castaño...",
+    note_en: "Arnica, butcher's broom...",
+  },
 ];
 
 // ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
@@ -275,7 +440,15 @@ const LANG = {
   es: {
     appTitle: "Lipedema Tracker",
     appSubtitle: "Tu diario de salud personalizado",
-    nav: { today: "Hoy", history: "Historial", charts: "Gráficos", foods: "Alimentos", supps: "Suplementos", info: "Info", profile: "Perfil" },
+    nav: {
+      today: "Hoy",
+      history: "Historial",
+      charts: "Gráficos",
+      foods: "Alimentos",
+      supps: "Suplementos",
+      info: "Info",
+      profile: "Perfil",
+    },
     today: {
       title: "Registro de Hoy",
       date: "Fecha",
@@ -286,16 +459,24 @@ const LANG = {
       water: "Agua bebida hoy",
       inflammation: "Inflamación por Zonas",
       inflammationNote: "Descripción libre (síntomas, sensaciones...)",
-      inflammationNotePlaceholder: "Ej: Piernas muy pesadas al levantarme, tobillos hinchados por la tarde...",
+      inflammationNotePlaceholder:
+        "Ej: Piernas muy pesadas al levantarme, tobillos hinchados por la tarde...",
       mood: "Estado Emocional",
       measures: "Medidas (cm)",
       save: "Guardar registro",
       saved: "✓ Guardado",
       todaysSupps: "Suplementos tomados hoy",
       zoneNames: {
-        waist: "Cintura", hips: "Caderas", leftThigh: "Muslo Izq.", rightThigh: "Muslo Der.",
-        leftCalf: "Pantorrilla Izq.", rightCalf: "Pantorrilla Der.", leftArm: "Brazo Izq.",
-        rightArm: "Brazo Der.", abdomen: "Abdomen", ankles: "Tobillos",
+        waist: "Cintura",
+        hips: "Caderas",
+        leftThigh: "Muslo Izq.",
+        rightThigh: "Muslo Der.",
+        leftCalf: "Pantorrilla Izq.",
+        rightCalf: "Pantorrilla Der.",
+        leftArm: "Brazo Izq.",
+        rightArm: "Brazo Der.",
+        abdomen: "Abdomen",
+        ankles: "Tobillos",
       },
     },
     foods: {
@@ -310,7 +491,13 @@ const LANG = {
       notes: "Notas",
       notesPlaceholder: "Cómo te sentiste después...",
       category: "Categoría",
-      categories: { antiinflammatory: "Antiinflamatorio", gluten: "Gluten", dairy: "Lácteos", sugar: "Azúcar", other: "Otro" },
+      categories: {
+        antiinflammatory: "Antiinflamatorio",
+        gluten: "Gluten",
+        dairy: "Lácteos",
+        sugar: "Azúcar",
+        other: "Otro",
+      },
       list: "Mi lista de alimentos",
       empty: "Aún no has registrado alimentos",
     },
@@ -339,18 +526,32 @@ const LANG = {
       filterEs: "En español",
       filterEn: "En inglés",
       tagTypes: {
-        review: "Revisión", guideline: "Guía clínica", research: "Investigación",
-        article: "Artículo", guide: "Guía", clinical: "Clínico",
-        association: "Asociación", forum: "Foro", influencer: "Perfil", platform: "Plataforma",
+        review: "Revisión",
+        guideline: "Guía clínica",
+        research: "Investigación",
+        article: "Artículo",
+        guide: "Guía",
+        clinical: "Clínico",
+        association: "Asociación",
+        forum: "Foro",
+        influencer: "Perfil",
+        platform: "Plataforma",
       },
-      disclaimer: "⚠️ Esta información es educativa. Consulta siempre con tu médico especialista antes de cambiar tu tratamiento.",
+      disclaimer:
+        "⚠️ Esta información es educativa. Consulta siempre con tu médico especialista antes de cambiar tu tratamiento.",
       openLink: "Abrir →",
     },
     profile: {
       title: "Mi Perfil",
       name: "Nombre",
       stage: "Estadio Lipedema",
-      stages: { "1": "Estadio 1", "2": "Estadio 2", "3": "Estadio 3", "4": "Estadio 4", unknown: "No sé / Sin diagnóstico" },
+      stages: {
+        1: "Estadio 1",
+        2: "Estadio 2",
+        3: "Estadio 3",
+        4: "Estadio 4",
+        unknown: "No sé / Sin diagnóstico",
+      },
       diagnosis: "Fecha de diagnóstico",
       activeZones: "Mis zonas afectadas",
       save: "Guardar perfil",
@@ -382,7 +583,15 @@ const LANG = {
   en: {
     appTitle: "Lipedema Tracker",
     appSubtitle: "Your personalized health diary",
-    nav: { today: "Today", history: "History", charts: "Charts", foods: "Foods", supps: "Supplements", info: "Info", profile: "Profile" },
+    nav: {
+      today: "Today",
+      history: "History",
+      charts: "Charts",
+      foods: "Foods",
+      supps: "Supplements",
+      info: "Info",
+      profile: "Profile",
+    },
     today: {
       title: "Today's Log",
       date: "Date",
@@ -393,16 +602,24 @@ const LANG = {
       water: "Water intake today",
       inflammation: "Inflammation by Zone",
       inflammationNote: "Free description (symptoms, sensations...)",
-      inflammationNotePlaceholder: "E.g. Very heavy legs in the morning, swollen ankles in the afternoon...",
+      inflammationNotePlaceholder:
+        "E.g. Very heavy legs in the morning, swollen ankles in the afternoon...",
       mood: "Emotional State",
       measures: "Measurements (cm)",
       save: "Save log",
       saved: "✓ Saved",
       todaysSupps: "Supplements taken today",
       zoneNames: {
-        waist: "Waist", hips: "Hips", leftThigh: "Left Thigh", rightThigh: "Right Thigh",
-        leftCalf: "Left Calf", rightCalf: "Right Calf", leftArm: "Left Arm",
-        rightArm: "Right Arm", abdomen: "Abdomen", ankles: "Ankles",
+        waist: "Waist",
+        hips: "Hips",
+        leftThigh: "Left Thigh",
+        rightThigh: "Right Thigh",
+        leftCalf: "Left Calf",
+        rightCalf: "Right Calf",
+        leftArm: "Left Arm",
+        rightArm: "Right Arm",
+        abdomen: "Abdomen",
+        ankles: "Ankles",
       },
     },
     foods: {
@@ -417,7 +634,13 @@ const LANG = {
       notes: "Notes",
       notesPlaceholder: "How you felt afterwards...",
       category: "Category",
-      categories: { antiinflammatory: "Anti-inflammatory", gluten: "Gluten", dairy: "Dairy", sugar: "Sugar", other: "Other" },
+      categories: {
+        antiinflammatory: "Anti-inflammatory",
+        gluten: "Gluten",
+        dairy: "Dairy",
+        sugar: "Sugar",
+        other: "Other",
+      },
       list: "My food list",
       empty: "No foods logged yet",
     },
@@ -446,18 +669,32 @@ const LANG = {
       filterEs: "In Spanish",
       filterEn: "In English",
       tagTypes: {
-        review: "Review", guideline: "Guideline", research: "Research",
-        article: "Article", guide: "Guide", clinical: "Clinical",
-        association: "Association", forum: "Forum", influencer: "Profile", platform: "Platform",
+        review: "Review",
+        guideline: "Guideline",
+        research: "Research",
+        article: "Article",
+        guide: "Guide",
+        clinical: "Clinical",
+        association: "Association",
+        forum: "Forum",
+        influencer: "Profile",
+        platform: "Platform",
       },
-      disclaimer: "⚠️ This information is educational. Always consult your specialist before changing your treatment.",
+      disclaimer:
+        "⚠️ This information is educational. Always consult your specialist before changing your treatment.",
       openLink: "Open →",
     },
     profile: {
       title: "My Profile",
       name: "Name",
       stage: "Lipedema Stage",
-      stages: { "1": "Stage 1", "2": "Stage 2", "3": "Stage 3", "4": "Stage 4", unknown: "Unknown / Undiagnosed" },
+      stages: {
+        1: "Stage 1",
+        2: "Stage 2",
+        3: "Stage 3",
+        4: "Stage 4",
+        unknown: "Unknown / Undiagnosed",
+      },
       diagnosis: "Diagnosis date",
       activeZones: "My affected zones",
       save: "Save profile",
@@ -488,22 +725,33 @@ const LANG = {
   },
 };
 
-const ALL_ZONES = ["waist","hips","leftThigh","rightThigh","leftCalf","rightCalf","leftArm","rightArm","abdomen","ankles"];
+const ALL_ZONES = [
+  "waist",
+  "hips",
+  "leftThigh",
+  "rightThigh",
+  "leftCalf",
+  "rightCalf",
+  "leftArm",
+  "rightArm",
+  "abdomen",
+  "ankles",
+];
 
 const ALLERGENS = [
-  { key: "gluten",      icon: "🌾", es: "Gluten",                en: "Gluten" },
-  { key: "dairy",       icon: "🥛", es: "Lácteos / Lactosa",     en: "Dairy / Lactose" },
-  { key: "nuts",        icon: "🥜", es: "Frutos secos",          en: "Nuts" },
-  { key: "fish",        icon: "🐟", es: "Pescado / Marisco",     en: "Fish / Shellfish" },
-  { key: "soy",         icon: "🫘", es: "Soja",                  en: "Soy" },
-  { key: "eggs",        icon: "🥚", es: "Huevos",                en: "Eggs" },
-  { key: "fructose",    icon: "🍎", es: "Fructosa",              en: "Fructose" },
-  { key: "histamine",   icon: "⚗️", es: "Histamina",             en: "Histamine" },
-  { key: "nightshades", icon: "🍅", es: "Solanáceas",            en: "Nightshades" },
-  { key: "corn",        icon: "🌽", es: "Maíz",                  en: "Corn" },
-  { key: "sesame",      icon: "🫗", es: "Sésamo",                en: "Sesame" },
-  { key: "sulfites",    icon: "🍷", es: "Sulfitos",              en: "Sulfites" },
-  { key: "caffeine",    icon: "☕", es: "Cafeína",               en: "Caffeine" },
+  { key: "gluten", icon: "🌾", es: "Gluten", en: "Gluten" },
+  { key: "dairy", icon: "🥛", es: "Lácteos / Lactosa", en: "Dairy / Lactose" },
+  { key: "nuts", icon: "🥜", es: "Frutos secos", en: "Nuts" },
+  { key: "fish", icon: "🐟", es: "Pescado / Marisco", en: "Fish / Shellfish" },
+  { key: "soy", icon: "🫘", es: "Soja", en: "Soy" },
+  { key: "eggs", icon: "🥚", es: "Huevos", en: "Eggs" },
+  { key: "fructose", icon: "🍎", es: "Fructosa", en: "Fructose" },
+  { key: "histamine", icon: "⚗️", es: "Histamina", en: "Histamine" },
+  { key: "nightshades", icon: "🍅", es: "Solanáceas", en: "Nightshades" },
+  { key: "corn", icon: "🌽", es: "Maíz", en: "Corn" },
+  { key: "sesame", icon: "🫗", es: "Sésamo", en: "Sesame" },
+  { key: "sulfites", icon: "🍷", es: "Sulfitos", en: "Sulfites" },
+  { key: "caffeine", icon: "☕", es: "Cafeína", en: "Caffeine" },
 ];
 
 const defaultEntry = () => ({
@@ -517,17 +765,17 @@ const defaultEntry = () => ({
   measures: {},
   suppsTaken: [],
   pillTaken: false,
-  water: 0,   // glasses of water (0-12)
+  water: 0, // glasses of water (0-12)
 });
 
 const defaultProfile = {
   name: "",
   stage: "unknown",
   diagnosis: "",
-  activeZones: ["leftThigh","rightThigh","leftCalf","rightCalf"],
-  pillActive: false,   // is she taking the pill?
-  pillBrand: "",       // brand name
-  intolerances: [],    // allergen keys the user is sensitive to
+  activeZones: ["leftThigh", "rightThigh", "leftCalf", "rightCalf"],
+  pillActive: false, // is she taking the pill?
+  pillBrand: "", // brand name
+  intolerances: [], // allergen keys the user is sensitive to
 };
 
 const defaultSupps = { active: [], custom: [] };
@@ -538,18 +786,31 @@ function SliderInput({ value, onChange, max = 6, labels, color = "#6366f1" }) {
   return (
     <div style={{ width: "100%" }}>
       <input
-        type="range" min={0} max={max} value={value}
+        type="range"
+        min={0}
+        max={max}
+        value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", accentColor: color, cursor: "pointer" }}
       />
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
         {labels.map((l, i) => (
-          <span key={i} style={{ fontSize: 10, color: i === value ? color : C.creamMuted, fontWeight: i === value ? 700 : 400, transition: "color 0.2s" }}>
+          <span
+            key={i}
+            style={{
+              fontSize: 10,
+              color: i === value ? color : C.creamMuted,
+              fontWeight: i === value ? 700 : 400,
+              transition: "color 0.2s",
+            }}
+          >
             {i === value ? l : "·"}
           </span>
         ))}
       </div>
-      <div style={{ textAlign: "center", marginTop: 6, fontSize: 13, fontWeight: 600, color }}>{labels[value]}</div>
+      <div style={{ textAlign: "center", marginTop: 6, fontSize: 13, fontWeight: 600, color }}>
+        {labels[value]}
+      </div>
     </div>
   );
 }
@@ -558,15 +819,40 @@ function ZoneCard({ zone, zoneName, value, onChange }) {
   const colors = [C.border, "#8ab89a", "#5a9a72", "#c5a040", C.danger, "#8a2020"];
   const lv = value || 0;
   return (
-    <div style={{ background: C.bgInput, borderRadius: 10, padding: "10px 14px", border: `1.5px solid ${lv > 0 ? colors[Math.min(lv,5)] : C.border}`, transition: "border-color 0.3s" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+    <div
+      style={{
+        background: C.bgInput,
+        borderRadius: 10,
+        padding: "10px 14px",
+        border: `1.5px solid ${lv > 0 ? colors[Math.min(lv, 5)] : C.border}`,
+        transition: "border-color 0.3s",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 6,
+        }}
+      >
         <span style={{ fontSize: 13, fontWeight: 600, color: C.cream }}>{zoneName}</span>
         <span style={{ fontSize: 12, color: C.creamMuted }}>{lv}/5</span>
       </div>
       <div style={{ display: "flex", gap: 6 }}>
-        {[0,1,2,3,4,5].map((v) => (
-          <div key={v} onClick={() => onChange(v)}
-            style={{ flex: 1, height: 18, borderRadius: 4, background: v <= lv ? colors[lv] : C.border, cursor: "pointer", transition: "background 0.2s", opacity: v <= lv ? 1 : 0.5 }}
+        {[0, 1, 2, 3, 4, 5].map((v) => (
+          <div
+            key={v}
+            onClick={() => onChange(v)}
+            style={{
+              flex: 1,
+              height: 18,
+              borderRadius: 4,
+              background: v <= lv ? colors[lv] : C.border,
+              cursor: "pointer",
+              transition: "background 0.2s",
+              opacity: v <= lv ? 1 : 0.5,
+            }}
           />
         ))}
       </div>
@@ -580,25 +866,44 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
   const t = LANG[lang].supps;
 
   return (
-    <div style={{
-      borderRadius: 12,
-      border: `1.5px solid ${isActive ? C.sage : C.border}`,
-      background: isActive ? "#f2f8f5" : C.bgCard,
-      transition: "all 0.2s", overflow: "hidden",
-      boxShadow: isActive ? "0 1px 6px rgba(77,138,110,0.1)" : "none",
-    }}>
-      <div onClick={onToggle} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer" }}>
+    <div
+      style={{
+        borderRadius: 12,
+        border: `1.5px solid ${isActive ? C.sage : C.border}`,
+        background: isActive ? "#f2f8f5" : C.bgCard,
+        transition: "all 0.2s",
+        overflow: "hidden",
+        boxShadow: isActive ? "0 1px 6px rgba(77,138,110,0.1)" : "none",
+      }}
+    >
+      <div
+        onClick={onToggle}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "12px 14px",
+          cursor: "pointer",
+        }}
+      >
         <span style={{ fontSize: 22 }}>{supp.icon}</span>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, fontSize: 14, color: C.cream }}>{name}</div>
           <div style={{ fontSize: 11, color: C.creamMuted }}>{note}</div>
         </div>
-        <div style={{
-          width: 22, height: 22, borderRadius: "50%",
-          border: `2px solid ${isActive ? C.sage : C.border}`,
-          background: isActive ? C.sage : "transparent",
-          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-        }}>
+        <div
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: "50%",
+            border: `2px solid ${isActive ? C.sage : C.border}`,
+            background: isActive ? C.sage : "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
           {isActive && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
         </div>
       </div>
@@ -608,29 +913,53 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
           <div style={{ paddingTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
             <div>
               <label style={labelStyle}>{t.dose}</label>
-              <input style={inputStyle} placeholder={t.dosePlaceholder}
-                value={suppData?.dose || ""} onChange={(e) => onUpdate({ dose: e.target.value })} />
+              <input
+                style={inputStyle}
+                placeholder={t.dosePlaceholder}
+                value={suppData?.dose || ""}
+                onChange={(e) => onUpdate({ dose: e.target.value })}
+              />
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>{t.startDate}</label>
-                <input type="date" style={inputStyle}
-                  value={suppData?.startDate || ""} onChange={(e) => onUpdate({ startDate: e.target.value })} />
+                <input
+                  type="date"
+                  style={inputStyle}
+                  value={suppData?.startDate || ""}
+                  onChange={(e) => onUpdate({ startDate: e.target.value })}
+                />
               </div>
             </div>
             <div>
               <label style={labelStyle}>{t.effect}</label>
               <div style={{ display: "flex", gap: 6 }}>
                 {Object.entries(t.effectOptions).map(([k, v]) => (
-                  <button key={k} onClick={() => onUpdate({ effect: k })}
+                  <button
+                    key={k}
+                    onClick={() => onUpdate({ effect: k })}
                     style={{
-                      flex: 1, padding: "6px 4px", borderRadius: 7, border: `1px solid ${C.border}`, cursor: "pointer", fontSize: 11, fontWeight: 600,
-                      background: suppData?.effect === k
-                        ? (k === "good" ? C.success : k === "bad" ? C.danger : C.creamMuted)
-                        : C.bgInput,
+                      flex: 1,
+                      padding: "6px 4px",
+                      borderRadius: 7,
+                      border: `1px solid ${C.border}`,
+                      cursor: "pointer",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      background:
+                        suppData?.effect === k
+                          ? k === "good"
+                            ? C.success
+                            : k === "bad"
+                              ? C.danger
+                              : C.creamMuted
+                          : C.bgInput,
                       color: suppData?.effect === k ? "#fff" : C.creamMuted,
                       transition: "all 0.2s",
-                    }}>{v}</button>
+                    }}
+                  >
+                    {v}
+                  </button>
                 ))}
               </div>
             </div>
@@ -642,81 +971,203 @@ function SupplementCard({ supp, lang, isActive, suppData, onToggle, onUpdate }) 
 }
 
 const C = {
-  bg:         "#f0f5f2",   // fondo principal — verde pálido
-  bgCard:     "#ffffff",   // tarjetas — blanco puro
-  bgCardHov:  "#f7faf8",   // hover tarjetas
-  bgInput:    "#f7faf8",   // inputs — blanco roto muy suave
-  border:     "#d6e5dd",   // bordes — sage muy suave
-  borderFoc:  "#4d8a6e",   // bordes activos
-  sage:       "#4d8a6e",   // verde salvia principal (oscurecido para contraste en claro)
-  sageDark:   "#3a6e57",   // sage oscuro (botones hover)
-  sageLight:  "#3a6e57",   // sage texto (mismo, contraste ≥4.5:1 sobre blanco)
-  cream:      "#1c2b24",   // texto principal — verde muy oscuro casi negro
-  creamMuted: "#5a7568",   // texto secundario — sage medio
-  creamFaint: "#e4eeea",   // superficies muy sutiles
-  accent:     "#8a6c3a",   // dorado/tierra acento (oscurecido para legibilidad)
-  danger:     "#b84040",   // error/dolor
-  success:    "#4d8a6e",   // éxito/bien
-  warn:       "#a07830",   // warning/neutral
+  bg: "#f0f5f2", // fondo principal — verde pálido
+  bgCard: "#ffffff", // tarjetas — blanco puro
+  bgCardHov: "#f7faf8", // hover tarjetas
+  bgInput: "#f7faf8", // inputs — blanco roto muy suave
+  border: "#d6e5dd", // bordes — sage muy suave
+  borderFoc: "#4d8a6e", // bordes activos
+  sage: "#4d8a6e", // verde salvia principal (oscurecido para contraste en claro)
+  sageDark: "#3a6e57", // sage oscuro (botones hover)
+  sageLight: "#3a6e57", // sage texto (mismo, contraste ≥4.5:1 sobre blanco)
+  cream: "#1c2b24", // texto principal — verde muy oscuro casi negro
+  creamMuted: "#5a7568", // texto secundario — sage medio
+  creamFaint: "#e4eeea", // superficies muy sutiles
+  accent: "#8a6c3a", // dorado/tierra acento (oscurecido para legibilidad)
+  danger: "#b84040", // error/dolor
+  success: "#4d8a6e", // éxito/bien
+  warn: "#a07830", // warning/neutral
 };
 
 const labelStyle = {
-  fontSize: 11, fontWeight: 700, color: C.creamMuted, marginBottom: 5,
-  display: "block", textTransform: "uppercase", letterSpacing: "0.6px",
+  fontSize: 11,
+  fontWeight: 700,
+  color: C.creamMuted,
+  marginBottom: 5,
+  display: "block",
+  textTransform: "uppercase",
+  letterSpacing: "0.6px",
 };
 const inputStyle = {
-  width: "100%", padding: "9px 12px", borderRadius: 8,
-  border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none",
-  background: C.bgCard, boxSizing: "border-box", fontFamily: "inherit",
-  color: C.cream, transition: "border-color 0.2s",
+  width: "100%",
+  padding: "9px 12px",
+  borderRadius: 8,
+  border: `1.5px solid ${C.border}`,
+  fontSize: 13,
+  outline: "none",
+  background: C.bgCard,
+  boxSizing: "border-box",
+  fontFamily: "inherit",
+  color: C.cream,
+  transition: "border-color 0.2s",
 };
 const textareaStyle = {
-  width: "100%", padding: "9px 12px", borderRadius: 8,
-  border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none",
-  background: C.bgInput, boxSizing: "border-box", resize: "vertical",
-  minHeight: 70, fontFamily: "inherit", color: C.cream,
+  width: "100%",
+  padding: "9px 12px",
+  borderRadius: 8,
+  border: `1.5px solid ${C.border}`,
+  fontSize: 13,
+  outline: "none",
+  background: C.bgInput,
+  boxSizing: "border-box",
+  resize: "vertical",
+  minHeight: 70,
+  fontFamily: "inherit",
+  color: C.cream,
 };
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
 // ─── NAV ITEMS & ICONS ────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { key: "home",     icon: "home",      es: "Inicio",    en: "Home"        },
-  { key: "today",    icon: "calendar",  es: "Hoy",       en: "Today"       },
-  { key: "history",  icon: "clock",     es: "Historial", en: "History"     },
-  { key: "charts",   icon: "trending",  es: "Gráficas",  en: "Charts"      },
-  { key: "foods",    icon: "utensils",  es: "Alimentos", en: "Foods"       },
-  { key: "supps",    icon: "pill",      es: "Suplementos",en: "Supplements"},
-  { key: "centers",  icon: "mappin",    es: "Centros",   en: "Centers"     },
-  { key: "info",     icon: "book",      es: "Información",en: "Info"       },
-  { key: "profile",  icon: "user",      es: "Perfil",    en: "Profile"     },
+  { key: "home", icon: "home", es: "Inicio", en: "Home" },
+  { key: "today", icon: "calendar", es: "Hoy", en: "Today" },
+  { key: "history", icon: "clock", es: "Historial", en: "History" },
+  { key: "charts", icon: "trending", es: "Gráficas", en: "Charts" },
+  { key: "foods", icon: "utensils", es: "Alimentos", en: "Foods" },
+  { key: "supps", icon: "pill", es: "Suplementos", en: "Supplements" },
+  { key: "centers", icon: "mappin", es: "Centros", en: "Centers" },
+  { key: "info", icon: "book", es: "Información", en: "Info" },
+  { key: "profile", icon: "user", es: "Perfil", en: "Profile" },
 ];
 
 // Lucide-style SVG icons — 20×20 viewBox, stroke-based
 function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
   const s = { width: size, height: size, display: "block", flexShrink: 0 };
-  const p = { fill: "none", stroke: color, strokeWidth, strokeLinecap: "round", strokeLinejoin: "round" };
+  const p = {
+    fill: "none",
+    stroke: color,
+    strokeWidth,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+  };
   const icons = {
-    calendar: <svg style={s} viewBox="0 0 24 24" {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="14" width="3" height="3" rx="0.5" fill={color} stroke="none"/></svg>,
-    clock:    <svg style={s} viewBox="0 0 24 24" {...p}><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>,
-    trending: <svg style={s} viewBox="0 0 24 24" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
-    utensils: <svg style={s} viewBox="0 0 24 24" {...p}><line x1="3" y1="2" x2="3" y2="22"/><path d="M7 2v7a4 4 0 0 1-4 4"/><path d="M21 2v20M21 2a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4"/></svg>,
-    pill:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M10.5 20H4a2 2 0 0 1-2-2v-2.5a2 2 0 0 1 2-2h6.5"/><path d="M13.5 4H20a2 2 0 0 1 2 2v2.5a2 2 0 0 1-2 2h-6.5"/><circle cx="12" cy="12" r="7"/><path d="M7.5 12h9"/></svg>,
-    mappin:   <svg style={s} viewBox="0 0 24 24" {...p}><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>,
-    book:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="6" x2="16" y2="6"/><line x1="12" y1="10" x2="16" y2="10"/></svg>,
-    user:     <svg style={s} viewBox="0 0 24 24" {...p}><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
-    menu:     <svg style={s} viewBox="0 0 24 24" {...p}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
-    x:        <svg style={s} viewBox="0 0 24 24" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-    home:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>,
-    leaf:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
-    hand:     <svg style={s} viewBox="0 0 24 24" {...p}><path d="M18 11V6a1 1 0 0 0-2 0v5"/><path d="M14 10V4a1 1 0 0 0-2 0v6"/><path d="M10 10.5V5a1 1 0 0 0-2 0v7"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.7-2.4L3.4 16a1.5 1.5 0 0 1 2.1-2.1L8 16"/></svg>,
-    sparkles: <svg style={s} viewBox="0 0 24 24" {...p}><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg>,
-    lightbulb:<svg style={s} viewBox="0 0 24 24" {...p}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>,
-    clipboard:<svg style={s} viewBox="0 0 24 24" {...p}><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>,
+    calendar: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <rect x="3" y="4" width="18" height="18" rx="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+        <rect x="7" y="14" width="3" height="3" rx="0.5" fill={color} stroke="none" />
+      </svg>
+    ),
+    clock: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <circle cx="12" cy="12" r="9" />
+        <polyline points="12 7 12 12 15.5 14" />
+      </svg>
+    ),
+    trending: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+        <polyline points="16 7 22 7 22 13" />
+      </svg>
+    ),
+    utensils: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <line x1="3" y1="2" x2="3" y2="22" />
+        <path d="M7 2v7a4 4 0 0 1-4 4" />
+        <path d="M21 2v20M21 2a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4" />
+      </svg>
+    ),
+    pill: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M10.5 20H4a2 2 0 0 1-2-2v-2.5a2 2 0 0 1 2-2h6.5" />
+        <path d="M13.5 4H20a2 2 0 0 1 2 2v2.5a2 2 0 0 1-2 2h-6.5" />
+        <circle cx="12" cy="12" r="7" />
+        <path d="M7.5 12h9" />
+      </svg>
+    ),
+    mappin: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+        <circle cx="12" cy="9" r="2.5" />
+      </svg>
+    ),
+    book: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        <line x1="12" y1="6" x2="16" y2="6" />
+        <line x1="12" y1="10" x2="16" y2="10" />
+      </svg>
+    ),
+    user: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+      </svg>
+    ),
+    menu: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    ),
+    x: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    ),
+    home: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z" />
+        <polyline points="9 21 9 12 15 12 15 21" />
+      </svg>
+    ),
+    leaf: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" />
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+      </svg>
+    ),
+    hand: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M18 11V6a1 1 0 0 0-2 0v5" />
+        <path d="M14 10V4a1 1 0 0 0-2 0v6" />
+        <path d="M10 10.5V5a1 1 0 0 0-2 0v7" />
+        <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.7-2.4L3.4 16a1.5 1.5 0 0 1 2.1-2.1L8 16" />
+      </svg>
+    ),
+    sparkles: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+        <path d="M20 3v4" />
+        <path d="M22 5h-4" />
+      </svg>
+    ),
+    lightbulb: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+      </svg>
+    ),
+    clipboard: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+        <path d="M12 11h4" />
+        <path d="M12 16h4" />
+        <path d="M8 11h.01" />
+        <path d="M8 16h.01" />
+      </svg>
+    ),
   };
   return icons[name] || null;
 }
-
 
 export default function App() {
   const { user, loading, loginWithGoogle, logout } = useAuth();
@@ -735,129 +1186,175 @@ export default function App() {
   const [profileSaved, setProfileSaved] = useState(false);
   const [suppsSaved, setSuppsSaved] = useState(false);
   const [cycleData, setCycleData] = useState({});
-  const [cycleMonth, setCycleMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`; });
+  const [cycleMonth, setCycleMonth] = useState(() => {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}`;
+  });
   const [cycleActiveType, setCycleActiveType] = useState(null); // "period"|"spm"|"retention"|null
   const [recipeExpanded, setRecipeExpanded] = useState(false);
   const [openLog, setOpenLog] = useState(null);
   const [avatarMenu, setAvatarMenu] = useState(false);
-  const [centersView, setCentersView] = useState("list");   // "list" | "propose" | "pending"
-  const [centerForm, setCenterForm] = useState({ name:"", address:"", city:"", mapsUrl:"", specialty:"", notes:"", type:"" });
+  const [centersView, setCentersView] = useState("list"); // "list" | "propose" | "pending"
+  const [centerForm, setCenterForm] = useState({
+    name: "",
+    address: "",
+    city: "",
+    mapsUrl: "",
+    specialty: "",
+    notes: "",
+    type: "",
+  });
   const [centerFilter, setCenterFilter] = useState("all");
   const [userCenters, setUserCenters] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("lt_centers") || "[]"); } catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem("lt_centers") || "[]");
+    } catch {
+      return [];
+    }
   });
   const [pendingCenters, setPendingCenters] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("lt_centers_pending") || "[]"); } catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem("lt_centers_pending") || "[]");
+    } catch {
+      return [];
+    }
   });
-  const [newFood, setNewFood] = useState({ name: "", reaction: "good", notes: "", category: "other" });
+  const [newFood, setNewFood] = useState({
+    name: "",
+    reaction: "good",
+    notes: "",
+    category: "other",
+  });
   const [customSuppName, setCustomSuppName] = useState("");
   const [infoFilter, setInfoFilter] = useState("all");
 
   const t = LANG[lang];
 
- useEffect(() => {
-  // Carga localStorage siempre (fallback y usuarios no logueados)
-  try {
-    const sl = localStorage.getItem("lt_logs");
-    const sf = localStorage.getItem("lt_foods");
-    const sp = localStorage.getItem("lt_profile");
-    const ss = localStorage.getItem("lt_supps");
-    const sl2 = localStorage.getItem("lt_lang");
-    const sw = localStorage.getItem("lt_welcome_seen");
-    const so = localStorage.getItem("lt_onboarding_done");
-    const sc = localStorage.getItem("lt_cycle");
-    if (sc) setCycleData(JSON.parse(sc));
-    if (sl) {
-      const parsed = JSON.parse(sl);
-      setLogs(parsed);
-      const todayStr = new Date().toISOString().split("T")[0];
-      const todayLog = parsed.find(l => l.date === todayStr);
-      if (todayLog) setEntry(todayLog);
-    }
-    if (sf) setFoods(JSON.parse(sf));
-    if (sp) setProfile({ ...defaultProfile, ...JSON.parse(sp) });
-    if (ss) setSupps(JSON.parse(ss));
-    if (sl2) setLang(sl2);
-    if (sw) setShowWelcome(false);
-    if (sw && !so) setShowOnboarding(true);
-  } catch {}
-
-  // Si hay sesión activa, sobreescribe con datos de Supabase
-  if (!user) return;
-  (async () => {
+  useEffect(() => {
+    // Carga localStorage siempre (fallback y usuarios no logueados)
     try {
-      const [dbProfile, dbLogs, dbFoods, dbCycle] = await Promise.all([
-        getProfile(user.id),
-        getLogs(user.id),
-        getFoods(user.id),
-        getCycle(user.id),
-      ]);
-      if (dbProfile) setProfile({ ...defaultProfile, ...dbProfile });
-      if (dbLogs?.length) {
-        setLogs(dbLogs);
+      const sl = localStorage.getItem("lt_logs");
+      const sf = localStorage.getItem("lt_foods");
+      const sp = localStorage.getItem("lt_profile");
+      const ss = localStorage.getItem("lt_supps");
+      const sl2 = localStorage.getItem("lt_lang");
+      const sw = localStorage.getItem("lt_welcome_seen");
+      const so = localStorage.getItem("lt_onboarding_done");
+      const sc = localStorage.getItem("lt_cycle");
+      if (sc) setCycleData(JSON.parse(sc));
+      if (sl) {
+        const parsed = JSON.parse(sl);
+        setLogs(parsed);
         const todayStr = new Date().toISOString().split("T")[0];
-        const todayLog = dbLogs.find(l => l.date === todayStr);
+        const todayLog = parsed.find((l) => l.date === todayStr);
         if (todayLog) setEntry(todayLog);
       }
-      if (dbFoods?.length) setFoods(dbFoods);
-      if (dbCycle && Object.keys(dbCycle).length) setCycleData(dbCycle);
-    } catch (e) { console.error("Supabase load:", e); }
-  })();
-}, [user]);
+      if (sf) setFoods(JSON.parse(sf));
+      if (sp) setProfile({ ...defaultProfile, ...JSON.parse(sp) });
+      if (ss) setSupps(JSON.parse(ss));
+      if (sl2) setLang(sl2);
+      if (sw) setShowWelcome(false);
+      if (sw && !so) setShowOnboarding(true);
+    } catch {}
+
+    // Si hay sesión activa, sobreescribe con datos de Supabase
+    if (!user) return;
+    (async () => {
+      try {
+        const [dbProfile, dbLogs, dbFoods, dbCycle] = await Promise.all([
+          getProfile(user.id),
+          getLogs(user.id),
+          getFoods(user.id),
+          getCycle(user.id),
+        ]);
+        if (dbProfile) setProfile({ ...defaultProfile, ...dbProfile });
+        if (dbLogs?.length) {
+          setLogs(dbLogs);
+          const todayStr = new Date().toISOString().split("T")[0];
+          const todayLog = dbLogs.find((l) => l.date === todayStr);
+          if (todayLog) setEntry(todayLog);
+        }
+        if (dbFoods?.length) setFoods(dbFoods);
+        if (dbCycle && Object.keys(dbCycle).length) setCycleData(dbCycle);
+      } catch (e) {
+        console.error("Supabase load:", e);
+      }
+    })();
+  }, [user]);
 
   const handleEnterApp = useCallback(() => {
-    try { localStorage.setItem("lt_welcome_seen", "1"); } catch {}
+    try {
+      localStorage.setItem("lt_welcome_seen", "1");
+    } catch {}
     setShowWelcome(false);
     setShowOnboarding(true);
   }, []);
 
-  const handleOnboardingComplete = useCallback(({ name, lang: newLang, country, region, stage, compression, posture }) => {
-    const updatedProfile = { ...defaultProfile, name, stage, country, region, compression, posture };
-    setProfile(updatedProfile);
-    setLang(newLang);
-    try {
-      localStorage.setItem("lt_profile", JSON.stringify(updatedProfile));
-      localStorage.setItem("lt_lang", newLang);
-      localStorage.setItem("lt_onboarding_done", "1");
-      if (country) localStorage.setItem("lt_location", JSON.stringify({ country, region }));
-    } catch {}
-    setShowOnboarding(false);
-  }, []);
+  const handleOnboardingComplete = useCallback(
+    ({ name, lang: newLang, country, region, stage, compression, posture }) => {
+      const updatedProfile = {
+        ...defaultProfile,
+        name,
+        stage,
+        country,
+        region,
+        compression,
+        posture,
+      };
+      setProfile(updatedProfile);
+      setLang(newLang);
+      try {
+        localStorage.setItem("lt_profile", JSON.stringify(updatedProfile));
+        localStorage.setItem("lt_lang", newLang);
+        localStorage.setItem("lt_onboarding_done", "1");
+        if (country) localStorage.setItem("lt_location", JSON.stringify({ country, region }));
+      } catch {}
+      setShowOnboarding(false);
+    },
+    []
+  );
 
   const persist = useCallback((key, val) => {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch {}
   }, []);
 
   const updateEntry = (field, val) => setEntry((e) => ({ ...e, [field]: val }));
 
   const handleLogout = () => {
-  if (!window.confirm(lang === "es"
-    ? "¿Segura que quieres cerrar sesión? Tus datos están guardados en la nube."
-    : "Sure you want to log out? Your data is safely stored in the cloud.")) return;
-  logout(); // Supabase signOut
-  localStorage.removeItem("lt_welcome_seen");
-  localStorage.removeItem("lt_onboarding_done");
-  setShowWelcome(true);
-  setShowOnboarding(false);
-  setAvatarMenu(false);
-};
+    if (
+      !window.confirm(
+        lang === "es"
+          ? "¿Segura que quieres cerrar sesión? Tus datos están guardados en la nube."
+          : "Sure you want to log out? Your data is safely stored in the cloud."
+      )
+    )
+      return;
+    logout(); // Supabase signOut
+    localStorage.removeItem("lt_welcome_seen");
+    localStorage.removeItem("lt_onboarding_done");
+    setShowWelcome(true);
+    setShowOnboarding(false);
+    setAvatarMenu(false);
+  };
 
   const saveLog = () => {
-  const updated = logs.filter((l) => l.date !== entry.date).concat(entry);
-  updated.sort((a, b) => a.date.localeCompare(b.date));
-  setLogs(updated);
-  persist("lt_logs", updated);
-  if (user) upsertLog(user.id, entry);
-  setSavedMsg(t.today.saved);
-  setTimeout(() => setSavedMsg(""), 2000);
-};
+    const updated = logs.filter((l) => l.date !== entry.date).concat(entry);
+    updated.sort((a, b) => a.date.localeCompare(b.date));
+    setLogs(updated);
+    persist("lt_logs", updated);
+    if (user) upsertLog(user.id, entry);
+    setSavedMsg(t.today.saved);
+    setTimeout(() => setSavedMsg(""), 2000);
+  };
 
   const saveProfile = () => {
-  persist("lt_profile", profile);
-  if (user) upsertProfile(user.id, profile);
-  setProfileSaved(true);
-  setTimeout(() => setProfileSaved(false), 2500);
-};
+    persist("lt_profile", profile);
+    if (user) upsertProfile(user.id, profile);
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 2500);
+  };
 
   const saveSupps = () => {
     persist("lt_supps", supps);
@@ -866,42 +1363,59 @@ export default function App() {
   };
 
   const addFood = () => {
-  if (!newFood.name.trim()) return;
-  const food = { ...newFood, id: Date.now().toString() };
-  const updated = [...foods, food];
-  setFoods(updated);
-  persist("lt_foods", updated);
-  if (user) upsertFood(user.id, food);
-  setNewFood({ name: "", reaction: "good", notes: "", category: "other" });
-};
+    if (!newFood.name.trim()) return;
+    const food = { ...newFood, id: Date.now().toString() };
+    const updated = [...foods, food];
+    setFoods(updated);
+    persist("lt_foods", updated);
+    if (user) upsertFood(user.id, food);
+    setNewFood({ name: "", reaction: "good", notes: "", category: "other" });
+  };
 
   const toggleCycleDay = (dateStr, type) => {
-  setCycleData(prev => {
-    const next = { ...prev };
-    if (next[dateStr] === type) delete next[dateStr];
-    else next[dateStr] = type;
-    try { localStorage.setItem("lt_cycle", JSON.stringify(next)); } catch {}
-    if (user) upsertCycle(user.id, next);
-    return next;
-  });
-};
+    setCycleData((prev) => {
+      const next = { ...prev };
+      if (next[dateStr] === type) delete next[dateStr];
+      else next[dateStr] = type;
+      try {
+        localStorage.setItem("lt_cycle", JSON.stringify(next));
+      } catch {}
+      if (user) upsertCycle(user.id, next);
+      return next;
+    });
+  };
 
   const saveCenterProposal = () => {
     if (!centerForm.name.trim() || !centerForm.city.trim()) return;
-    const proposal = { ...centerForm, id: Date.now(), status:"pending", proposedAt: new Date().toISOString() };
+    const proposal = {
+      ...centerForm,
+      id: Date.now(),
+      status: "pending",
+      proposedAt: new Date().toISOString(),
+    };
     const updated = [...pendingCenters, proposal];
     setPendingCenters(updated);
-    try { localStorage.setItem("lt_centers_pending", JSON.stringify(updated)); } catch {}
-    setCenterForm({ name:"", address:"", city:"", mapsUrl:"", specialty:"", notes:"", type:"" });
+    try {
+      localStorage.setItem("lt_centers_pending", JSON.stringify(updated));
+    } catch {}
+    setCenterForm({
+      name: "",
+      address: "",
+      city: "",
+      mapsUrl: "",
+      specialty: "",
+      notes: "",
+      type: "",
+    });
     setCentersView("list");
   };
 
   const approveCenter = (id) => {
-    const center = pendingCenters.find(c => c.id === id);
+    const center = pendingCenters.find((c) => c.id === id);
     if (!center) return;
-    const approved = { ...center, status:"approved", verified: false };
+    const approved = { ...center, status: "approved", verified: false };
     const newUser = [...userCenters, approved];
-    const newPending = pendingCenters.filter(c => c.id !== id);
+    const newPending = pendingCenters.filter((c) => c.id !== id);
     setUserCenters(newUser);
     setPendingCenters(newPending);
     try {
@@ -911,19 +1425,24 @@ export default function App() {
   };
 
   const rejectCenter = (id) => {
-    const updated = pendingCenters.filter(c => c.id !== id);
+    const updated = pendingCenters.filter((c) => c.id !== id);
     setPendingCenters(updated);
-    try { localStorage.setItem("lt_centers_pending", JSON.stringify(updated)); } catch {}
+    try {
+      localStorage.setItem("lt_centers_pending", JSON.stringify(updated));
+    } catch {}
   };
 
   const removeFood = (id) => {
-  const updated = foods.filter((f) => f.id !== id);
-  setFoods(updated);
-  persist("lt_foods", updated);
-  if (user) deleteFood(user.id, id);
-};
+    const updated = foods.filter((f) => f.id !== id);
+    setFoods(updated);
+    persist("lt_foods", updated);
+    if (user) deleteFood(user.id, id);
+  };
 
-  const switchLang = (l) => { setLang(l); persist("lt_lang", l); };
+  const switchLang = (l) => {
+    setLang(l);
+    persist("lt_lang", l);
+  };
 
   // Supplement helpers
   const allSupplementKeys = [
@@ -943,7 +1462,7 @@ export default function App() {
   const updateSuppData = (key, patch) => {
     const updated = {
       ...supps,
-      active: supps.active.map((a) => a.key === key ? { ...a, ...patch } : a),
+      active: supps.active.map((a) => (a.key === key ? { ...a, ...patch } : a)),
     };
     setSupps(updated);
   };
@@ -965,7 +1484,14 @@ export default function App() {
 
   const allSuppsList = [
     ...SUPPLEMENT_OPTIONS,
-    ...(supps.custom || []).map((c) => ({ key: c.key, icon: c.icon, es: c.name, en: c.name, note_es: "", note_en: "" })),
+    ...(supps.custom || []).map((c) => ({
+      key: c.key,
+      icon: c.icon,
+      es: c.name,
+      en: c.name,
+      note_es: "",
+      note_en: "",
+    })),
   ];
 
   // Chart data
@@ -989,29 +1515,54 @@ export default function App() {
   }));
 
   const last30 = logs.slice(-30);
-  const suppFreqData = activeSupps.map((a) => {
-    const def = allSuppsList.find(s => s.key === a.key);
-    return {
-      name: def ? (lang === "es" ? def.es : def.en) : a.key,
-      count: last30.filter(l => (l.suppsTaken || []).includes(a.key)).length,
-    };
-  }).sort((a, b) => b.count - a.count);
+  const suppFreqData = activeSupps
+    .map((a) => {
+      const def = allSuppsList.find((s) => s.key === a.key);
+      return {
+        name: def ? (lang === "es" ? def.es : def.en) : a.key,
+        count: last30.filter((l) => (l.suppsTaken || []).includes(a.key)).length,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
   const foodReactions = [
-    { name: t.foods.good, count: foods.filter((f) => f.reaction === "good").length, fill: "#34d399" },
+    {
+      name: t.foods.good,
+      count: foods.filter((f) => f.reaction === "good").length,
+      fill: "#34d399",
+    },
     { name: t.foods.bad, count: foods.filter((f) => f.reaction === "bad").length, fill: "#f87171" },
-    { name: t.foods.neutral, count: foods.filter((f) => f.reaction === "neutral").length, fill: "#94a3b8" },
+    {
+      name: t.foods.neutral,
+      count: foods.filter((f) => f.reaction === "neutral").length,
+      fill: "#94a3b8",
+    },
   ];
 
   // ─── STYLES ───────────────────────────────────────────────────────────────
   const S = {
-    app:       { fontFamily: "'DM Sans','Segoe UI',sans-serif", minHeight: "100vh", background: C.bg, color: C.cream, display: "flex", flexDirection: "column" },
-    layout:    { display: "flex", flex: 1 },
-    header:    {
-      background: C.bgCard, borderBottom: `1px solid ${C.border}`,
-      padding: "0 16px", height: 56, display: "flex", alignItems: "center",
-      justifyContent: "space-between", position: "sticky", top: 0, zIndex: 200,
-      boxShadow: "0 1px 8px rgba(74,110,87,0.07)", flexShrink: 0,
+    app: {
+      fontFamily: "'DM Sans','Segoe UI',sans-serif",
+      minHeight: "100vh",
+      background: C.bg,
+      color: C.cream,
+      display: "flex",
+      flexDirection: "column",
+    },
+    layout: { display: "flex", flex: 1 },
+    header: {
+      background: C.bgCard,
+      borderBottom: `1px solid ${C.border}`,
+      padding: "0 16px",
+      height: 56,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      position: "sticky",
+      top: 0,
+      zIndex: 200,
+      boxShadow: "0 1px 8px rgba(74,110,87,0.07)",
+      flexShrink: 0,
     },
     // Sidebar — shown on desktop (≥768px) via inline media workaround
     sidebar: (visible) => ({
@@ -1031,53 +1582,142 @@ export default function App() {
     }),
     // Mobile drawer
     drawerOverlay: {
-      position: "fixed", inset: 0, zIndex: 300,
-      background: "rgba(28,43,36,0.35)", backdropFilter: "blur(3px)",
+      position: "fixed",
+      inset: 0,
+      zIndex: 300,
+      background: "rgba(28,43,36,0.35)",
+      backdropFilter: "blur(3px)",
     },
     drawer: {
-      position: "fixed", top: 0, left: 0, bottom: 0, width: 248, zIndex: 301,
-      background: C.bgCard, borderRight: `1px solid ${C.border}`,
+      position: "fixed",
+      top: 0,
+      left: 0,
+      bottom: 0,
+      width: 248,
+      zIndex: 301,
+      background: C.bgCard,
+      borderRight: `1px solid ${C.border}`,
       boxShadow: "6px 0 32px rgba(28,43,36,0.12)",
-      display: "flex", flexDirection: "column", overflowY: "auto",
+      display: "flex",
+      flexDirection: "column",
+      overflowY: "auto",
     },
     sbItem: (active) => ({
-      display: "flex", alignItems: "center", gap: 10, padding: "9px 12px",
-      borderRadius: 10, cursor: "pointer", transition: "all 0.15s",
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "9px 12px",
+      borderRadius: 10,
+      cursor: "pointer",
+      transition: "all 0.15s",
       background: active ? C.creamFaint : "transparent",
       color: active ? C.sage : C.creamMuted,
-      fontWeight: active ? 700 : 500, fontSize: 13,
-      border: "none", width: "100%", textAlign: "left",
+      fontWeight: active ? 700 : 500,
+      fontSize: 13,
+      border: "none",
+      width: "100%",
+      textAlign: "left",
     }),
     sbSection: {
-      fontSize: 10, fontWeight: 800, textTransform: "uppercase",
-      letterSpacing: "0.7px", color: C.creamMuted, padding: "12px 12px 4px",
+      fontSize: 10,
+      fontWeight: 800,
+      textTransform: "uppercase",
+      letterSpacing: "0.7px",
+      color: C.creamMuted,
+      padding: "12px 12px 4px",
     },
     // Bottom nav — mobile only
     bottomNav: {
-      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
-      background: C.bgCard, borderTop: `1px solid ${C.border}`,
-      display: "flex", boxShadow: "0 -2px 12px rgba(28,43,36,0.06)",
+      position: "fixed",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      zIndex: 200,
+      background: C.bgCard,
+      borderTop: `1px solid ${C.border}`,
+      display: "flex",
+      boxShadow: "0 -2px 12px rgba(28,43,36,0.06)",
     },
     bnItem: (active) => ({
-      flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
-      gap: 3, padding: "8px 2px 6px", cursor: "pointer",
-      border: "none", background: "none",
-      color: active ? C.sage : C.creamMuted, transition: "color 0.15s",
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 3,
+      padding: "8px 2px 6px",
+      cursor: "pointer",
+      border: "none",
+      background: "none",
+      color: active ? C.sage : C.creamMuted,
+      transition: "color 0.15s",
     }),
-    page:      { flex: 1, overflowY: "auto", padding: "24px 24px 90px", maxWidth: 800, width: "100%", margin: "0 auto" },
-    card:      { background: C.bgCard, borderRadius: 14, padding: 20, marginBottom: 16, border: `1px solid ${C.border}`, boxShadow: "0 1px 4px rgba(74,110,87,0.06)" },
-    cardTitle: { fontSize: 14, fontWeight: 700, color: C.cream, marginBottom: 14, letterSpacing: "-0.3px" },
-    label:     labelStyle, input: inputStyle, textarea: textareaStyle,
-    btn:       { padding: "12px 24px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, background: C.sage, color: "#fff", width: "100%", transition: "background 0.2s" },
-    btnSm:     (col) => ({ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: col || C.creamFaint, color: col ? "#fff" : C.cream }),
-    row:       { display: "flex", gap: 12 }, col: { flex: 1 },
-    grid2:     { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
-    tag:       (color) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: color + "18", color }),
+    page: {
+      flex: 1,
+      overflowY: "auto",
+      padding: "24px 24px 90px",
+      maxWidth: 800,
+      width: "100%",
+      margin: "0 auto",
+    },
+    card: {
+      background: C.bgCard,
+      borderRadius: 14,
+      padding: 20,
+      marginBottom: 16,
+      border: `1px solid ${C.border}`,
+      boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+    },
+    cardTitle: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: C.cream,
+      marginBottom: 14,
+      letterSpacing: "-0.3px",
+    },
+    label: labelStyle,
+    input: inputStyle,
+    textarea: textareaStyle,
+    btn: {
+      padding: "12px 24px",
+      borderRadius: 10,
+      border: "none",
+      cursor: "pointer",
+      fontSize: 14,
+      fontWeight: 700,
+      background: C.sage,
+      color: "#fff",
+      width: "100%",
+      transition: "background 0.2s",
+    },
+    btnSm: (col) => ({
+      padding: "6px 14px",
+      borderRadius: 7,
+      border: "none",
+      cursor: "pointer",
+      fontSize: 12,
+      fontWeight: 600,
+      background: col || C.creamFaint,
+      color: col ? "#fff" : C.cream,
+    }),
+    row: { display: "flex", gap: 12 },
+    col: { flex: 1 },
+    grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
+    tag: (color) => ({
+      display: "inline-block",
+      padding: "2px 8px",
+      borderRadius: 20,
+      fontSize: 11,
+      fontWeight: 600,
+      background: color + "18",
+      color,
+    }),
     reactionColor: { good: C.success, bad: C.danger, neutral: C.creamMuted },
   };
 
   // Responsive breakpoint
-  const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" && window.innerWidth >= 768);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== "undefined" && window.innerWidth >= 768
+  );
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const handler = (e) => setIsDesktop(e.matches);
@@ -1089,20 +1729,31 @@ export default function App() {
 
   // Nav sections for sidebar grouping
   const NAV_GROUPS = [
-    { label: lang === "es" ? "Seguimiento" : "Tracking", keys: ["home","today","history","charts"] },
-    { label: lang === "es" ? "Salud"       : "Health",   keys: ["foods","supps"] },
-    { label: lang === "es" ? "Recursos"    : "Resources",keys: ["centers","info"] },
-    { label: lang === "es" ? "Cuenta"      : "Account",  keys: ["profile"] },
+    {
+      label: lang === "es" ? "Seguimiento" : "Tracking",
+      keys: ["home", "today", "history", "charts"],
+    },
+    { label: lang === "es" ? "Salud" : "Health", keys: ["foods", "supps"] },
+    { label: lang === "es" ? "Recursos" : "Resources", keys: ["centers", "info"] },
+    { label: lang === "es" ? "Cuenta" : "Account", keys: ["profile"] },
   ];
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
   // Loading state mientras Supabase verifica la sesión
   if (loading) {
     return (
-      <div style={{ minHeight:"100vh", background:"#f0f5f2", display:"flex", alignItems:"center", justifyContent:"center" }}>
-        <div style={{ textAlign:"center", color:"#5a7568" }}>
-          <div style={{ fontSize:32, marginBottom:12 }}>🌿</div>
-          <div style={{ fontSize:13, fontWeight:600 }}>Cargando…</div>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#f0f5f2",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#5a7568" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🌿</div>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>Cargando…</div>
         </div>
       </div>
     );
@@ -1119,61 +1770,180 @@ export default function App() {
     <div style={S.app}>
       {/* Guide overlay — shown from Info tab, covers app without resetting state */}
       {showGuide && (
-        <div style={{ position:"fixed", inset:0, zIndex:500, overflowY:"auto" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 500, overflowY: "auto" }}>
           <WelcomeGuide lang={lang} onEnter={() => setShowGuide(false)} isOverlay />
         </div>
       )}
       {/* ── HEADER ── */}
       <div style={S.header}>
-
         {/* Left: hamburger (mobile only) + logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {!isDesktop && (
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", alignItems: "center" }}>
+            <button
+              onClick={() => setSidebarOpen(true)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               <Icon name="menu" size={22} color={C.cream} />
             </button>
           )}
           {/* Logo SVG — leaf + circle mark */}
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1"/>
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 28 28"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1" />
             {/* Leaf shape */}
-            <path d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z"
-              fill="none" stroke={C.sage} strokeWidth="1.4" strokeLinejoin="round"/>
+            <path
+              d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z"
+              fill="none"
+              stroke={C.sage}
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
             {/* Vein */}
-            <line x1="14" y1="6" x2="14" y2="22" stroke={C.sage} strokeWidth="0.9" strokeLinecap="round"/>
-            <line x1="14" y1="13" x2="18" y2="11" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
-            <line x1="14" y1="16" x2="18" y2="14" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
-            <line x1="14" y1="13" x2="10" y2="11" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
-            <line x1="14" y1="16" x2="10" y2="14" stroke={C.sage} strokeWidth="0.7" strokeLinecap="round"/>
+            <line
+              x1="14"
+              y1="6"
+              x2="14"
+              y2="22"
+              stroke={C.sage}
+              strokeWidth="0.9"
+              strokeLinecap="round"
+            />
+            <line
+              x1="14"
+              y1="13"
+              x2="18"
+              y2="11"
+              stroke={C.sage}
+              strokeWidth="0.7"
+              strokeLinecap="round"
+            />
+            <line
+              x1="14"
+              y1="16"
+              x2="18"
+              y2="14"
+              stroke={C.sage}
+              strokeWidth="0.7"
+              strokeLinecap="round"
+            />
+            <line
+              x1="14"
+              y1="13"
+              x2="10"
+              y2="11"
+              stroke={C.sage}
+              strokeWidth="0.7"
+              strokeLinecap="round"
+            />
+            <line
+              x1="14"
+              y1="16"
+              x2="10"
+              y2="14"
+              stroke={C.sage}
+              strokeWidth="0.7"
+              strokeLinecap="round"
+            />
           </svg>
 
           {/* Wordmark */}
           <div>
-            <span style={{ fontSize: 15, fontWeight: 800, color: C.cream, letterSpacing: "-0.4px" }}>
+            <span
+              style={{ fontSize: 15, fontWeight: 800, color: C.cream, letterSpacing: "-0.4px" }}
+            >
               lipedema
             </span>
-            <span style={{ fontSize: 15, fontWeight: 300, color: C.sageLight, letterSpacing: "-0.2px" }}>
-              {" "}tracker
+            <span
+              style={{ fontSize: 15, fontWeight: 300, color: C.sageLight, letterSpacing: "-0.2px" }}
+            >
+              {" "}
+              tracker
             </span>
-            <span style={{ fontSize: 9, color: C.creamMuted, marginLeft: 4, verticalAlign: "middle" }}>v{__APP_VERSION__}</span>
+            <span
+              style={{ fontSize: 9, color: C.creamMuted, marginLeft: 4, verticalAlign: "middle" }}
+            >
+              v{__APP_VERSION__}
+            </span>
           </div>
         </div>
 
         {/* Right: lang toggle + avatar */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ display: "flex", gap: 2, background: C.creamFaint, borderRadius: 8, padding: 2 }}>
-            <button style={{ padding: "3px 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: lang === "es" ? C.bgCard : "transparent", color: lang === "es" ? C.sageLight : C.creamMuted, transition: "all 0.2s" }} onClick={() => switchLang("es")}>ES</button>
-            <button style={{ padding: "3px 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: lang === "en" ? C.bgCard : "transparent", color: lang === "en" ? C.sageLight : C.creamMuted, transition: "all 0.2s" }} onClick={() => switchLang("en")}>EN</button>
+          <div
+            style={{
+              display: "flex",
+              gap: 2,
+              background: C.creamFaint,
+              borderRadius: 8,
+              padding: 2,
+            }}
+          >
+            <button
+              style={{
+                padding: "3px 9px",
+                borderRadius: 6,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 11,
+                fontWeight: 700,
+                background: lang === "es" ? C.bgCard : "transparent",
+                color: lang === "es" ? C.sageLight : C.creamMuted,
+                transition: "all 0.2s",
+              }}
+              onClick={() => switchLang("es")}
+            >
+              ES
+            </button>
+            <button
+              style={{
+                padding: "3px 9px",
+                borderRadius: 6,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 11,
+                fontWeight: 700,
+                background: lang === "en" ? C.bgCard : "transparent",
+                color: lang === "en" ? C.sageLight : C.creamMuted,
+                transition: "all 0.2s",
+              }}
+              onClick={() => switchLang("en")}
+            >
+              EN
+            </button>
           </div>
 
           {/* Avatar + dropdown */}
-          <div style={{ position:"relative" }}>
+          <div style={{ position: "relative" }}>
             <div
-              onClick={() => setAvatarMenu(m => !m)}
+              onClick={() => setAvatarMenu((m) => !m)}
               title={profile.name || (lang === "es" ? "Mi perfil" : "My profile")}
-              style={{ width:32, height:32, borderRadius:"50%", background:`linear-gradient(135deg, ${C.sage}, ${C.sageDark})`, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", flexShrink:0, border:`2px solid ${avatarMenu ? C.sage : C.creamFaint}`, transition:"border 0.15s" }}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                background: `linear-gradient(135deg, ${C.sage}, ${C.sageDark})`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                flexShrink: 0,
+                border: `2px solid ${avatarMenu ? C.sage : C.creamFaint}`,
+                transition: "border 0.15s",
+              }}
             >
-              <span style={{ fontSize:13, fontWeight:800, color:"#fff", lineHeight:1 }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: "#fff", lineHeight: 1 }}>
                 {profile.name ? profile.name.trim()[0].toUpperCase() : "?"}
               </span>
             </div>
@@ -1182,62 +1952,204 @@ export default function App() {
             {avatarMenu && (
               <>
                 {/* Backdrop — click outside to close */}
-                <div onClick={() => setAvatarMenu(false)} style={{ position:"fixed", inset:0, zIndex:299 }} />
-                <div style={{ position:"absolute", top:40, right:0, zIndex:300, background:"white", borderRadius:14, border:`1px solid ${C.border}`, boxShadow:"0 8px 32px rgba(74,110,87,0.15)", minWidth:200, overflow:"hidden" }}>
+                <div
+                  onClick={() => setAvatarMenu(false)}
+                  style={{ position: "fixed", inset: 0, zIndex: 299 }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 40,
+                    right: 0,
+                    zIndex: 300,
+                    background: "white",
+                    borderRadius: 14,
+                    border: `1px solid ${C.border}`,
+                    boxShadow: "0 8px 32px rgba(74,110,87,0.15)",
+                    minWidth: 200,
+                    overflow: "hidden",
+                  }}
+                >
                   {/* User info */}
-                  <div style={{ padding:"14px 16px 10px", borderBottom:`1px solid ${C.border}` }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                      <div style={{ width:36, height:36, borderRadius:"50%", background:`linear-gradient(135deg, ${C.sage}, ${C.sageDark})`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                        <span style={{ fontSize:15, fontWeight:800, color:"#fff" }}>{profile.name ? profile.name.trim()[0].toUpperCase() : "?"}</span>
+                  <div style={{ padding: "14px 16px 10px", borderBottom: `1px solid ${C.border}` }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: "50%",
+                          background: `linear-gradient(135deg, ${C.sage}, ${C.sageDark})`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
+                          {profile.name ? profile.name.trim()[0].toUpperCase() : "?"}
+                        </span>
                       </div>
                       <div>
-                        <div style={{ fontSize:13, fontWeight:800, color:C.cream }}>{profile.name || (lang==="es"?"Sin nombre":"No name")}</div>
-                        <div style={{ fontSize:11, color:C.creamMuted }}>{lang==="es" ? `Estadio ${profile.stage === "unknown" ? "—" : profile.stage}` : `Stage ${profile.stage === "unknown" ? "—" : profile.stage}`}</div>
-                        <div style={{ fontSize:10, color: user ? C.sage : C.creamMuted, marginTop:2, fontWeight:600 }}>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: C.cream }}>
+                          {profile.name || (lang === "es" ? "Sin nombre" : "No name")}
+                        </div>
+                        <div style={{ fontSize: 11, color: C.creamMuted }}>
+                          {lang === "es"
+                            ? `Estadio ${profile.stage === "unknown" ? "—" : profile.stage}`
+                            : `Stage ${profile.stage === "unknown" ? "—" : profile.stage}`}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10,
+                            color: user ? C.sage : C.creamMuted,
+                            marginTop: 2,
+                            fontWeight: 600,
+                          }}
+                        >
                           {user
-                            ? (lang==="es" ? "✓ Sincronizado" : "✓ Synced")
-                            : (lang==="es" ? "Sin cuenta — datos locales" : "No account — local data")}
+                            ? lang === "es"
+                              ? "✓ Sincronizado"
+                              : "✓ Synced"
+                            : lang === "es"
+                              ? "Sin cuenta — datos locales"
+                              : "No account — local data"}
                         </div>
                       </div>
                     </div>
                   </div>
                   {/* Menu items */}
-                  <div style={{ padding:"6px 0" }}>
-                    <button onClick={() => { setTab("profile"); setAvatarMenu(false); }}
-                      style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.cream, fontWeight:600, textAlign:"left" }}>
+                  <div style={{ padding: "6px 0" }}>
+                    <button
+                      onClick={() => {
+                        setTab("profile");
+                        setAvatarMenu(false);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 16px",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        fontSize: 13,
+                        color: C.cream,
+                        fontWeight: 600,
+                        textAlign: "left",
+                      }}
+                    >
                       <Icon name="user" size={16} color={C.creamMuted} />
-                      {lang==="es" ? "Mi perfil" : "My profile"}
+                      {lang === "es" ? "Mi perfil" : "My profile"}
                     </button>
-                    <button onClick={() => { setTab("home"); setAvatarMenu(false); }}
-                      style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.cream, fontWeight:600, textAlign:"left" }}>
+                    <button
+                      onClick={() => {
+                        setTab("home");
+                        setAvatarMenu(false);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 16px",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        fontSize: 13,
+                        color: C.cream,
+                        fontWeight: 600,
+                        textAlign: "left",
+                      }}
+                    >
                       <Icon name="home" size={16} color={C.creamMuted} />
-                      {lang==="es" ? "Inicio" : "Home"}
+                      {lang === "es" ? "Inicio" : "Home"}
                     </button>
-                    <div style={{ margin:"4px 12px", borderTop:`1px solid ${C.border}` }} />
+                    <div style={{ margin: "4px 12px", borderTop: `1px solid ${C.border}` }} />
 
                     {/* Botón Google login — solo si no hay sesión activa */}
                     {!user && (
                       <>
-                        <button onClick={() => { loginWithGoogle(); setAvatarMenu(false); }}
-                          style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:C.cream, fontWeight:700, textAlign:"left" }}>
+                        <button
+                          onClick={() => {
+                            loginWithGoogle();
+                            setAvatarMenu(false);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "10px 16px",
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            fontSize: 13,
+                            color: C.cream,
+                            fontWeight: 700,
+                            textAlign: "left",
+                          }}
+                        >
                           <svg width="16" height="16" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            <path
+                              fill="#4285F4"
+                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            />
+                            <path
+                              fill="#34A853"
+                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            />
+                            <path
+                              fill="#FBBC05"
+                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                            />
+                            <path
+                              fill="#EA4335"
+                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            />
                           </svg>
-                          {lang==="es" ? "Iniciar sesión con Google" : "Sign in with Google"}
+                          {lang === "es" ? "Iniciar sesión con Google" : "Sign in with Google"}
                         </button>
-                        <div style={{ margin:"4px 12px", borderTop:`1px solid ${C.border}` }} />
+                        <div style={{ margin: "4px 12px", borderTop: `1px solid ${C.border}` }} />
                       </>
                     )}
 
-                    <button onClick={handleLogout}
-                      style={{ width:"100%", padding:"10px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, fontSize:13, color:"#c06080", fontWeight:700, textAlign:"left" }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c06080" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        width: "100%",
+                        padding: "10px 16px",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        fontSize: 13,
+                        color: "#c06080",
+                        fontWeight: 700,
+                        textAlign: "left",
+                      }}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#c06080"
+                        strokeWidth="1.75"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
                       </svg>
-                      {lang==="es" ? "Cerrar sesión" : "Log out"}
+                      {lang === "es" ? "Cerrar sesión" : "Log out"}
                     </button>
                   </div>
                 </div>
@@ -1249,1858 +2161,4482 @@ export default function App() {
 
       {/* ── LAYOUT: sidebar + content ── */}
       <div style={S.layout}>
-
-      {/* ── SIDEBAR (desktop) ── */}
-      {isDesktop && (
-        <aside style={S.sidebar(true)}>
-          {/* Mini logo in sidebar */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px 16px", borderBottom: `1px solid ${C.border}`, marginBottom: 8, cursor: "pointer" }} onClick={() => setTab("home")}>
-            <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
-              <circle cx="14" cy="14" r="13" fill={C.creamFaint} stroke={C.border} strokeWidth="1"/>
-              <path d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z" fill="none" stroke={C.sage} strokeWidth="1.4" strokeLinejoin="round"/>
-              <line x1="14" y1="6" x2="14" y2="22" stroke={C.sage} strokeWidth="0.9" strokeLinecap="round"/>
-            </svg>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.creamMuted, cursor: "pointer" }} onClick={() => setTab("home")}>{lang === "es" ? "Inicio" : "Home"}</span>
-          </div>
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label}>
-              <div style={S.sbSection}>{group.label}</div>
-              {group.keys.map((key) => {
-                const item = NAV_ITEMS.find(n => n.key === key);
-                if (!item) return null;
-                const active = tab === key;
-                return (
-                  <button key={key} style={S.sbItem(active)} onClick={() => setTab(key)}>
-                    <Icon name={item.icon} size={16} color={active ? C.sage : C.creamMuted} />
-                    {lang === "es" ? item.es : item.en}
-                  </button>
-                );
-              })}
+        {/* ── SIDEBAR (desktop) ── */}
+        {isDesktop && (
+          <aside style={S.sidebar(true)}>
+            {/* Mini logo in sidebar */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "4px 12px 16px",
+                borderBottom: `1px solid ${C.border}`,
+                marginBottom: 8,
+                cursor: "pointer",
+              }}
+              onClick={() => setTab("home")}
+            >
+              <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                <circle
+                  cx="14"
+                  cy="14"
+                  r="13"
+                  fill={C.creamFaint}
+                  stroke={C.border}
+                  strokeWidth="1"
+                />
+                <path
+                  d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z"
+                  fill="none"
+                  stroke={C.sage}
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                />
+                <line
+                  x1="14"
+                  y1="6"
+                  x2="14"
+                  y2="22"
+                  stroke={C.sage}
+                  strokeWidth="0.9"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span
+                style={{ fontSize: 12, fontWeight: 700, color: C.creamMuted, cursor: "pointer" }}
+                onClick={() => setTab("home")}
+              >
+                {lang === "es" ? "Inicio" : "Home"}
+              </span>
             </div>
-          ))}
-        </aside>
-      )}
-
-      {/* ── MOBILE DRAWER ── */}
-      {!isDesktop && sidebarOpen && (
-        <>
-          <div style={S.drawerOverlay} onClick={() => setSidebarOpen(false)} />
-          <div style={S.drawer}>
-            {/* Drawer header */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 16px 12px", borderBottom: `1px solid ${C.border}` }}>
-              <div>
-                <div style={{ fontWeight: 800, fontSize: 14, color: C.cream }}>lipedema <span style={{ fontWeight: 300, color: C.creamMuted }}>tracker</span></div>
-                {profile.name && <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 2 }}>{profile.name}</div>}
-              </div>
-              <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: C.creamMuted, padding: 4 }}>
-                <Icon name="x" size={18} color={C.creamMuted} />
-              </button>
-            </div>
-            <div style={{ padding: "8px 10px 24px", display: "flex", flexDirection: "column", gap: 2 }}>
-              {NAV_GROUPS.map((group) => (
-                <div key={group.label}>
-                  <div style={S.sbSection}>{group.label}</div>
-                  {group.keys.map((key) => {
-                    const item = NAV_ITEMS.find(n => n.key === key);
-                    if (!item) return null;
-                    const active = tab === key;
-                    return (
-                      <button key={key} style={S.sbItem(active)} onClick={() => { setTab(key); setSidebarOpen(false); }}>
-                        <Icon name={item.icon} size={16} color={active ? C.sage : C.creamMuted} />
-                        {lang === "es" ? item.es : item.en}
-                      </button>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ── PAGE CONTENT ── */}
-      <div style={S.page}>
-
-        {/* ══ HOME DASHBOARD ══ */}
-        {tab === "home" && (() => {
-          // ── derived data ──
-          const last7 = logs.slice(-7);
-          const lastLog = logs[logs.length - 1];
-          const avgPain   = last7.length ? (last7.reduce((s,l) => s + l.pain, 0) / last7.length).toFixed(1) : null;
-          const avgEnergy = last7.length ? (last7.reduce((s,l) => s + l.energy, 0) / last7.length).toFixed(1) : null;
-          const lastWeight = logs.slice().reverse().find(l => l.weight)?.weight || null;
-
-          // cycle summary
-          const today = new Date().toISOString().slice(0,10);
-          const [cy, cm] = today.slice(0,7).split("-").map(Number);
-          const periodThisMonth = Object.entries(cycleData)
-            .filter(([k,v]) => k.startsWith(`${cy}-${String(cm).padStart(2,"0")}`) && v === "period")
-            .map(([k]) => k).sort();
-          const spmThisMonth = Object.entries(cycleData)
-            .filter(([k,v]) => k.startsWith(`${cy}-${String(cm).padStart(2,"0")}`) && v === "spm").length;
-          const retentionThisMonth = Object.entries(cycleData)
-            .filter(([k,v]) => k.startsWith(`${cy}-${String(cm).padStart(2,"0")}`) && v === "retention").length;
-
-          // last period start across all data
-          const allPeriodDays = Object.entries(cycleData).filter(([,v]) => v==="period").map(([k])=>k).sort();
-          let lastPeriodStart = null;
-          for (let i = 0; i < allPeriodDays.length; i++) {
-            const prev = i > 0 ? new Date(allPeriodDays[i-1]) : null;
-            if (!prev || (new Date(allPeriodDays[i]) - prev) > 86400000*2) lastPeriodStart = allPeriodDays[i];
-          }
-
-          // supplements
-          const recentSupps = activeSupps.slice(0, 4);
-
-          // motivational phrases
-          const phrases_es = [
-            "Tu cuerpo merece cuidado, no castigo. Pequeños pasos cuentan.",
-            "Registrar es un acto de amor propio. Lo estás haciendo genial.",
-            "El lipedema no te define — tu constancia sí.",
-            "Cada dato que guardas es un paso más hacia entenderte mejor.",
-            "Hoy es un buen día para cuidarte un poco más.",
-            "La inflamación fluctúa, tu fuerza no.",
-            "Conocer tu cuerpo es el primer paso para aliviarlo.",
-          ];
-          const phrases_en = [
-            "Your body deserves care, not punishment. Small steps count.",
-            "Tracking is an act of self-love. You're doing great.",
-            "Lipedema doesn't define you — your consistency does.",
-            "Every data point is a step toward understanding yourself better.",
-            "Today is a great day to take care of yourself a little more.",
-            "Inflammation fluctuates, your strength does not.",
-            "Knowing your body is the first step to easing it.",
-          ];
-          const dayIdx = new Date().getDay();
-          const phrase = lang === "es" ? phrases_es[dayIdx] : phrases_en[dayIdx];
-
-          // anti-inflammatory recipes
-          const recipes = lang === "es" ? [
-            {
-              name: "Batido antiinflamatorio de cúrcuma",
-              time: "5 min", difficulty: "Fácil",
-              ingredients: ["1 taza leche vegetal","1 cdta cúrcuma","½ cdta jengibre rallado","1 cdta miel cruda","pizca de pimienta negra"],
-              steps: ["Calienta la leche vegetal sin que llegue a hervir.","Añade la cúrcuma, el jengibre y la pimienta negra. Remueve bien.","Endulza con miel y sirve inmediatamente."],
-              nutrition: { kcal:120, protein:"2g", carbs:"18g", fat:"4g" },
-              tip: "La pimienta negra aumenta la absorción de curcumina hasta un 2000%.",
-              allergens: [],
-            },
-            {
-              name: "Ensalada de salmón y aguacate",
-              time: "10 min", difficulty: "Fácil",
-              ingredients: ["150g salmón ahumado","1 aguacate maduro","2 puñados espinacas","½ limón","2 cdas AOVE","1 cdta semillas de chía"],
-              steps: ["Lava y seca las espinacas, colócalas en un bol.","Corta el aguacate en láminas y el salmón en tiras.","Dispón sobre las espinacas. Aliña con zumo de limón y AOVE.","Espolvorea las semillas de chía por encima."],
-              nutrition: { kcal:380, protein:"28g", carbs:"8g", fat:"28g" },
-              tip: "Omega-3 del salmón + grasas saludables del aguacate = potente sinergia antiinflamatoria.",
-              allergens: ["fish"],
-            },
-            {
-              name: "Sopa de miso con algas",
-              time: "15 min", difficulty: "Fácil",
-              ingredients: ["2 cdas miso blanco","10g alga wakame seca","150g tofu firme","2 cebollinos","1L agua caliente"],
-              steps: ["Hidrata el alga wakame en agua fría 5 minutos. Escurre.","Calienta el agua sin hervir. Disuelve el miso removiendo (no hiervas el miso — destruye los probióticos).","Añade el tofu cortado en cubos y el alga hidratada.","Sirve con cebollino picado por encima."],
-              nutrition: { kcal:95, protein:"9g", carbs:"7g", fat:"3g" },
-              tip: "Los probióticos del miso apoyan la microbiota intestinal, clave en la modulación inflamatoria.",
-              allergens: ["soy"],
-            },
-            {
-              name: "Smoothie de frutos rojos y espinacas",
-              time: "5 min", difficulty: "Fácil",
-              ingredients: ["1 taza arándanos","½ taza fresas","1 puñado espinacas baby","200ml leche de avena","1 cdta semillas de chía"],
-              steps: ["Congela los frutos rojos la noche anterior para textura más cremosa.","Pon todos los ingredientes en la batidora.","Tritura a máxima potencia 60 segundos.","Sirve inmediatamente."],
-              nutrition: { kcal:165, protein:"4g", carbs:"30g", fat:"3g" },
-              tip: "Los antioxidantes de los arándanos (antocianinas) reducen el estrés oxidativo asociado al lipedema.",
-              allergens: ["gluten"],
-            },
-            {
-              name: "Té de jengibre y limón",
-              time: "5 min", difficulty: "Fácil",
-              ingredients: ["2cm raíz de jengibre fresco","½ limón (zumo)","1 cdta miel cruda","500ml agua caliente (no hirviendo)"],
-              steps: ["Pela y ralla o lamina el jengibre fresco.","Infusiona en agua a 80–85°C durante 4 minutos.","Cuela, añade el zumo de limón y la miel.","Bebe caliente o deja enfriar para tomar frío."],
-              nutrition: { kcal:25, protein:"0g", carbs:"6g", fat:"0g" },
-              tip: "El gingerol del jengibre inhibe las ciclooxigenasas (COX), las mismas enzimas que bloquea el ibuprofeno.",
-              allergens: [],
-            },
-            {
-              name: "Bowl de quinoa con verduras asadas",
-              time: "25 min", difficulty: "Media",
-              ingredients: ["½ taza quinoa","1 calabacín","1 pimiento rojo","½ cebolla morada","2 cdas AOVE","romero y tomillo al gusto"],
-              steps: ["Precalienta el horno a 200°C.","Corta las verduras en dados, aliña con AOVE, romero y tomillo. Hornea 20 minutos.","Mientras, cuece la quinoa en el doble de agua con sal (12 min).","Monta el bowl: quinoa de base, verduras asadas encima. Añade un chorrito de limón."],
-              nutrition: { kcal:310, protein:"10g", carbs:"42g", fat:"12g" },
-              tip: "La quinoa es proteína completa sin gluten; su perfil de aminoácidos favorece la reparación del tejido conectivo.",
-              allergens: [],
-            },
-            {
-              name: "Crema de brócoli y almendras",
-              time: "20 min", difficulty: "Media",
-              ingredients: ["2 tazas brócoli","½ taza almendras crudas","2 dientes de ajo","750ml caldo vegetal bajo en sodio","nuez moscada al gusto"],
-              steps: ["Cuece el brócoli al vapor 8 minutos (no más, para conservar el sulforafano).","Sofríe el ajo laminado en un poco de AOVE 1 minuto.","Tritura el brócoli, el ajo, las almendras y el caldo hasta textura suave.","Calienta suavemente, sirve con nuez moscada rallada."],
-              nutrition: { kcal:220, protein:"9g", carbs:"16g", fat:"14g" },
-              tip: "El sulforafano del brócoli (mayor concentración si no se supera 70°C al cocinar) activa el factor Nrf2, regulador maestro de la respuesta antioxidante.",
-              allergens: ["nuts"],
-            },
-            {
-              name: "Gazpacho antiinflamatorio",
-              time: "10 min", difficulty: "Fácil",
-              ingredients: ["4 tomates maduros","½ pepino","1 diente de ajo","2 cdas AOVE","1 cda vinagre de manzana","sal y pimienta al gusto"],
-              steps: ["Lava y trocea los tomates y el pepino.","Tritura todo junto con el ajo, el AOVE y el vinagre hasta obtener una textura suave.","Sazona con sal y pimienta. Refrigera al menos 30 minutos.","Sirve frío con un hilo de AOVE por encima."],
-              nutrition: { kcal:110, protein:"2g", carbs:"12g", fat:"6g" },
-              tip: "El licopeno del tomate es un potente antioxidante que se absorbe mejor con grasas saludables como el AOVE.",
-              allergens: ["nightshades"],
-            },
-            {
-              name: "Ensalada de lentejas y cúrcuma",
-              time: "20 min", difficulty: "Fácil",
-              ingredients: ["1 taza lentejas cocidas","1 zanahoria rallada","½ pepino en cubos","perejil fresco","2 cdas AOVE","1 cdta cúrcuma","zumo de ½ limón"],
-              steps: ["Mezcla las lentejas cocidas con la zanahoria y el pepino.","Aliña con AOVE, cúrcuma y zumo de limón.","Añade el perejil picado y mezcla bien.","Sirve a temperatura ambiente o fría."],
-              nutrition: { kcal:250, protein:"14g", carbs:"32g", fat:"7g" },
-              tip: "Las lentejas aportan hierro y fibra, y la cúrcuma potencia su efecto antiinflamatorio.",
-              allergens: [],
-            },
-            {
-              name: "Arroz integral con verduras al vapor",
-              time: "30 min", difficulty: "Fácil",
-              ingredients: ["1 taza arroz integral","1 taza brócoli","1 zanahoria","½ calabacín","1 cda AOVE","sal y hierbas al gusto"],
-              steps: ["Cuece el arroz integral según las instrucciones del paquete.","Corta las verduras y cocínalas al vapor 8-10 minutos.","Sirve el arroz con las verduras al vapor por encima.","Aliña con AOVE y hierbas al gusto."],
-              nutrition: { kcal:290, protein:"7g", carbs:"52g", fat:"5g" },
-              tip: "El arroz integral conserva la fibra y los minerales que el arroz blanco pierde en el refinado.",
-              allergens: [],
-            },
-            {
-              name: "Caldo de huesos con jengibre",
-              time: "15 min", difficulty: "Fácil",
-              ingredients: ["500ml caldo de huesos casero o ecológico","2cm jengibre fresco","1 diente de ajo","1 cda cúrcuma","sal al gusto"],
-              steps: ["Calienta el caldo de huesos a fuego medio.","Ralla el jengibre y el ajo, añádelos al caldo.","Agrega la cúrcuma y remueve bien.","Deja infusionar 10 minutos a fuego bajo. Cuela y sirve caliente."],
-              nutrition: { kcal:60, protein:"6g", carbs:"2g", fat:"3g" },
-              tip: "El caldo de huesos es rico en colágeno y glicina, nutrientes clave para el tejido conectivo afectado en lipedema.",
-              allergens: [],
-            },
-            {
-              name: "Ensalada de pepino, menta y limón",
-              time: "5 min", difficulty: "Fácil",
-              ingredients: ["2 pepinos","hojas de menta fresca","zumo de 1 limón","2 cdas AOVE","sal y pimienta al gusto"],
-              steps: ["Corta los pepinos en rodajas finas.","Pica las hojas de menta.","Aliña con zumo de limón, AOVE, sal y pimienta.","Mezcla bien y sirve fresca."],
-              nutrition: { kcal:80, protein:"1g", carbs:"6g", fat:"6g" },
-              tip: "El pepino es altamente hidratante y la menta favorece la digestión y reduce la hinchazón.",
-              allergens: [],
-            },
-            {
-              name: "Batata asada con tahini y semillas",
-              time: "35 min", difficulty: "Fácil",
-              ingredients: ["2 batatas medianas","2 cdas tahini","1 cda semillas de calabaza","1 cda semillas de girasol","AOVE","sal y pimentón"],
-              steps: ["Precalienta el horno a 200°C.","Corta las batatas por la mitad, pincela con AOVE y sazona.","Hornea 30 minutos hasta que estén tiernas.","Sirve con tahini por encima y espolvorea las semillas."],
-              nutrition: { kcal:280, protein:"6g", carbs:"38g", fat:"12g" },
-              tip: "La batata es rica en betacaroteno, un antioxidante que protege las células del daño oxidativo.",
-              allergens: ["sesame"],
-            },
-            {
-              name: "Sopa de calabaza y jengibre",
-              time: "25 min", difficulty: "Fácil",
-              ingredients: ["500g calabaza pelada","2cm jengibre fresco","1 cebolla","750ml caldo vegetal","1 cda AOVE","nuez moscada"],
-              steps: ["Sofríe la cebolla picada en AOVE hasta que esté transparente.","Añade la calabaza en cubos y el jengibre rallado. Cocina 3 minutos.","Agrega el caldo y cuece 20 minutos hasta que la calabaza esté tierna.","Tritura hasta obtener una crema suave. Sirve con nuez moscada rallada."],
-              nutrition: { kcal:140, protein:"3g", carbs:"22g", fat:"5g" },
-              tip: "La calabaza es rica en potasio, que ayuda a regular la retención de líquidos asociada al lipedema.",
-              allergens: [],
-            },
-            {
-              name: "Agua de pepino, limón y hierbabuena",
-              time: "5 min", difficulty: "Fácil",
-              ingredients: ["1 pepino en rodajas","1 limón en rodajas","ramitas de hierbabuena","1L agua fría"],
-              steps: ["Coloca las rodajas de pepino y limón en una jarra.","Añade las ramitas de hierbabuena.","Vierte el agua fría y deja reposar en la nevera al menos 1 hora.","Sirve bien fría."],
-              nutrition: { kcal:10, protein:"0g", carbs:"2g", fat:"0g" },
-              tip: "Mantenerse hidratada es esencial en lipedema: el agua aromatizada ayuda a alcanzar los 2L diarios recomendados.",
-              allergens: [],
-            },
-          ] : [
-            {
-              name: "Anti-inflammatory turmeric smoothie",
-              time: "5 min", difficulty: "Easy",
-              ingredients: ["1 cup plant milk","1 tsp turmeric","½ tsp fresh grated ginger","1 tsp raw honey","pinch black pepper"],
-              steps: ["Warm the plant milk without boiling.","Add turmeric, ginger and black pepper. Stir well.","Sweeten with honey and serve immediately."],
-              nutrition: { kcal:120, protein:"2g", carbs:"18g", fat:"4g" },
-              tip: "Black pepper increases curcumin absorption by up to 2000% through piperine.",
-              allergens: [],
-            },
-            {
-              name: "Salmon & avocado salad",
-              time: "10 min", difficulty: "Easy",
-              ingredients: ["150g smoked salmon","1 ripe avocado","2 handfuls spinach","½ lemon","2 tbsp olive oil","1 tsp chia seeds"],
-              steps: ["Wash and dry the spinach, place in a bowl.","Slice the avocado and cut salmon into strips.","Arrange over the spinach. Dress with lemon juice and olive oil.","Sprinkle chia seeds on top."],
-              nutrition: { kcal:380, protein:"28g", carbs:"8g", fat:"28g" },
-              tip: "Salmon omega-3 + avocado healthy fats create a powerful anti-inflammatory synergy.",
-              allergens: ["fish"],
-            },
-            {
-              name: "Miso soup with seaweed",
-              time: "15 min", difficulty: "Easy",
-              ingredients: ["2 tbsp white miso","10g dried wakame seaweed","150g firm tofu","2 spring onions","1L hot water"],
-              steps: ["Rehydrate wakame in cold water for 5 minutes. Drain.","Heat water to just below boiling. Dissolve miso by stirring (do not boil — destroys probiotics).","Add tofu cut into cubes and the rehydrated seaweed.","Serve with sliced spring onions on top."],
-              nutrition: { kcal:95, protein:"9g", carbs:"7g", fat:"3g" },
-              tip: "Miso probiotics support the gut microbiome, a key regulator of the inflammatory response.",
-              allergens: ["soy"],
-            },
-            {
-              name: "Red berry & spinach smoothie",
-              time: "5 min", difficulty: "Easy",
-              ingredients: ["1 cup blueberries","½ cup strawberries","1 handful baby spinach","200ml oat milk","1 tsp chia seeds"],
-              steps: ["Freeze the berries the night before for creamier texture.","Put all ingredients in the blender.","Blend at full speed for 60 seconds.","Serve immediately."],
-              nutrition: { kcal:165, protein:"4g", carbs:"30g", fat:"3g" },
-              tip: "Blueberry anthocyanins reduce the oxidative stress associated with lipedema tissue.",
-              allergens: ["gluten"],
-            },
-            {
-              name: "Ginger & lemon tea",
-              time: "5 min", difficulty: "Easy",
-              ingredients: ["2cm fresh ginger root","½ lemon (juice)","1 tsp raw honey","500ml hot water (not boiling)"],
-              steps: ["Peel and grate or slice the fresh ginger.","Steep in water at 80–85°C for 4 minutes.","Strain, add lemon juice and honey.","Drink warm or leave to cool and serve cold."],
-              nutrition: { kcal:25, protein:"0g", carbs:"6g", fat:"0g" },
-              tip: "Gingerol inhibits cyclooxygenases (COX) — the same enzymes blocked by ibuprofen.",
-              allergens: [],
-            },
-            {
-              name: "Quinoa bowl with roasted vegetables",
-              time: "25 min", difficulty: "Medium",
-              ingredients: ["½ cup quinoa","1 courgette","1 red pepper","½ red onion","2 tbsp olive oil","rosemary and thyme to taste"],
-              steps: ["Preheat oven to 200°C / 400°F.","Dice the vegetables, toss with olive oil, rosemary and thyme. Roast 20 minutes.","Meanwhile, cook quinoa in double the water with a pinch of salt (12 min).","Build the bowl: quinoa base, roasted vegetables on top. Finish with a squeeze of lemon."],
-              nutrition: { kcal:310, protein:"10g", carbs:"42g", fat:"12g" },
-              tip: "Quinoa is a gluten-free complete protein; its amino acid profile supports connective tissue repair.",
-              allergens: [],
-            },
-            {
-              name: "Broccoli & almond cream soup",
-              time: "20 min", difficulty: "Medium",
-              ingredients: ["2 cups broccoli","½ cup raw almonds","2 garlic cloves","750ml low-sodium vegetable stock","nutmeg to taste"],
-              steps: ["Steam broccoli for 8 minutes (not more, to preserve sulforaphane).","Sauté sliced garlic in a little olive oil for 1 minute.","Blend broccoli, garlic, almonds and stock until smooth.","Gently reheat and serve with freshly grated nutmeg."],
-              nutrition: { kcal:220, protein:"9g", carbs:"16g", fat:"14g" },
-              tip: "Broccoli sulforaphane (highest when not cooked above 70°C) activates Nrf2, the master antioxidant regulator.",
-              allergens: ["nuts"],
-            },
-            {
-              name: "Anti-inflammatory gazpacho",
-              time: "10 min", difficulty: "Easy",
-              ingredients: ["4 ripe tomatoes","½ cucumber","1 garlic clove","2 tbsp olive oil","1 tbsp apple cider vinegar","salt and pepper to taste"],
-              steps: ["Wash and chop the tomatoes and cucumber.","Blend everything with garlic, olive oil and vinegar until smooth.","Season with salt and pepper. Refrigerate for at least 30 minutes.","Serve cold with a drizzle of olive oil on top."],
-              nutrition: { kcal:110, protein:"2g", carbs:"12g", fat:"6g" },
-              tip: "Tomato lycopene is a powerful antioxidant that is better absorbed with healthy fats like olive oil.",
-              allergens: ["nightshades"],
-            },
-            {
-              name: "Turmeric lentil salad",
-              time: "20 min", difficulty: "Easy",
-              ingredients: ["1 cup cooked lentils","1 grated carrot","½ diced cucumber","fresh parsley","2 tbsp olive oil","1 tsp turmeric","juice of ½ lemon"],
-              steps: ["Mix the cooked lentils with carrot and cucumber.","Dress with olive oil, turmeric and lemon juice.","Add chopped parsley and mix well.","Serve at room temperature or chilled."],
-              nutrition: { kcal:250, protein:"14g", carbs:"32g", fat:"7g" },
-              tip: "Lentils provide iron and fibre, and turmeric enhances their anti-inflammatory effect.",
-              allergens: [],
-            },
-            {
-              name: "Brown rice with steamed vegetables",
-              time: "30 min", difficulty: "Easy",
-              ingredients: ["1 cup brown rice","1 cup broccoli","1 carrot","½ courgette","1 tbsp olive oil","salt and herbs to taste"],
-              steps: ["Cook brown rice according to package instructions.","Chop the vegetables and steam for 8–10 minutes.","Serve the rice topped with the steamed vegetables.","Drizzle with olive oil and season with herbs."],
-              nutrition: { kcal:290, protein:"7g", carbs:"52g", fat:"5g" },
-              tip: "Brown rice retains the fibre and minerals that white rice loses during processing.",
-              allergens: [],
-            },
-            {
-              name: "Ginger bone broth",
-              time: "15 min", difficulty: "Easy",
-              ingredients: ["500ml bone broth (homemade or organic)","2cm fresh ginger","1 garlic clove","1 tsp turmeric","salt to taste"],
-              steps: ["Heat the bone broth over medium heat.","Grate the ginger and garlic, add to the broth.","Stir in the turmeric.","Simmer on low for 10 minutes. Strain and serve hot."],
-              nutrition: { kcal:60, protein:"6g", carbs:"2g", fat:"3g" },
-              tip: "Bone broth is rich in collagen and glycine — key nutrients for the connective tissue affected in lipedema.",
-              allergens: [],
-            },
-            {
-              name: "Cucumber, mint & lemon salad",
-              time: "5 min", difficulty: "Easy",
-              ingredients: ["2 cucumbers","fresh mint leaves","juice of 1 lemon","2 tbsp olive oil","salt and pepper to taste"],
-              steps: ["Slice the cucumbers thinly.","Chop the mint leaves.","Dress with lemon juice, olive oil, salt and pepper.","Toss well and serve fresh."],
-              nutrition: { kcal:80, protein:"1g", carbs:"6g", fat:"6g" },
-              tip: "Cucumber is highly hydrating and mint aids digestion and reduces bloating.",
-              allergens: [],
-            },
-            {
-              name: "Roasted sweet potato with tahini & seeds",
-              time: "35 min", difficulty: "Easy",
-              ingredients: ["2 medium sweet potatoes","2 tbsp tahini","1 tbsp pumpkin seeds","1 tbsp sunflower seeds","olive oil","salt and paprika"],
-              steps: ["Preheat oven to 200°C / 400°F.","Halve the sweet potatoes, brush with olive oil and season.","Roast for 30 minutes until tender.","Drizzle with tahini and sprinkle seeds on top."],
-              nutrition: { kcal:280, protein:"6g", carbs:"38g", fat:"12g" },
-              tip: "Sweet potato is rich in beta-carotene, an antioxidant that protects cells from oxidative damage.",
-              allergens: ["sesame"],
-            },
-            {
-              name: "Pumpkin & ginger soup",
-              time: "25 min", difficulty: "Easy",
-              ingredients: ["500g peeled pumpkin","2cm fresh ginger","1 onion","750ml vegetable stock","1 tbsp olive oil","nutmeg"],
-              steps: ["Sauté the diced onion in olive oil until translucent.","Add the cubed pumpkin and grated ginger. Cook for 3 minutes.","Pour in the stock and simmer 20 minutes until the pumpkin is tender.","Blend until smooth. Serve with freshly grated nutmeg."],
-              nutrition: { kcal:140, protein:"3g", carbs:"22g", fat:"5g" },
-              tip: "Pumpkin is rich in potassium, which helps regulate fluid retention associated with lipedema.",
-              allergens: [],
-            },
-            {
-              name: "Cucumber, lemon & mint infusion",
-              time: "5 min", difficulty: "Easy",
-              ingredients: ["1 sliced cucumber","1 sliced lemon","sprigs of fresh mint","1L cold water"],
-              steps: ["Place cucumber and lemon slices in a pitcher.","Add the mint sprigs.","Pour in cold water and refrigerate for at least 1 hour.","Serve well chilled."],
-              nutrition: { kcal:10, protein:"0g", carbs:"2g", fat:"0g" },
-              tip: "Staying hydrated is essential with lipedema: infused water helps reach the recommended 2L daily intake.",
-              allergens: [],
-            },
-          ];
-          const userAllergens = profile.intolerances || [];
-          const safeRecipes = recipes.filter(r => !r.allergens?.some(a => userAllergens.includes(a)));
-          const recipePool = safeRecipes.length > 0 ? safeRecipes : recipes;
-          const recipe = recipePool[new Date().getDate() % recipePool.length];
-
-          const statCard = (label, value, unit, color, icon) => (
-            <div style={{ flex:1, background:C.bgCard, borderRadius:12, padding:"14px 16px", border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
-              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>{label}</div>
-              <div style={{ fontSize:22, fontWeight:800, color: color || C.cream, letterSpacing:"-0.5px" }}>
-                {value ?? <span style={{ fontSize:14, color:C.creamMuted, fontWeight:500 }}>{lang==="es"?"Sin datos":"No data"}</span>}
-                {value && <span style={{ fontSize:12, fontWeight:500, color:C.creamMuted, marginLeft:3 }}>{unit}</span>}
-              </div>
-            </div>
-          );
-
-          return (
-            <>
-              {/* Greeting */}
-              <div style={{ marginBottom:20 }}>
-                <h2 style={{ fontSize:20, fontWeight:800, color:C.cream, letterSpacing:"-0.5px", marginBottom:2 }}>
-                  {lang==="es" ? `Hola${profile.name ? `, ${profile.name}` : ""}` : `Hello${profile.name ? `, ${profile.name}` : ""}`} <Icon name="hand" size={20} color={C.cream} />
-                </h2>
-                <div style={{ fontSize:13, color:C.creamMuted }}>
-                  {new Date().toLocaleDateString(lang==="es"?"es-ES":"en-GB", { weekday:"long", day:"numeric", month:"long" })}
-                </div>
-              </div>
-
-              {/* 1. SALUD RECIENTE */}
-              <div style={{ marginBottom:6 }}>
-                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                  <span>{lang==="es" ? "Salud — últimos 7 días" : "Health — last 7 days"}</span>
-                  <button onClick={() => setTab("today")} style={{ background:"none", border:"none", fontSize:11, color:C.sage, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                    {lang==="es" ? "Registrar hoy →" : "Log today →"}
-                  </button>
-                </div>
-                <div style={{ display:"flex", gap:8, marginBottom:8 }}>
-                  {statCard(lang==="es"?"Dolor medio":"Avg pain", avgPain, "/6", avgPain >= 4 ? "#c06080" : avgPain >= 2 ? C.accent : C.sage)}
-                  {statCard(lang==="es"?"Energía media":"Avg energy", avgEnergy, "/6", avgEnergy >= 4 ? C.sage : avgEnergy >= 2 ? C.accent : "#c06080")}
-                  {statCard(lang==="es"?"Último peso":"Last weight", lastWeight, "kg", C.cream)}
-                </div>
-                {last7.length === 0 && (
-                  <div style={{ background:C.creamFaint, borderRadius:10, padding:"12px 14px", border:`1px solid ${C.border}`, fontSize:12, color:C.creamMuted, textAlign:"center" }}>
-                    {lang==="es" ? "Aún no hay registros. ¡Empieza hoy!" : "No entries yet. Start today!"}
-                  </div>
-                )}
-                {last7.length > 0 && (
-                  <div style={{ display:"flex", gap:4 }}>
-                    {last7.map((l,i) => {
-                      const painH = Math.round((l.pain/6)*100);
-                      const energyH = Math.round((l.energy/6)*100);
-                      return (
-                        <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", gap:2, alignItems:"center" }}>
-                          <div style={{ width:"100%", height:48, background:C.creamFaint, borderRadius:4, display:"flex", flexDirection:"column", justifyContent:"flex-end", overflow:"hidden", position:"relative" }}>
-                            <div style={{ position:"absolute", bottom:0, left:0, right:0, height:`${painH}%`, background:"#f5d0dc", borderRadius:4 }}/>
-                            <div style={{ position:"absolute", bottom:0, left:"30%", right:"30%", height:`${energyH}%`, background:`${C.sage}60`, borderRadius:4 }}/>
-                          </div>
-                          <div style={{ fontSize:9, color:C.creamMuted }}>{l.date.slice(8)}</div>
-                        </div>
-                      );
-                    })}
-                    <div style={{ display:"flex", flexDirection:"column", justifyContent:"center", gap:4, paddingLeft:6 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:4 }}><div style={{ width:8, height:8, borderRadius:2, background:"#f5d0dc" }}/><span style={{ fontSize:9, color:C.creamMuted }}>{lang==="es"?"Dolor":"Pain"}</span></div>
-                      <div style={{ display:"flex", alignItems:"center", gap:4 }}><div style={{ width:8, height:8, borderRadius:2, background:`${C.sage}60` }}/><span style={{ fontSize:9, color:C.creamMuted }}>{lang==="es"?"Energía":"Energy"}</span></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 2. CICLO */}
-              <div style={{ background:C.bgCard, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
-                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10, display:"flex", justifyContent:"space-between" }}>
-                  <span>{lang==="es" ? "Ciclo menstrual" : "Menstrual cycle"}</span>
-                  <button onClick={() => setTab("today")} style={{ background:"none", border:"none", fontSize:11, color:C.sage, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                    {lang==="es" ? "Ver calendario →" : "View calendar →"}
-                  </button>
-                </div>
-                {allPeriodDays.length === 0 ? (
-                  <div style={{ fontSize:12, color:C.creamMuted, fontStyle:"italic" }}>
-                    {lang==="es" ? "Aún no has marcado ningún día de período." : "You haven't marked any period days yet."}
-                  </div>
-                ) : (
-                  <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-                    {lastPeriodStart && (
-                      <div>
-                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Último inicio":"Last start"}</div>
-                        <div style={{ fontSize:15, fontWeight:800, color:"#c06080" }}>{lastPeriodStart.slice(8)}/{lastPeriodStart.slice(5,7)}</div>
-                      </div>
-                    )}
-                    <div>
-                      <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Días regla este mes":"Period days this month"}</div>
-                      <div style={{ fontSize:15, fontWeight:800, color:"#c06080" }}>{periodThisMonth.length}</div>
-                    </div>
-                    {spmThisMonth > 0 && (
-                      <div>
-                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Días SPM":"PMS days"}</div>
-                        <div style={{ fontSize:15, fontWeight:800, color:C.accent }}>{spmThisMonth}</div>
-                      </div>
-                    )}
-                    {retentionThisMonth > 0 && (
-                      <div>
-                        <div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es"?"Días retención":"Retention days"}</div>
-                        <div style={{ fontSize:15, fontWeight:800, color:"#5080a0" }}>{retentionThisMonth}</div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* 3. SUPLEMENTOS */}
-              <div style={{ background:C.bgCard, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
-                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10, display:"flex", justifyContent:"space-between" }}>
-                  <span>{lang==="es" ? "Mis suplementos activos" : "My active supplements"}</span>
-                  <button onClick={() => setTab("supps")} style={{ background:"none", border:"none", fontSize:11, color:C.sage, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                    {lang==="es" ? "Gestionar →" : "Manage →"}
-                  </button>
-                </div>
-                {recentSupps.length === 0 ? (
-                  <div style={{ fontSize:12, color:C.creamMuted, fontStyle:"italic" }}>
-                    {lang==="es" ? "No tienes suplementos activos aún." : "No active supplements yet."}
-                  </div>
-                ) : (
-                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                    {recentSupps.map(a => {
-                      const def = allSuppsList.find(s => s.key === a.key);
-                      if (!def) return null;
-                      const takenToday = (lastLog?.suppsTaken || []).includes(a.key);
-                      return (
-                        <div key={a.key} style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 10px", borderRadius:20, border:`1.5px solid ${takenToday ? C.sage : C.border}`, background: takenToday ? C.creamFaint : "white" }}>
-                          <span style={{ fontSize:14 }}>{def.icon}</span>
-                          <span style={{ fontSize:11, fontWeight:600, color: takenToday ? C.sage : C.creamMuted }}>{lang==="es" ? def.es : def.en}</span>
-                          {takenToday && <span style={{ fontSize:10, color:C.sage }}>✓</span>}
-                        </div>
-                      );
-                    })}
-                    {activeSupps.length > 4 && (
-                      <div style={{ padding:"6px 10px", borderRadius:20, border:`1px solid ${C.border}`, fontSize:11, color:C.creamMuted }}>
-                        +{activeSupps.length - 4} {lang==="es"?"más":"more"}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* 4. FRASE MOTIVACIONAL */}
-              <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
-                <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                  <Icon name="sparkles" size={12} color={C.sage} />{" "}{lang==="es" ? "Reflexión del día" : "Daily reflection"}
-                </div>
-                <p style={{ fontSize:14, color:C.cream, lineHeight:1.6, fontStyle:"italic", margin:0, fontWeight:500 }}>
-                  "{phrase}"
-                </p>
-              </div>
-
-              {/* 4b. CONSEJO PERSONALIZADO POR ZONA */}
-              {(() => {
-                const hasArms = profile.activeZones?.some(z => z.includes("Arm"));
-                const hasLegs = profile.activeZones?.some(z =>
-                  ["leftThigh","rightThigh","leftCalf","rightCalf","ankles","hips"].includes(z));
-                if (!hasArms && !hasLegs) return null;
-                const zonePattern = hasArms && hasLegs ? "both" : hasArms ? "arms" : "legs";
-                const zoneTips = {
-                  both: {
-                    es: [
-                      "El lipedema en brazos y piernas requiere compresión adaptada a cada zona. Consulta con tu especialista sobre prendas de manga completa.",
-                      "Si tienes afectación en brazos y piernas, prioriza ejercicios acuáticos: la presión del agua comprime todas las zonas por igual.",
-                      "El drenaje linfático manual debe cubrir brazos y piernas por separado — no omitas los brazos en tus sesiones.",
-                      "Registra la inflamación de brazos y piernas por separado: pueden evolucionar de forma diferente.",
-                    ],
-                    en: [
-                      "Lipedema in both arms and legs requires compression tailored to each area. Ask your specialist about full-sleeve garments.",
-                      "With both arm and leg involvement, prioritise aquatic exercise: water pressure compresses all zones evenly.",
-                      "Manual lymphatic drainage should cover arms and legs separately — don't skip arms in your sessions.",
-                      "Track arm and leg inflammation separately: they can progress differently and may need different treatments.",
-                    ],
-                  },
-                  arms: {
-                    es: [
-                      "El lipedema en brazos (Tipo 4) se beneficia de mangas de compresión médica, especialmente durante el ejercicio.",
-                      "Ejercicios suaves de remo y natación fortalecen los brazos sin impacto, ideal para lipedema en miembros superiores.",
-                      "El cepillado en seco en brazos, siempre hacia el corazón, puede mejorar la circulación linfática.",
-                      "Los brazos con lipedema son propensos a hematomas: evita cargar peso excesivo y usa protección si es necesario.",
-                    ],
-                    en: [
-                      "Arm lipedema (Type 4) benefits from medical compression sleeves, especially during exercise.",
-                      "Gentle rowing and swimming strengthen arms without impact — ideal for upper limb lipedema.",
-                      "Dry brushing on arms, always toward the heart, can improve lymphatic circulation.",
-                      "Arms with lipedema bruise easily: avoid excessive weight-bearing and use protection if needed.",
-                    ],
-                  },
-                  legs: {
-                    es: [
-                      "Caminar 30 minutos al día es uno de los ejercicios más efectivos para el lipedema en piernas.",
-                      "Eleva las piernas 15 minutos antes de dormir para favorecer el retorno linfático.",
-                      "Las medias de compresión de tejido plano son las más recomendadas para lipedema en piernas.",
-                      "Evita estar de pie o sentada más de 1 hora seguida — los descansos activos reducen la hinchazón en piernas.",
-                    ],
-                    en: [
-                      "Walking 30 minutes a day is one of the most effective exercises for leg lipedema.",
-                      "Elevate your legs for 15 minutes before bed to support lymphatic return.",
-                      "Flat-knit compression stockings are the most recommended for leg lipedema.",
-                      "Avoid standing or sitting for more than 1 hour — active breaks reduce leg swelling.",
-                    ],
-                  },
-                };
-                const tips = zoneTips[zonePattern][lang] || zoneTips[zonePattern]["en"];
-                const tipText = tips[dayIdx % tips.length];
-                return (
-                  <div style={{ background:`linear-gradient(135deg, ${C.creamFaint}, white)`, borderRadius:14, padding:"16px 18px", marginBottom:8, border:`1px solid ${C.border}` }}>
-                    <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                      <Icon name="lightbulb" size={12} color={C.sage} />{" "}{lang==="es" ? "Consejo personalizado" : "Personalized tip"}
-                    </div>
-                    <p style={{ fontSize:13, color:C.cream, lineHeight:1.6, margin:0, fontWeight:500 }}>
-                      {tipText}
-                    </p>
-                  </div>
-                );
-              })()}
-
-              {/* 5. RECETA DEL DÍA */}
-              {(() => {
-                const [recipeOpen, setRecipeOpen] = [tab === "home" ? recipeExpanded : false, setRecipeExpanded];
-                const diffColor = recipe.difficulty === "Fácil" || recipe.difficulty === "Easy" ? C.sage : C.accent;
-                return (
-                  <div style={{ background:C.bgCard, borderRadius:14, marginBottom:8, border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)", overflow:"hidden" }}>
-                    {/* Header — always visible, clickable */}
-                    <div onClick={() => setRecipeExpanded(o => !o)}
-                      style={{ padding:"16px 18px", cursor:"pointer", userSelect:"none" }}>
-                      <div style={{ fontSize:10, fontWeight:800, color:C.sage, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:8 }}>
-                        <Icon name="leaf" size={12} color={C.sage} />{" "}{lang==="es" ? "Receta antiinflamatoria del día" : "Anti-inflammatory recipe of the day"}
-                      </div>
-                      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:10 }}>
-                        <div style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px", flex:1 }}>{recipe.name}</div>
-                        <div style={{ display:"flex", flexDirection:"column", gap:4, alignItems:"flex-end", flexShrink:0 }}>
-                          <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, background:C.creamFaint, padding:"3px 8px", borderRadius:20, display:"flex", alignItems:"center", gap:3 }}><Icon name="clock" size={11} color={C.creamMuted} /> {recipe.time}</div>
-                          <div style={{ fontSize:10, fontWeight:700, color:diffColor, background:`${diffColor}15`, padding:"2px 7px", borderRadius:20 }}>
-                            {recipe.difficulty}
-                          </div>
-                        </div>
-                      </div>
-                      {/* Nutrition row */}
-                      <div style={{ display:"flex", gap:10, marginBottom:10 }}>
-                        {Object.entries(recipe.nutrition).map(([k,v]) => (
-                          <div key={k} style={{ textAlign:"center" }}>
-                            <div style={{ fontSize:12, fontWeight:800, color:C.cream }}>{v}</div>
-                            <div style={{ fontSize:9, color:C.creamMuted, textTransform:"uppercase" }}>{k === "kcal" ? "kcal" : k === "protein" ? (lang==="es"?"prot":"prot") : k === "carbs" ? (lang==="es"?"hidr":"carbs") : "grasas"}</div>
-                          </div>
-                        ))}
-                      </div>
-                      {/* Ingredients */}
-                      <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-                        {recipe.ingredients.map((ing,i) => (
-                          <span key={i} style={{ fontSize:11, background:C.creamFaint, border:`1px solid ${C.border}`, borderRadius:20, padding:"3px 9px", color:C.cream }}>
-                            {ing}
-                          </span>
-                        ))}
-                      </div>
-                      {/* Expand hint */}
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:4, marginTop:10, fontSize:11, color:C.creamMuted }}>
-                        <span>{recipeOpen ? (lang==="es"?"Ocultar preparación":"Hide preparation") : (lang==="es"?"Ver preparación paso a paso":"View step-by-step")}</span>
-                        <span style={{ transition:"transform 0.2s", display:"inline-block", transform: recipeOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
-                      </div>
-                    </div>
-
-                    {/* Expandable: steps + tip */}
-                    {recipeOpen && (
-                      <div style={{ borderTop:`1px solid ${C.border}`, padding:"16px 18px", background:C.bg }}>
-                        <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:10 }}>
-                          {lang==="es" ? "Preparación" : "Preparation"}
-                        </div>
-                        <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:14 }}>
-                          {recipe.steps.map((step,i) => (
-                            <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
-                              <div style={{ width:22, height:22, borderRadius:"50%", background:C.sage, color:"white", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                                {i+1}
-                              </div>
-                              <div style={{ fontSize:13, color:C.cream, lineHeight:1.6, paddingTop:2 }}>{step}</div>
-                            </div>
-                          ))}
-                        </div>
-                        <div style={{ fontSize:11, color:C.sage, lineHeight:1.6, padding:"10px 12px", background:`${C.sage}0d`, borderRadius:8, borderLeft:`3px solid ${C.sage}` }}>
-                          <span style={{ display:"flex", alignItems:"flex-start", gap:5 }}><Icon name="lightbulb" size={13} color={C.sage} />{recipe.tip}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* 6. ACCESOS RÁPIDOS */}
-              <div style={{ marginTop:4 }}>
-                <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.6px", marginBottom:10 }}>
-                  {lang==="es" ? "Accesos rápidos" : "Quick links"}
-                </div>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                  {[
-                    { key:"today",   label: lang==="es"?"Registro de hoy":"Log today",    icon:"calendar" },
-                    { key:"history", label: lang==="es"?"Historial":"History",             icon:"clipboard" },
-                    { key:"charts",  label: lang==="es"?"Gráficas":"Charts",               icon:"trending" },
-                    { key:"foods",   label: lang==="es"?"Alimentos":"Foods",               icon:"utensils" },
-                  ].map(q => (
-                    <button key={q.key} onClick={() => setTab(q.key)}
-                      style={{ padding:"12px 14px", borderRadius:12, border:`1px solid ${C.border}`, background:"white", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:10, textAlign:"left", transition:"all 0.15s" }}>
-                      <Icon name={q.icon} size={20} color={C.sage} />
-                      <span style={{ fontSize:12, fontWeight:700, color:C.cream }}>{q.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          );
-        })()}
-
-        {/* ── TODAY ── */}
-        {tab === "today" && (
-          <>
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.today.title}</div>
-              <div style={S.row}>
-                <div style={S.col}>
-                  <label style={S.label}>{t.today.date}</label>
-                  <input style={S.input} type="date" value={entry.date} onChange={(e) => updateEntry("date", e.target.value)} />
-                </div>
-                <div style={S.col}>
-                  <label style={S.label}>{t.today.weight}</label>
-                  <input style={S.input} type="number" step="0.1" placeholder="65.5" value={entry.weight} onChange={(e) => updateEntry("weight", e.target.value)} />
-                </div>
-              </div>
-            </div>
-
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.today.mood}</div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                {t.moodOptions.map((m, i) => (
-                  <span key={i} onClick={() => updateEntry("mood", i)} style={{ fontSize: 28, cursor: "pointer", opacity: entry.mood === i ? 1 : 0.3, transform: entry.mood === i ? "scale(1.3)" : "scale(1)", transition: "all 0.2s" }}>{m}</span>
-                ))}
-              </div>
-            </div>
-
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.today.energy}</div>
-              <SliderInput value={entry.energy} onChange={(v) => updateEntry("energy", v)} labels={t.energyLabels} color="#6366f1" />
-            </div>
-
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.today.pain}</div>
-              <SliderInput value={entry.pain} onChange={(v) => updateEntry("pain", v)} labels={t.painLabels} color="#ef4444" />
-            </div>
-
-
-            {/* Water */}
-            <div style={S.card}>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-                <div style={S.cardTitle}>{t.today.water}</div>
-                <div style={{ fontSize:13, fontWeight:800, color: entry.water >= 8 ? C.sage : entry.water >= 5 ? C.accent : C.creamMuted }}>
-                  {entry.water} / 8 {lang==="es"?"vasos":"glasses"}
-                </div>
-              </div>
-              {/* Glass buttons grid */}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(8,1fr)", gap:4, marginBottom:10 }}>
-                {Array.from({length:8}, (_,i) => {
-                  const filled = i < entry.water;
+            {NAV_GROUPS.map((group) => (
+              <div key={group.label}>
+                <div style={S.sbSection}>{group.label}</div>
+                {group.keys.map((key) => {
+                  const item = NAV_ITEMS.find((n) => n.key === key);
+                  if (!item) return null;
+                  const active = tab === key;
                   return (
-                    <div key={i}
-                      onClick={() => updateEntry("water", entry.water === i+1 ? i : i+1)}
-                      style={{ cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:2, userSelect:"none" }}>
-                      <svg width="24" height="32" viewBox="0 0 24 32" fill="none">
-                        <path d="M5 4 L3 28 Q3 30 5 30 L19 30 Q21 30 21 28 L19 4 Z"
-                          fill={filled ? "#a0c4e8" : C.creamFaint}
-                          stroke={filled ? "#5080a0" : C.border}
-                          strokeWidth="1.5"/>
-                        {filled && <path d="M4.5 20 Q7 17 12 19 Q17 21 19.5 18" stroke="#5080a0" strokeWidth="1" fill="none" strokeLinecap="round"/>}
-                      </svg>
-                    </div>
+                    <button key={key} style={S.sbItem(active)} onClick={() => setTab(key)}>
+                      <Icon name={item.icon} size={16} color={active ? C.sage : C.creamMuted} />
+                      {lang === "es" ? item.es : item.en}
+                    </button>
                   );
                 })}
               </div>
-              {/* Extra glasses beyond 8 */}
-              {entry.water > 8 && (
-                <div style={{ fontSize:11, color:C.sage, fontWeight:600, marginBottom:6 }}>
-                  +{entry.water - 8} {lang==="es"?"vasos extra 🎉":"extra glasses 🎉"}
-                </div>
-              )}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                <div style={{ fontSize:10, color:C.creamMuted, fontStyle:"italic" }}>{t.today.waterGoal}</div>
-                <div style={{ display:"flex", gap:6 }}>
-                  <button onClick={() => updateEntry("water", Math.max(0, entry.water - 1))}
-                    style={{ width:28, height:28, borderRadius:8, border:`1px solid ${C.border}`, background:"white", cursor:"pointer", fontFamily:"inherit", fontSize:16, color:C.creamMuted, display:"flex", alignItems:"center", justifyContent:"center" }}>−</button>
-                  <button onClick={() => updateEntry("water", Math.min(12, entry.water + 1))}
-                    style={{ width:28, height:28, borderRadius:8, border:`1px solid ${C.sage}`, background:C.sage, cursor:"pointer", fontFamily:"inherit", fontSize:16, color:"white", display:"flex", alignItems:"center", justifyContent:"center" }}>+</button>
-                </div>
-              </div>
-              {/* Progress bar */}
-              <div style={{ marginTop:10, height:5, background:C.creamFaint, borderRadius:4, overflow:"hidden" }}>
-                <div style={{ width:`${Math.min(100,(entry.water/8)*100)}%`, height:"100%", borderRadius:4, background: entry.water >= 8 ? C.sage : entry.water >= 5 ? "#a0c4e8" : C.border, transition:"width 0.3s" }}/>
-              </div>
-            </div>
+            ))}
+          </aside>
+        )}
 
-            {/* Inflammation */}
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.today.inflammation}</div>
-              {activeZones.length === 0 && (
-                <p style={{ color: C.creamMuted, fontSize: 13 }}>{lang === "es" ? "Configura tus zonas en el Perfil" : "Set up your zones in Profile"}</p>
-              )}
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {activeZones.map((z) => (
-                  <ZoneCard key={z} zone={z} zoneName={t.today.zoneNames[z] || z}
-                    value={entry.inflammationZones?.[z] || 0}
-                    onChange={(v) => updateEntry("inflammationZones", { ...entry.inflammationZones, [z]: v })}
-                  />
+        {/* ── MOBILE DRAWER ── */}
+        {!isDesktop && sidebarOpen && (
+          <>
+            <div style={S.drawerOverlay} onClick={() => setSidebarOpen(false)} />
+            <div style={S.drawer}>
+              {/* Drawer header */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "16px 16px 12px",
+                  borderBottom: `1px solid ${C.border}`,
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: C.cream }}>
+                    lipedema <span style={{ fontWeight: 300, color: C.creamMuted }}>tracker</span>
+                  </div>
+                  {profile.name && (
+                    <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 2 }}>
+                      {profile.name}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: C.creamMuted,
+                    padding: 4,
+                  }}
+                >
+                  <Icon name="x" size={18} color={C.creamMuted} />
+                </button>
+              </div>
+              <div
+                style={{
+                  padding: "8px 10px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                {NAV_GROUPS.map((group) => (
+                  <div key={group.label}>
+                    <div style={S.sbSection}>{group.label}</div>
+                    {group.keys.map((key) => {
+                      const item = NAV_ITEMS.find((n) => n.key === key);
+                      if (!item) return null;
+                      const active = tab === key;
+                      return (
+                        <button
+                          key={key}
+                          style={S.sbItem(active)}
+                          onClick={() => {
+                            setTab(key);
+                            setSidebarOpen(false);
+                          }}
+                        >
+                          <Icon name={item.icon} size={16} color={active ? C.sage : C.creamMuted} />
+                          {lang === "es" ? item.es : item.en}
+                        </button>
+                      );
+                    })}
+                  </div>
                 ))}
               </div>
-              <div style={{ marginTop: 14 }}>
-                <label style={S.label}>{t.today.inflammationNote}</label>
-                <textarea style={S.textarea} placeholder={t.today.inflammationNotePlaceholder}
-                  value={entry.inflammationNote} onChange={(e) => updateEntry("inflammationNote", e.target.value)} />
-              </div>
             </div>
+          </>
+        )}
 
-            {/* Measures */}
-            {activeZones.length > 0 && (
-              <div style={S.card}>
-                <div style={S.cardTitle}>{t.today.measures}</div>
-                <div style={S.grid2}>
-                  {activeZones.map((z) => (
-                    <div key={z}>
-                      <label style={S.label}>{t.today.zoneNames[z] || z}</label>
-                      <input style={S.input} type="number" step="0.5" placeholder="cm"
-                        value={entry.measures?.[z] || ""}
-                        onChange={(e) => updateEntry("measures", { ...entry.measures, [z]: e.target.value })}
-                      />
+        {/* ── PAGE CONTENT ── */}
+        <div style={S.page}>
+          {/* ══ HOME DASHBOARD ══ */}
+          {tab === "home" &&
+            (() => {
+              // ── derived data ──
+              const last7 = logs.slice(-7);
+              const lastLog = logs[logs.length - 1];
+              const avgPain = last7.length
+                ? (last7.reduce((s, l) => s + l.pain, 0) / last7.length).toFixed(1)
+                : null;
+              const avgEnergy = last7.length
+                ? (last7.reduce((s, l) => s + l.energy, 0) / last7.length).toFixed(1)
+                : null;
+              const lastWeight =
+                logs
+                  .slice()
+                  .reverse()
+                  .find((l) => l.weight)?.weight || null;
+
+              // cycle summary
+              const today = new Date().toISOString().slice(0, 10);
+              const [cy, cm] = today.slice(0, 7).split("-").map(Number);
+              const periodThisMonth = Object.entries(cycleData)
+                .filter(
+                  ([k, v]) => k.startsWith(`${cy}-${String(cm).padStart(2, "0")}`) && v === "period"
+                )
+                .map(([k]) => k)
+                .sort();
+              const spmThisMonth = Object.entries(cycleData).filter(
+                ([k, v]) => k.startsWith(`${cy}-${String(cm).padStart(2, "0")}`) && v === "spm"
+              ).length;
+              const retentionThisMonth = Object.entries(cycleData).filter(
+                ([k, v]) =>
+                  k.startsWith(`${cy}-${String(cm).padStart(2, "0")}`) && v === "retention"
+              ).length;
+
+              // last period start across all data
+              const allPeriodDays = Object.entries(cycleData)
+                .filter(([, v]) => v === "period")
+                .map(([k]) => k)
+                .sort();
+              let lastPeriodStart = null;
+              for (let i = 0; i < allPeriodDays.length; i++) {
+                const prev = i > 0 ? new Date(allPeriodDays[i - 1]) : null;
+                if (!prev || new Date(allPeriodDays[i]) - prev > 86400000 * 2)
+                  lastPeriodStart = allPeriodDays[i];
+              }
+
+              // supplements
+              const recentSupps = activeSupps.slice(0, 4);
+
+              // motivational phrases
+              const phrases_es = [
+                "Tu cuerpo merece cuidado, no castigo. Pequeños pasos cuentan.",
+                "Registrar es un acto de amor propio. Lo estás haciendo genial.",
+                "El lipedema no te define — tu constancia sí.",
+                "Cada dato que guardas es un paso más hacia entenderte mejor.",
+                "Hoy es un buen día para cuidarte un poco más.",
+                "La inflamación fluctúa, tu fuerza no.",
+                "Conocer tu cuerpo es el primer paso para aliviarlo.",
+              ];
+              const phrases_en = [
+                "Your body deserves care, not punishment. Small steps count.",
+                "Tracking is an act of self-love. You're doing great.",
+                "Lipedema doesn't define you — your consistency does.",
+                "Every data point is a step toward understanding yourself better.",
+                "Today is a great day to take care of yourself a little more.",
+                "Inflammation fluctuates, your strength does not.",
+                "Knowing your body is the first step to easing it.",
+              ];
+              const dayIdx = new Date().getDay();
+              const phrase = lang === "es" ? phrases_es[dayIdx] : phrases_en[dayIdx];
+
+              // anti-inflammatory recipes
+              const recipes =
+                lang === "es"
+                  ? [
+                      {
+                        name: "Batido antiinflamatorio de cúrcuma",
+                        time: "5 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "1 taza leche vegetal",
+                          "1 cdta cúrcuma",
+                          "½ cdta jengibre rallado",
+                          "1 cdta miel cruda",
+                          "pizca de pimienta negra",
+                        ],
+                        steps: [
+                          "Calienta la leche vegetal sin que llegue a hervir.",
+                          "Añade la cúrcuma, el jengibre y la pimienta negra. Remueve bien.",
+                          "Endulza con miel y sirve inmediatamente.",
+                        ],
+                        nutrition: { kcal: 120, protein: "2g", carbs: "18g", fat: "4g" },
+                        tip: "La pimienta negra aumenta la absorción de curcumina hasta un 2000%.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Ensalada de salmón y aguacate",
+                        time: "10 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "150g salmón ahumado",
+                          "1 aguacate maduro",
+                          "2 puñados espinacas",
+                          "½ limón",
+                          "2 cdas AOVE",
+                          "1 cdta semillas de chía",
+                        ],
+                        steps: [
+                          "Lava y seca las espinacas, colócalas en un bol.",
+                          "Corta el aguacate en láminas y el salmón en tiras.",
+                          "Dispón sobre las espinacas. Aliña con zumo de limón y AOVE.",
+                          "Espolvorea las semillas de chía por encima.",
+                        ],
+                        nutrition: { kcal: 380, protein: "28g", carbs: "8g", fat: "28g" },
+                        tip: "Omega-3 del salmón + grasas saludables del aguacate = potente sinergia antiinflamatoria.",
+                        allergens: ["fish"],
+                      },
+                      {
+                        name: "Sopa de miso con algas",
+                        time: "15 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "2 cdas miso blanco",
+                          "10g alga wakame seca",
+                          "150g tofu firme",
+                          "2 cebollinos",
+                          "1L agua caliente",
+                        ],
+                        steps: [
+                          "Hidrata el alga wakame en agua fría 5 minutos. Escurre.",
+                          "Calienta el agua sin hervir. Disuelve el miso removiendo (no hiervas el miso — destruye los probióticos).",
+                          "Añade el tofu cortado en cubos y el alga hidratada.",
+                          "Sirve con cebollino picado por encima.",
+                        ],
+                        nutrition: { kcal: 95, protein: "9g", carbs: "7g", fat: "3g" },
+                        tip: "Los probióticos del miso apoyan la microbiota intestinal, clave en la modulación inflamatoria.",
+                        allergens: ["soy"],
+                      },
+                      {
+                        name: "Smoothie de frutos rojos y espinacas",
+                        time: "5 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "1 taza arándanos",
+                          "½ taza fresas",
+                          "1 puñado espinacas baby",
+                          "200ml leche de avena",
+                          "1 cdta semillas de chía",
+                        ],
+                        steps: [
+                          "Congela los frutos rojos la noche anterior para textura más cremosa.",
+                          "Pon todos los ingredientes en la batidora.",
+                          "Tritura a máxima potencia 60 segundos.",
+                          "Sirve inmediatamente.",
+                        ],
+                        nutrition: { kcal: 165, protein: "4g", carbs: "30g", fat: "3g" },
+                        tip: "Los antioxidantes de los arándanos (antocianinas) reducen el estrés oxidativo asociado al lipedema.",
+                        allergens: ["gluten"],
+                      },
+                      {
+                        name: "Té de jengibre y limón",
+                        time: "5 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "2cm raíz de jengibre fresco",
+                          "½ limón (zumo)",
+                          "1 cdta miel cruda",
+                          "500ml agua caliente (no hirviendo)",
+                        ],
+                        steps: [
+                          "Pela y ralla o lamina el jengibre fresco.",
+                          "Infusiona en agua a 80–85°C durante 4 minutos.",
+                          "Cuela, añade el zumo de limón y la miel.",
+                          "Bebe caliente o deja enfriar para tomar frío.",
+                        ],
+                        nutrition: { kcal: 25, protein: "0g", carbs: "6g", fat: "0g" },
+                        tip: "El gingerol del jengibre inhibe las ciclooxigenasas (COX), las mismas enzimas que bloquea el ibuprofeno.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Bowl de quinoa con verduras asadas",
+                        time: "25 min",
+                        difficulty: "Media",
+                        ingredients: [
+                          "½ taza quinoa",
+                          "1 calabacín",
+                          "1 pimiento rojo",
+                          "½ cebolla morada",
+                          "2 cdas AOVE",
+                          "romero y tomillo al gusto",
+                        ],
+                        steps: [
+                          "Precalienta el horno a 200°C.",
+                          "Corta las verduras en dados, aliña con AOVE, romero y tomillo. Hornea 20 minutos.",
+                          "Mientras, cuece la quinoa en el doble de agua con sal (12 min).",
+                          "Monta el bowl: quinoa de base, verduras asadas encima. Añade un chorrito de limón.",
+                        ],
+                        nutrition: { kcal: 310, protein: "10g", carbs: "42g", fat: "12g" },
+                        tip: "La quinoa es proteína completa sin gluten; su perfil de aminoácidos favorece la reparación del tejido conectivo.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Crema de brócoli y almendras",
+                        time: "20 min",
+                        difficulty: "Media",
+                        ingredients: [
+                          "2 tazas brócoli",
+                          "½ taza almendras crudas",
+                          "2 dientes de ajo",
+                          "750ml caldo vegetal bajo en sodio",
+                          "nuez moscada al gusto",
+                        ],
+                        steps: [
+                          "Cuece el brócoli al vapor 8 minutos (no más, para conservar el sulforafano).",
+                          "Sofríe el ajo laminado en un poco de AOVE 1 minuto.",
+                          "Tritura el brócoli, el ajo, las almendras y el caldo hasta textura suave.",
+                          "Calienta suavemente, sirve con nuez moscada rallada.",
+                        ],
+                        nutrition: { kcal: 220, protein: "9g", carbs: "16g", fat: "14g" },
+                        tip: "El sulforafano del brócoli (mayor concentración si no se supera 70°C al cocinar) activa el factor Nrf2, regulador maestro de la respuesta antioxidante.",
+                        allergens: ["nuts"],
+                      },
+                      {
+                        name: "Gazpacho antiinflamatorio",
+                        time: "10 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "4 tomates maduros",
+                          "½ pepino",
+                          "1 diente de ajo",
+                          "2 cdas AOVE",
+                          "1 cda vinagre de manzana",
+                          "sal y pimienta al gusto",
+                        ],
+                        steps: [
+                          "Lava y trocea los tomates y el pepino.",
+                          "Tritura todo junto con el ajo, el AOVE y el vinagre hasta obtener una textura suave.",
+                          "Sazona con sal y pimienta. Refrigera al menos 30 minutos.",
+                          "Sirve frío con un hilo de AOVE por encima.",
+                        ],
+                        nutrition: { kcal: 110, protein: "2g", carbs: "12g", fat: "6g" },
+                        tip: "El licopeno del tomate es un potente antioxidante que se absorbe mejor con grasas saludables como el AOVE.",
+                        allergens: ["nightshades"],
+                      },
+                      {
+                        name: "Ensalada de lentejas y cúrcuma",
+                        time: "20 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "1 taza lentejas cocidas",
+                          "1 zanahoria rallada",
+                          "½ pepino en cubos",
+                          "perejil fresco",
+                          "2 cdas AOVE",
+                          "1 cdta cúrcuma",
+                          "zumo de ½ limón",
+                        ],
+                        steps: [
+                          "Mezcla las lentejas cocidas con la zanahoria y el pepino.",
+                          "Aliña con AOVE, cúrcuma y zumo de limón.",
+                          "Añade el perejil picado y mezcla bien.",
+                          "Sirve a temperatura ambiente o fría.",
+                        ],
+                        nutrition: { kcal: 250, protein: "14g", carbs: "32g", fat: "7g" },
+                        tip: "Las lentejas aportan hierro y fibra, y la cúrcuma potencia su efecto antiinflamatorio.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Arroz integral con verduras al vapor",
+                        time: "30 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "1 taza arroz integral",
+                          "1 taza brócoli",
+                          "1 zanahoria",
+                          "½ calabacín",
+                          "1 cda AOVE",
+                          "sal y hierbas al gusto",
+                        ],
+                        steps: [
+                          "Cuece el arroz integral según las instrucciones del paquete.",
+                          "Corta las verduras y cocínalas al vapor 8-10 minutos.",
+                          "Sirve el arroz con las verduras al vapor por encima.",
+                          "Aliña con AOVE y hierbas al gusto.",
+                        ],
+                        nutrition: { kcal: 290, protein: "7g", carbs: "52g", fat: "5g" },
+                        tip: "El arroz integral conserva la fibra y los minerales que el arroz blanco pierde en el refinado.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Caldo de huesos con jengibre",
+                        time: "15 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "500ml caldo de huesos casero o ecológico",
+                          "2cm jengibre fresco",
+                          "1 diente de ajo",
+                          "1 cda cúrcuma",
+                          "sal al gusto",
+                        ],
+                        steps: [
+                          "Calienta el caldo de huesos a fuego medio.",
+                          "Ralla el jengibre y el ajo, añádelos al caldo.",
+                          "Agrega la cúrcuma y remueve bien.",
+                          "Deja infusionar 10 minutos a fuego bajo. Cuela y sirve caliente.",
+                        ],
+                        nutrition: { kcal: 60, protein: "6g", carbs: "2g", fat: "3g" },
+                        tip: "El caldo de huesos es rico en colágeno y glicina, nutrientes clave para el tejido conectivo afectado en lipedema.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Ensalada de pepino, menta y limón",
+                        time: "5 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "2 pepinos",
+                          "hojas de menta fresca",
+                          "zumo de 1 limón",
+                          "2 cdas AOVE",
+                          "sal y pimienta al gusto",
+                        ],
+                        steps: [
+                          "Corta los pepinos en rodajas finas.",
+                          "Pica las hojas de menta.",
+                          "Aliña con zumo de limón, AOVE, sal y pimienta.",
+                          "Mezcla bien y sirve fresca.",
+                        ],
+                        nutrition: { kcal: 80, protein: "1g", carbs: "6g", fat: "6g" },
+                        tip: "El pepino es altamente hidratante y la menta favorece la digestión y reduce la hinchazón.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Batata asada con tahini y semillas",
+                        time: "35 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "2 batatas medianas",
+                          "2 cdas tahini",
+                          "1 cda semillas de calabaza",
+                          "1 cda semillas de girasol",
+                          "AOVE",
+                          "sal y pimentón",
+                        ],
+                        steps: [
+                          "Precalienta el horno a 200°C.",
+                          "Corta las batatas por la mitad, pincela con AOVE y sazona.",
+                          "Hornea 30 minutos hasta que estén tiernas.",
+                          "Sirve con tahini por encima y espolvorea las semillas.",
+                        ],
+                        nutrition: { kcal: 280, protein: "6g", carbs: "38g", fat: "12g" },
+                        tip: "La batata es rica en betacaroteno, un antioxidante que protege las células del daño oxidativo.",
+                        allergens: ["sesame"],
+                      },
+                      {
+                        name: "Sopa de calabaza y jengibre",
+                        time: "25 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "500g calabaza pelada",
+                          "2cm jengibre fresco",
+                          "1 cebolla",
+                          "750ml caldo vegetal",
+                          "1 cda AOVE",
+                          "nuez moscada",
+                        ],
+                        steps: [
+                          "Sofríe la cebolla picada en AOVE hasta que esté transparente.",
+                          "Añade la calabaza en cubos y el jengibre rallado. Cocina 3 minutos.",
+                          "Agrega el caldo y cuece 20 minutos hasta que la calabaza esté tierna.",
+                          "Tritura hasta obtener una crema suave. Sirve con nuez moscada rallada.",
+                        ],
+                        nutrition: { kcal: 140, protein: "3g", carbs: "22g", fat: "5g" },
+                        tip: "La calabaza es rica en potasio, que ayuda a regular la retención de líquidos asociada al lipedema.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Agua de pepino, limón y hierbabuena",
+                        time: "5 min",
+                        difficulty: "Fácil",
+                        ingredients: [
+                          "1 pepino en rodajas",
+                          "1 limón en rodajas",
+                          "ramitas de hierbabuena",
+                          "1L agua fría",
+                        ],
+                        steps: [
+                          "Coloca las rodajas de pepino y limón en una jarra.",
+                          "Añade las ramitas de hierbabuena.",
+                          "Vierte el agua fría y deja reposar en la nevera al menos 1 hora.",
+                          "Sirve bien fría.",
+                        ],
+                        nutrition: { kcal: 10, protein: "0g", carbs: "2g", fat: "0g" },
+                        tip: "Mantenerse hidratada es esencial en lipedema: el agua aromatizada ayuda a alcanzar los 2L diarios recomendados.",
+                        allergens: [],
+                      },
+                    ]
+                  : [
+                      {
+                        name: "Anti-inflammatory turmeric smoothie",
+                        time: "5 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "1 cup plant milk",
+                          "1 tsp turmeric",
+                          "½ tsp fresh grated ginger",
+                          "1 tsp raw honey",
+                          "pinch black pepper",
+                        ],
+                        steps: [
+                          "Warm the plant milk without boiling.",
+                          "Add turmeric, ginger and black pepper. Stir well.",
+                          "Sweeten with honey and serve immediately.",
+                        ],
+                        nutrition: { kcal: 120, protein: "2g", carbs: "18g", fat: "4g" },
+                        tip: "Black pepper increases curcumin absorption by up to 2000% through piperine.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Salmon & avocado salad",
+                        time: "10 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "150g smoked salmon",
+                          "1 ripe avocado",
+                          "2 handfuls spinach",
+                          "½ lemon",
+                          "2 tbsp olive oil",
+                          "1 tsp chia seeds",
+                        ],
+                        steps: [
+                          "Wash and dry the spinach, place in a bowl.",
+                          "Slice the avocado and cut salmon into strips.",
+                          "Arrange over the spinach. Dress with lemon juice and olive oil.",
+                          "Sprinkle chia seeds on top.",
+                        ],
+                        nutrition: { kcal: 380, protein: "28g", carbs: "8g", fat: "28g" },
+                        tip: "Salmon omega-3 + avocado healthy fats create a powerful anti-inflammatory synergy.",
+                        allergens: ["fish"],
+                      },
+                      {
+                        name: "Miso soup with seaweed",
+                        time: "15 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "2 tbsp white miso",
+                          "10g dried wakame seaweed",
+                          "150g firm tofu",
+                          "2 spring onions",
+                          "1L hot water",
+                        ],
+                        steps: [
+                          "Rehydrate wakame in cold water for 5 minutes. Drain.",
+                          "Heat water to just below boiling. Dissolve miso by stirring (do not boil — destroys probiotics).",
+                          "Add tofu cut into cubes and the rehydrated seaweed.",
+                          "Serve with sliced spring onions on top.",
+                        ],
+                        nutrition: { kcal: 95, protein: "9g", carbs: "7g", fat: "3g" },
+                        tip: "Miso probiotics support the gut microbiome, a key regulator of the inflammatory response.",
+                        allergens: ["soy"],
+                      },
+                      {
+                        name: "Red berry & spinach smoothie",
+                        time: "5 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "1 cup blueberries",
+                          "½ cup strawberries",
+                          "1 handful baby spinach",
+                          "200ml oat milk",
+                          "1 tsp chia seeds",
+                        ],
+                        steps: [
+                          "Freeze the berries the night before for creamier texture.",
+                          "Put all ingredients in the blender.",
+                          "Blend at full speed for 60 seconds.",
+                          "Serve immediately.",
+                        ],
+                        nutrition: { kcal: 165, protein: "4g", carbs: "30g", fat: "3g" },
+                        tip: "Blueberry anthocyanins reduce the oxidative stress associated with lipedema tissue.",
+                        allergens: ["gluten"],
+                      },
+                      {
+                        name: "Ginger & lemon tea",
+                        time: "5 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "2cm fresh ginger root",
+                          "½ lemon (juice)",
+                          "1 tsp raw honey",
+                          "500ml hot water (not boiling)",
+                        ],
+                        steps: [
+                          "Peel and grate or slice the fresh ginger.",
+                          "Steep in water at 80–85°C for 4 minutes.",
+                          "Strain, add lemon juice and honey.",
+                          "Drink warm or leave to cool and serve cold.",
+                        ],
+                        nutrition: { kcal: 25, protein: "0g", carbs: "6g", fat: "0g" },
+                        tip: "Gingerol inhibits cyclooxygenases (COX) — the same enzymes blocked by ibuprofen.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Quinoa bowl with roasted vegetables",
+                        time: "25 min",
+                        difficulty: "Medium",
+                        ingredients: [
+                          "½ cup quinoa",
+                          "1 courgette",
+                          "1 red pepper",
+                          "½ red onion",
+                          "2 tbsp olive oil",
+                          "rosemary and thyme to taste",
+                        ],
+                        steps: [
+                          "Preheat oven to 200°C / 400°F.",
+                          "Dice the vegetables, toss with olive oil, rosemary and thyme. Roast 20 minutes.",
+                          "Meanwhile, cook quinoa in double the water with a pinch of salt (12 min).",
+                          "Build the bowl: quinoa base, roasted vegetables on top. Finish with a squeeze of lemon.",
+                        ],
+                        nutrition: { kcal: 310, protein: "10g", carbs: "42g", fat: "12g" },
+                        tip: "Quinoa is a gluten-free complete protein; its amino acid profile supports connective tissue repair.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Broccoli & almond cream soup",
+                        time: "20 min",
+                        difficulty: "Medium",
+                        ingredients: [
+                          "2 cups broccoli",
+                          "½ cup raw almonds",
+                          "2 garlic cloves",
+                          "750ml low-sodium vegetable stock",
+                          "nutmeg to taste",
+                        ],
+                        steps: [
+                          "Steam broccoli for 8 minutes (not more, to preserve sulforaphane).",
+                          "Sauté sliced garlic in a little olive oil for 1 minute.",
+                          "Blend broccoli, garlic, almonds and stock until smooth.",
+                          "Gently reheat and serve with freshly grated nutmeg.",
+                        ],
+                        nutrition: { kcal: 220, protein: "9g", carbs: "16g", fat: "14g" },
+                        tip: "Broccoli sulforaphane (highest when not cooked above 70°C) activates Nrf2, the master antioxidant regulator.",
+                        allergens: ["nuts"],
+                      },
+                      {
+                        name: "Anti-inflammatory gazpacho",
+                        time: "10 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "4 ripe tomatoes",
+                          "½ cucumber",
+                          "1 garlic clove",
+                          "2 tbsp olive oil",
+                          "1 tbsp apple cider vinegar",
+                          "salt and pepper to taste",
+                        ],
+                        steps: [
+                          "Wash and chop the tomatoes and cucumber.",
+                          "Blend everything with garlic, olive oil and vinegar until smooth.",
+                          "Season with salt and pepper. Refrigerate for at least 30 minutes.",
+                          "Serve cold with a drizzle of olive oil on top.",
+                        ],
+                        nutrition: { kcal: 110, protein: "2g", carbs: "12g", fat: "6g" },
+                        tip: "Tomato lycopene is a powerful antioxidant that is better absorbed with healthy fats like olive oil.",
+                        allergens: ["nightshades"],
+                      },
+                      {
+                        name: "Turmeric lentil salad",
+                        time: "20 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "1 cup cooked lentils",
+                          "1 grated carrot",
+                          "½ diced cucumber",
+                          "fresh parsley",
+                          "2 tbsp olive oil",
+                          "1 tsp turmeric",
+                          "juice of ½ lemon",
+                        ],
+                        steps: [
+                          "Mix the cooked lentils with carrot and cucumber.",
+                          "Dress with olive oil, turmeric and lemon juice.",
+                          "Add chopped parsley and mix well.",
+                          "Serve at room temperature or chilled.",
+                        ],
+                        nutrition: { kcal: 250, protein: "14g", carbs: "32g", fat: "7g" },
+                        tip: "Lentils provide iron and fibre, and turmeric enhances their anti-inflammatory effect.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Brown rice with steamed vegetables",
+                        time: "30 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "1 cup brown rice",
+                          "1 cup broccoli",
+                          "1 carrot",
+                          "½ courgette",
+                          "1 tbsp olive oil",
+                          "salt and herbs to taste",
+                        ],
+                        steps: [
+                          "Cook brown rice according to package instructions.",
+                          "Chop the vegetables and steam for 8–10 minutes.",
+                          "Serve the rice topped with the steamed vegetables.",
+                          "Drizzle with olive oil and season with herbs.",
+                        ],
+                        nutrition: { kcal: 290, protein: "7g", carbs: "52g", fat: "5g" },
+                        tip: "Brown rice retains the fibre and minerals that white rice loses during processing.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Ginger bone broth",
+                        time: "15 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "500ml bone broth (homemade or organic)",
+                          "2cm fresh ginger",
+                          "1 garlic clove",
+                          "1 tsp turmeric",
+                          "salt to taste",
+                        ],
+                        steps: [
+                          "Heat the bone broth over medium heat.",
+                          "Grate the ginger and garlic, add to the broth.",
+                          "Stir in the turmeric.",
+                          "Simmer on low for 10 minutes. Strain and serve hot.",
+                        ],
+                        nutrition: { kcal: 60, protein: "6g", carbs: "2g", fat: "3g" },
+                        tip: "Bone broth is rich in collagen and glycine — key nutrients for the connective tissue affected in lipedema.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Cucumber, mint & lemon salad",
+                        time: "5 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "2 cucumbers",
+                          "fresh mint leaves",
+                          "juice of 1 lemon",
+                          "2 tbsp olive oil",
+                          "salt and pepper to taste",
+                        ],
+                        steps: [
+                          "Slice the cucumbers thinly.",
+                          "Chop the mint leaves.",
+                          "Dress with lemon juice, olive oil, salt and pepper.",
+                          "Toss well and serve fresh.",
+                        ],
+                        nutrition: { kcal: 80, protein: "1g", carbs: "6g", fat: "6g" },
+                        tip: "Cucumber is highly hydrating and mint aids digestion and reduces bloating.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Roasted sweet potato with tahini & seeds",
+                        time: "35 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "2 medium sweet potatoes",
+                          "2 tbsp tahini",
+                          "1 tbsp pumpkin seeds",
+                          "1 tbsp sunflower seeds",
+                          "olive oil",
+                          "salt and paprika",
+                        ],
+                        steps: [
+                          "Preheat oven to 200°C / 400°F.",
+                          "Halve the sweet potatoes, brush with olive oil and season.",
+                          "Roast for 30 minutes until tender.",
+                          "Drizzle with tahini and sprinkle seeds on top.",
+                        ],
+                        nutrition: { kcal: 280, protein: "6g", carbs: "38g", fat: "12g" },
+                        tip: "Sweet potato is rich in beta-carotene, an antioxidant that protects cells from oxidative damage.",
+                        allergens: ["sesame"],
+                      },
+                      {
+                        name: "Pumpkin & ginger soup",
+                        time: "25 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "500g peeled pumpkin",
+                          "2cm fresh ginger",
+                          "1 onion",
+                          "750ml vegetable stock",
+                          "1 tbsp olive oil",
+                          "nutmeg",
+                        ],
+                        steps: [
+                          "Sauté the diced onion in olive oil until translucent.",
+                          "Add the cubed pumpkin and grated ginger. Cook for 3 minutes.",
+                          "Pour in the stock and simmer 20 minutes until the pumpkin is tender.",
+                          "Blend until smooth. Serve with freshly grated nutmeg.",
+                        ],
+                        nutrition: { kcal: 140, protein: "3g", carbs: "22g", fat: "5g" },
+                        tip: "Pumpkin is rich in potassium, which helps regulate fluid retention associated with lipedema.",
+                        allergens: [],
+                      },
+                      {
+                        name: "Cucumber, lemon & mint infusion",
+                        time: "5 min",
+                        difficulty: "Easy",
+                        ingredients: [
+                          "1 sliced cucumber",
+                          "1 sliced lemon",
+                          "sprigs of fresh mint",
+                          "1L cold water",
+                        ],
+                        steps: [
+                          "Place cucumber and lemon slices in a pitcher.",
+                          "Add the mint sprigs.",
+                          "Pour in cold water and refrigerate for at least 1 hour.",
+                          "Serve well chilled.",
+                        ],
+                        nutrition: { kcal: 10, protein: "0g", carbs: "2g", fat: "0g" },
+                        tip: "Staying hydrated is essential with lipedema: infused water helps reach the recommended 2L daily intake.",
+                        allergens: [],
+                      },
+                    ];
+              const userAllergens = profile.intolerances || [];
+              const safeRecipes = recipes.filter(
+                (r) => !r.allergens?.some((a) => userAllergens.includes(a))
+              );
+              const recipePool = safeRecipes.length > 0 ? safeRecipes : recipes;
+              const recipe = recipePool[new Date().getDate() % recipePool.length];
+
+              const statCard = (label, value, unit, color, icon) => (
+                <div
+                  style={{
+                    flex: 1,
+                    background: C.bgCard,
+                    borderRadius: 12,
+                    padding: "14px 16px",
+                    border: `1px solid ${C.border}`,
+                    boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.creamMuted,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      marginBottom: 6,
+                    }}
+                  >
+                    {label}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 800,
+                      color: color || C.cream,
+                      letterSpacing: "-0.5px",
+                    }}
+                  >
+                    {value ?? (
+                      <span style={{ fontSize: 14, color: C.creamMuted, fontWeight: 500 }}>
+                        {lang === "es" ? "Sin datos" : "No data"}
+                      </span>
+                    )}
+                    {value && (
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: C.creamMuted,
+                          marginLeft: 3,
+                        }}
+                      >
+                        {unit}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+
+              return (
+                <>
+                  {/* Greeting */}
+                  <div style={{ marginBottom: 20 }}>
+                    <h2
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: C.cream,
+                        letterSpacing: "-0.5px",
+                        marginBottom: 2,
+                      }}
+                    >
+                      {lang === "es"
+                        ? `Hola${profile.name ? `, ${profile.name}` : ""}`
+                        : `Hello${profile.name ? `, ${profile.name}` : ""}`}{" "}
+                      <Icon name="hand" size={20} color={C.cream} />
+                    </h2>
+                    <div style={{ fontSize: 13, color: C.creamMuted }}>
+                      {new Date().toLocaleDateString(lang === "es" ? "es-ES" : "en-GB", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                      })}
                     </div>
+                  </div>
+
+                  {/* 1. SALUD RECIENTE */}
+                  <div style={{ marginBottom: 6 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: C.creamMuted,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.6px",
+                        marginBottom: 10,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        {lang === "es" ? "Salud — últimos 7 días" : "Health — last 7 days"}
+                      </span>
+                      <button
+                        onClick={() => setTab("today")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          fontSize: 11,
+                          color: C.sage,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        {lang === "es" ? "Registrar hoy →" : "Log today →"}
+                      </button>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                      {statCard(
+                        lang === "es" ? "Dolor medio" : "Avg pain",
+                        avgPain,
+                        "/6",
+                        avgPain >= 4 ? "#c06080" : avgPain >= 2 ? C.accent : C.sage
+                      )}
+                      {statCard(
+                        lang === "es" ? "Energía media" : "Avg energy",
+                        avgEnergy,
+                        "/6",
+                        avgEnergy >= 4 ? C.sage : avgEnergy >= 2 ? C.accent : "#c06080"
+                      )}
+                      {statCard(
+                        lang === "es" ? "Último peso" : "Last weight",
+                        lastWeight,
+                        "kg",
+                        C.cream
+                      )}
+                    </div>
+                    {last7.length === 0 && (
+                      <div
+                        style={{
+                          background: C.creamFaint,
+                          borderRadius: 10,
+                          padding: "12px 14px",
+                          border: `1px solid ${C.border}`,
+                          fontSize: 12,
+                          color: C.creamMuted,
+                          textAlign: "center",
+                        }}
+                      >
+                        {lang === "es"
+                          ? "Aún no hay registros. ¡Empieza hoy!"
+                          : "No entries yet. Start today!"}
+                      </div>
+                    )}
+                    {last7.length > 0 && (
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {last7.map((l, i) => {
+                          const painH = Math.round((l.pain / 6) * 100);
+                          const energyH = Math.round((l.energy / 6) * 100);
+                          return (
+                            <div
+                              key={i}
+                              style={{
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 2,
+                                alignItems: "center",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: "100%",
+                                  height: 48,
+                                  background: C.creamFaint,
+                                  borderRadius: 4,
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "flex-end",
+                                  overflow: "hidden",
+                                  position: "relative",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: `${painH}%`,
+                                    background: "#f5d0dc",
+                                    borderRadius: 4,
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    bottom: 0,
+                                    left: "30%",
+                                    right: "30%",
+                                    height: `${energyH}%`,
+                                    background: `${C.sage}60`,
+                                    borderRadius: 4,
+                                  }}
+                                />
+                              </div>
+                              <div style={{ fontSize: 9, color: C.creamMuted }}>
+                                {l.date.slice(8)}
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            gap: 4,
+                            paddingLeft: 6,
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <div
+                              style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: 2,
+                                background: "#f5d0dc",
+                              }}
+                            />
+                            <span style={{ fontSize: 9, color: C.creamMuted }}>
+                              {lang === "es" ? "Dolor" : "Pain"}
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <div
+                              style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: 2,
+                                background: `${C.sage}60`,
+                              }}
+                            />
+                            <span style={{ fontSize: 9, color: C.creamMuted }}>
+                              {lang === "es" ? "Energía" : "Energy"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2. CICLO */}
+                  <div
+                    style={{
+                      background: C.bgCard,
+                      borderRadius: 14,
+                      padding: "16px 18px",
+                      marginBottom: 8,
+                      border: `1px solid ${C.border}`,
+                      boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: C.creamMuted,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.6px",
+                        marginBottom: 10,
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>{lang === "es" ? "Ciclo menstrual" : "Menstrual cycle"}</span>
+                      <button
+                        onClick={() => setTab("today")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          fontSize: 11,
+                          color: C.sage,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        {lang === "es" ? "Ver calendario →" : "View calendar →"}
+                      </button>
+                    </div>
+                    {allPeriodDays.length === 0 ? (
+                      <div style={{ fontSize: 12, color: C.creamMuted, fontStyle: "italic" }}>
+                        {lang === "es"
+                          ? "Aún no has marcado ningún día de período."
+                          : "You haven't marked any period days yet."}
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                        {lastPeriodStart && (
+                          <div>
+                            <div style={{ fontSize: 10, color: C.creamMuted }}>
+                              {lang === "es" ? "Último inicio" : "Last start"}
+                            </div>
+                            <div style={{ fontSize: 15, fontWeight: 800, color: "#c06080" }}>
+                              {lastPeriodStart.slice(8)}/{lastPeriodStart.slice(5, 7)}
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <div style={{ fontSize: 10, color: C.creamMuted }}>
+                            {lang === "es" ? "Días regla este mes" : "Period days this month"}
+                          </div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "#c06080" }}>
+                            {periodThisMonth.length}
+                          </div>
+                        </div>
+                        {spmThisMonth > 0 && (
+                          <div>
+                            <div style={{ fontSize: 10, color: C.creamMuted }}>
+                              {lang === "es" ? "Días SPM" : "PMS days"}
+                            </div>
+                            <div style={{ fontSize: 15, fontWeight: 800, color: C.accent }}>
+                              {spmThisMonth}
+                            </div>
+                          </div>
+                        )}
+                        {retentionThisMonth > 0 && (
+                          <div>
+                            <div style={{ fontSize: 10, color: C.creamMuted }}>
+                              {lang === "es" ? "Días retención" : "Retention days"}
+                            </div>
+                            <div style={{ fontSize: 15, fontWeight: 800, color: "#5080a0" }}>
+                              {retentionThisMonth}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. SUPLEMENTOS */}
+                  <div
+                    style={{
+                      background: C.bgCard,
+                      borderRadius: 14,
+                      padding: "16px 18px",
+                      marginBottom: 8,
+                      border: `1px solid ${C.border}`,
+                      boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: C.creamMuted,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.6px",
+                        marginBottom: 10,
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        {lang === "es" ? "Mis suplementos activos" : "My active supplements"}
+                      </span>
+                      <button
+                        onClick={() => setTab("supps")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          fontSize: 11,
+                          color: C.sage,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        {lang === "es" ? "Gestionar →" : "Manage →"}
+                      </button>
+                    </div>
+                    {recentSupps.length === 0 ? (
+                      <div style={{ fontSize: 12, color: C.creamMuted, fontStyle: "italic" }}>
+                        {lang === "es"
+                          ? "No tienes suplementos activos aún."
+                          : "No active supplements yet."}
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                        {recentSupps.map((a) => {
+                          const def = allSuppsList.find((s) => s.key === a.key);
+                          if (!def) return null;
+                          const takenToday = (lastLog?.suppsTaken || []).includes(a.key);
+                          return (
+                            <div
+                              key={a.key}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                                padding: "6px 10px",
+                                borderRadius: 20,
+                                border: `1.5px solid ${takenToday ? C.sage : C.border}`,
+                                background: takenToday ? C.creamFaint : "white",
+                              }}
+                            >
+                              <span style={{ fontSize: 14 }}>{def.icon}</span>
+                              <span
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 600,
+                                  color: takenToday ? C.sage : C.creamMuted,
+                                }}
+                              >
+                                {lang === "es" ? def.es : def.en}
+                              </span>
+                              {takenToday && <span style={{ fontSize: 10, color: C.sage }}>✓</span>}
+                            </div>
+                          );
+                        })}
+                        {activeSupps.length > 4 && (
+                          <div
+                            style={{
+                              padding: "6px 10px",
+                              borderRadius: 20,
+                              border: `1px solid ${C.border}`,
+                              fontSize: 11,
+                              color: C.creamMuted,
+                            }}
+                          >
+                            +{activeSupps.length - 4} {lang === "es" ? "más" : "more"}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. FRASE MOTIVACIONAL */}
+                  <div
+                    style={{
+                      background: `linear-gradient(135deg, ${C.creamFaint}, white)`,
+                      borderRadius: 14,
+                      padding: "16px 18px",
+                      marginBottom: 8,
+                      border: `1px solid ${C.border}`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        color: C.sage,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.6px",
+                        marginBottom: 8,
+                      }}
+                    >
+                      <Icon name="sparkles" size={12} color={C.sage} />{" "}
+                      {lang === "es" ? "Reflexión del día" : "Daily reflection"}
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        color: C.cream,
+                        lineHeight: 1.6,
+                        fontStyle: "italic",
+                        margin: 0,
+                        fontWeight: 500,
+                      }}
+                    >
+                      "{phrase}"
+                    </p>
+                  </div>
+
+                  {/* 4b. CONSEJO PERSONALIZADO POR ZONA */}
+                  {(() => {
+                    const hasArms = profile.activeZones?.some((z) => z.includes("Arm"));
+                    const hasLegs = profile.activeZones?.some((z) =>
+                      [
+                        "leftThigh",
+                        "rightThigh",
+                        "leftCalf",
+                        "rightCalf",
+                        "ankles",
+                        "hips",
+                      ].includes(z)
+                    );
+                    if (!hasArms && !hasLegs) return null;
+                    const zonePattern = hasArms && hasLegs ? "both" : hasArms ? "arms" : "legs";
+                    const zoneTips = {
+                      both: {
+                        es: [
+                          "El lipedema en brazos y piernas requiere compresión adaptada a cada zona. Consulta con tu especialista sobre prendas de manga completa.",
+                          "Si tienes afectación en brazos y piernas, prioriza ejercicios acuáticos: la presión del agua comprime todas las zonas por igual.",
+                          "El drenaje linfático manual debe cubrir brazos y piernas por separado — no omitas los brazos en tus sesiones.",
+                          "Registra la inflamación de brazos y piernas por separado: pueden evolucionar de forma diferente.",
+                        ],
+                        en: [
+                          "Lipedema in both arms and legs requires compression tailored to each area. Ask your specialist about full-sleeve garments.",
+                          "With both arm and leg involvement, prioritise aquatic exercise: water pressure compresses all zones evenly.",
+                          "Manual lymphatic drainage should cover arms and legs separately — don't skip arms in your sessions.",
+                          "Track arm and leg inflammation separately: they can progress differently and may need different treatments.",
+                        ],
+                      },
+                      arms: {
+                        es: [
+                          "El lipedema en brazos (Tipo 4) se beneficia de mangas de compresión médica, especialmente durante el ejercicio.",
+                          "Ejercicios suaves de remo y natación fortalecen los brazos sin impacto, ideal para lipedema en miembros superiores.",
+                          "El cepillado en seco en brazos, siempre hacia el corazón, puede mejorar la circulación linfática.",
+                          "Los brazos con lipedema son propensos a hematomas: evita cargar peso excesivo y usa protección si es necesario.",
+                        ],
+                        en: [
+                          "Arm lipedema (Type 4) benefits from medical compression sleeves, especially during exercise.",
+                          "Gentle rowing and swimming strengthen arms without impact — ideal for upper limb lipedema.",
+                          "Dry brushing on arms, always toward the heart, can improve lymphatic circulation.",
+                          "Arms with lipedema bruise easily: avoid excessive weight-bearing and use protection if needed.",
+                        ],
+                      },
+                      legs: {
+                        es: [
+                          "Caminar 30 minutos al día es uno de los ejercicios más efectivos para el lipedema en piernas.",
+                          "Eleva las piernas 15 minutos antes de dormir para favorecer el retorno linfático.",
+                          "Las medias de compresión de tejido plano son las más recomendadas para lipedema en piernas.",
+                          "Evita estar de pie o sentada más de 1 hora seguida — los descansos activos reducen la hinchazón en piernas.",
+                        ],
+                        en: [
+                          "Walking 30 minutes a day is one of the most effective exercises for leg lipedema.",
+                          "Elevate your legs for 15 minutes before bed to support lymphatic return.",
+                          "Flat-knit compression stockings are the most recommended for leg lipedema.",
+                          "Avoid standing or sitting for more than 1 hour — active breaks reduce leg swelling.",
+                        ],
+                      },
+                    };
+                    const tips = zoneTips[zonePattern][lang] || zoneTips[zonePattern]["en"];
+                    const tipText = tips[dayIdx % tips.length];
+                    return (
+                      <div
+                        style={{
+                          background: `linear-gradient(135deg, ${C.creamFaint}, white)`,
+                          borderRadius: 14,
+                          padding: "16px 18px",
+                          marginBottom: 8,
+                          border: `1px solid ${C.border}`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 800,
+                            color: C.sage,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.6px",
+                            marginBottom: 8,
+                          }}
+                        >
+                          <Icon name="lightbulb" size={12} color={C.sage} />{" "}
+                          {lang === "es" ? "Consejo personalizado" : "Personalized tip"}
+                        </div>
+                        <p
+                          style={{
+                            fontSize: 13,
+                            color: C.cream,
+                            lineHeight: 1.6,
+                            margin: 0,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {tipText}
+                        </p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 5. RECETA DEL DÍA */}
+                  {(() => {
+                    const [recipeOpen, setRecipeOpen] = [
+                      tab === "home" ? recipeExpanded : false,
+                      setRecipeExpanded,
+                    ];
+                    const diffColor =
+                      recipe.difficulty === "Fácil" || recipe.difficulty === "Easy"
+                        ? C.sage
+                        : C.accent;
+                    return (
+                      <div
+                        style={{
+                          background: C.bgCard,
+                          borderRadius: 14,
+                          marginBottom: 8,
+                          border: `1px solid ${C.border}`,
+                          boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {/* Header — always visible, clickable */}
+                        <div
+                          onClick={() => setRecipeExpanded((o) => !o)}
+                          style={{ padding: "16px 18px", cursor: "pointer", userSelect: "none" }}
+                        >
+                          <div
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 800,
+                              color: C.sage,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.6px",
+                              marginBottom: 8,
+                            }}
+                          >
+                            <Icon name="leaf" size={12} color={C.sage} />{" "}
+                            {lang === "es"
+                              ? "Receta antiinflamatoria del día"
+                              : "Anti-inflammatory recipe of the day"}
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              justifyContent: "space-between",
+                              gap: 8,
+                              marginBottom: 10,
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: 14,
+                                fontWeight: 800,
+                                color: C.cream,
+                                letterSpacing: "-0.3px",
+                                flex: 1,
+                              }}
+                            >
+                              {recipe.name}
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 4,
+                                alignItems: "flex-end",
+                                flexShrink: 0,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  color: C.creamMuted,
+                                  background: C.creamFaint,
+                                  padding: "3px 8px",
+                                  borderRadius: 20,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 3,
+                                }}
+                              >
+                                <Icon name="clock" size={11} color={C.creamMuted} /> {recipe.time}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  color: diffColor,
+                                  background: `${diffColor}15`,
+                                  padding: "2px 7px",
+                                  borderRadius: 20,
+                                }}
+                              >
+                                {recipe.difficulty}
+                              </div>
+                            </div>
+                          </div>
+                          {/* Nutrition row */}
+                          <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+                            {Object.entries(recipe.nutrition).map(([k, v]) => (
+                              <div key={k} style={{ textAlign: "center" }}>
+                                <div style={{ fontSize: 12, fontWeight: 800, color: C.cream }}>
+                                  {v}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: 9,
+                                    color: C.creamMuted,
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {k === "kcal"
+                                    ? "kcal"
+                                    : k === "protein"
+                                      ? lang === "es"
+                                        ? "prot"
+                                        : "prot"
+                                      : k === "carbs"
+                                        ? lang === "es"
+                                          ? "hidr"
+                                          : "carbs"
+                                        : "grasas"}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {/* Ingredients */}
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                            {recipe.ingredients.map((ing, i) => (
+                              <span
+                                key={i}
+                                style={{
+                                  fontSize: 11,
+                                  background: C.creamFaint,
+                                  border: `1px solid ${C.border}`,
+                                  borderRadius: 20,
+                                  padding: "3px 9px",
+                                  color: C.cream,
+                                }}
+                              >
+                                {ing}
+                              </span>
+                            ))}
+                          </div>
+                          {/* Expand hint */}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: 4,
+                              marginTop: 10,
+                              fontSize: 11,
+                              color: C.creamMuted,
+                            }}
+                          >
+                            <span>
+                              {recipeOpen
+                                ? lang === "es"
+                                  ? "Ocultar preparación"
+                                  : "Hide preparation"
+                                : lang === "es"
+                                  ? "Ver preparación paso a paso"
+                                  : "View step-by-step"}
+                            </span>
+                            <span
+                              style={{
+                                transition: "transform 0.2s",
+                                display: "inline-block",
+                                transform: recipeOpen ? "rotate(180deg)" : "rotate(0deg)",
+                              }}
+                            >
+                              ▾
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Expandable: steps + tip */}
+                        {recipeOpen && (
+                          <div
+                            style={{
+                              borderTop: `1px solid ${C.border}`,
+                              padding: "16px 18px",
+                              background: C.bg,
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 800,
+                                color: C.creamMuted,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                                marginBottom: 10,
+                              }}
+                            >
+                              {lang === "es" ? "Preparación" : "Preparation"}
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 10,
+                                marginBottom: 14,
+                              }}
+                            >
+                              {recipe.steps.map((step, i) => (
+                                <div
+                                  key={i}
+                                  style={{ display: "flex", gap: 10, alignItems: "flex-start" }}
+                                >
+                                  <div
+                                    style={{
+                                      width: 22,
+                                      height: 22,
+                                      borderRadius: "50%",
+                                      background: C.sage,
+                                      color: "white",
+                                      fontSize: 11,
+                                      fontWeight: 800,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    {i + 1}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: 13,
+                                      color: C.cream,
+                                      lineHeight: 1.6,
+                                      paddingTop: 2,
+                                    }}
+                                  >
+                                    {step}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 11,
+                                color: C.sage,
+                                lineHeight: 1.6,
+                                padding: "10px 12px",
+                                background: `${C.sage}0d`,
+                                borderRadius: 8,
+                                borderLeft: `3px solid ${C.sage}`,
+                              }}
+                            >
+                              <span style={{ display: "flex", alignItems: "flex-start", gap: 5 }}>
+                                <Icon name="lightbulb" size={13} color={C.sage} />
+                                {recipe.tip}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* 6. ACCESOS RÁPIDOS */}
+                  <div style={{ marginTop: 4 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: C.creamMuted,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.6px",
+                        marginBottom: 10,
+                      }}
+                    >
+                      {lang === "es" ? "Accesos rápidos" : "Quick links"}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {[
+                        {
+                          key: "today",
+                          label: lang === "es" ? "Registro de hoy" : "Log today",
+                          icon: "calendar",
+                        },
+                        {
+                          key: "history",
+                          label: lang === "es" ? "Historial" : "History",
+                          icon: "clipboard",
+                        },
+                        {
+                          key: "charts",
+                          label: lang === "es" ? "Gráficas" : "Charts",
+                          icon: "trending",
+                        },
+                        {
+                          key: "foods",
+                          label: lang === "es" ? "Alimentos" : "Foods",
+                          icon: "utensils",
+                        },
+                      ].map((q) => (
+                        <button
+                          key={q.key}
+                          onClick={() => setTab(q.key)}
+                          style={{
+                            padding: "12px 14px",
+                            borderRadius: 12,
+                            border: `1px solid ${C.border}`,
+                            background: "white",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            textAlign: "left",
+                            transition: "all 0.15s",
+                          }}
+                        >
+                          <Icon name={q.icon} size={20} color={C.sage} />
+                          <span style={{ fontSize: 12, fontWeight: 700, color: C.cream }}>
+                            {q.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+
+          {/* ── TODAY ── */}
+          {tab === "today" && (
+            <>
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.today.title}</div>
+                <div style={S.row}>
+                  <div style={S.col}>
+                    <label style={S.label}>{t.today.date}</label>
+                    <input
+                      style={S.input}
+                      type="date"
+                      value={entry.date}
+                      onChange={(e) => updateEntry("date", e.target.value)}
+                    />
+                  </div>
+                  <div style={S.col}>
+                    <label style={S.label}>{t.today.weight}</label>
+                    <input
+                      style={S.input}
+                      type="number"
+                      step="0.1"
+                      placeholder="65.5"
+                      value={entry.weight}
+                      onChange={(e) => updateEntry("weight", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.today.mood}</div>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                  {t.moodOptions.map((m, i) => (
+                    <span
+                      key={i}
+                      onClick={() => updateEntry("mood", i)}
+                      style={{
+                        fontSize: 28,
+                        cursor: "pointer",
+                        opacity: entry.mood === i ? 1 : 0.3,
+                        transform: entry.mood === i ? "scale(1.3)" : "scale(1)",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {m}
+                    </span>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Daily supps check */}
-            {activeSupps.length > 0 && (
               <div style={S.card}>
-                <div style={S.cardTitle}>{t.today.todaysSupps}</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {activeSupps.map((a) => {
-                    const def = allSuppsList.find((s) => s.key === a.key);
-                    if (!def) return null;
-                    const name = lang === "es" ? def.es : def.en;
-                    const taken = (entry.suppsTaken || []).includes(a.key);
+                <div style={S.cardTitle}>{t.today.energy}</div>
+                <SliderInput
+                  value={entry.energy}
+                  onChange={(v) => updateEntry("energy", v)}
+                  labels={t.energyLabels}
+                  color="#6366f1"
+                />
+              </div>
+
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.today.pain}</div>
+                <SliderInput
+                  value={entry.pain}
+                  onChange={(v) => updateEntry("pain", v)}
+                  labels={t.painLabels}
+                  color="#ef4444"
+                />
+              </div>
+
+              {/* Water */}
+              <div style={S.card}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 12,
+                  }}
+                >
+                  <div style={S.cardTitle}>{t.today.water}</div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: entry.water >= 8 ? C.sage : entry.water >= 5 ? C.accent : C.creamMuted,
+                    }}
+                  >
+                    {entry.water} / 8 {lang === "es" ? "vasos" : "glasses"}
+                  </div>
+                </div>
+                {/* Glass buttons grid */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(8,1fr)",
+                    gap: 4,
+                    marginBottom: 10,
+                  }}
+                >
+                  {Array.from({ length: 8 }, (_, i) => {
+                    const filled = i < entry.water;
                     return (
-                      <div key={a.key} onClick={() => {
-                        const curr = entry.suppsTaken || [];
-                        updateEntry("suppsTaken", taken ? curr.filter((k) => k !== a.key) : [...curr, a.key]);
-                      }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, border: `1.5px solid ${taken ? C.sage : C.border}`, background: taken ? C.sage : C.bgInput, cursor: "pointer", transition: "all 0.2s" }}>
-                        <span style={{ fontSize: 16 }}>{def.icon}</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: taken ? "#fff" : C.cream }}>{name}</span>
+                      <div
+                        key={i}
+                        onClick={() => updateEntry("water", entry.water === i + 1 ? i : i + 1)}
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: 2,
+                          userSelect: "none",
+                        }}
+                      >
+                        <svg width="24" height="32" viewBox="0 0 24 32" fill="none">
+                          <path
+                            d="M5 4 L3 28 Q3 30 5 30 L19 30 Q21 30 21 28 L19 4 Z"
+                            fill={filled ? "#a0c4e8" : C.creamFaint}
+                            stroke={filled ? "#5080a0" : C.border}
+                            strokeWidth="1.5"
+                          />
+                          {filled && (
+                            <path
+                              d="M4.5 20 Q7 17 12 19 Q17 21 19.5 18"
+                              stroke="#5080a0"
+                              strokeWidth="1"
+                              fill="none"
+                              strokeLinecap="round"
+                            />
+                          )}
+                        </svg>
                       </div>
                     );
                   })}
                 </div>
-              </div>
-            )}
-
-
-            {/* ── CICLO MENSTRUAL ── */}
-            <div style={S.card}>
-              {/* Header */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.sage} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg>
-    <span style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px" }}>
-      {lang === "es" ? "Ciclo menstrual" : "Menstrual cycle"}
-    </span>
-  </div>
-</div>
-
-              {/* Step 1: type selector */}
-              <div style={{ marginBottom:14 }}>
-                <div style={{ fontSize:11, fontWeight:700, color:C.creamMuted, marginBottom:8, textTransform:"uppercase", letterSpacing:"0.5px" }}>
-                  {lang==="es" ? "1. Elige qué quieres marcar" : "1. Choose what to mark"}
-                </div>
-                <div style={{ display:"flex", gap:6 }}>
-                  {[
-                    { key:"period",    color:"#c06080", bg:"#f5d0dc", label: lang==="es" ? "Menstruación" : "Period",   emoji:"🩸" },
-                    { key:"spm",       color:"#8a6c3a", bg:"#f5ecd5", label: "SPM / PMS",                               emoji:"🟡" },
-                    { key:"retention", color:"#5080a0", bg:"#d0e4f0", label: lang==="es" ? "Retención" : "Retention",   emoji:"💧" },
-                  ].map(ctype => (
-                    <button key={ctype.key}
-                      onClick={() => setCycleActiveType(prev => prev === ctype.key ? null : ctype.key)}
+                {/* Extra glasses beyond 8 */}
+                {entry.water > 8 && (
+                  <div style={{ fontSize: 11, color: C.sage, fontWeight: 600, marginBottom: 6 }}>
+                    +{entry.water - 8} {lang === "es" ? "vasos extra 🎉" : "extra glasses 🎉"}
+                  </div>
+                )}
+                <div
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                >
+                  <div style={{ fontSize: 10, color: C.creamMuted, fontStyle: "italic" }}>
+                    {t.today.waterGoal}
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button
+                      onClick={() => updateEntry("water", Math.max(0, entry.water - 1))}
                       style={{
-                        flex:1, padding:"8px 4px", borderRadius:10,
-                        border:`2px solid ${cycleActiveType === ctype.key ? ctype.color : C.border}`,
-                        background: cycleActiveType === ctype.key ? ctype.bg : "white",
-                        fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit",
-                        color: cycleActiveType === ctype.key ? ctype.color : C.creamMuted,
-                        transition:"all 0.15s", display:"flex", flexDirection:"column", alignItems:"center", gap:3,
-                      }}>
-                      <span style={{ fontSize:16 }}>{ctype.emoji}</span>
-                      <span>{ctype.label}</span>
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        border: `1px solid ${C.border}`,
+                        background: "white",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        fontSize: 16,
+                        color: C.creamMuted,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      −
                     </button>
+                    <button
+                      onClick={() => updateEntry("water", Math.min(12, entry.water + 1))}
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        border: `1px solid ${C.sage}`,
+                        background: C.sage,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        fontSize: 16,
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                {/* Progress bar */}
+                <div
+                  style={{
+                    marginTop: 10,
+                    height: 5,
+                    background: C.creamFaint,
+                    borderRadius: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${Math.min(100, (entry.water / 8) * 100)}%`,
+                      height: "100%",
+                      borderRadius: 4,
+                      background:
+                        entry.water >= 8 ? C.sage : entry.water >= 5 ? "#a0c4e8" : C.border,
+                      transition: "width 0.3s",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Inflammation */}
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.today.inflammation}</div>
+                {activeZones.length === 0 && (
+                  <p style={{ color: C.creamMuted, fontSize: 13 }}>
+                    {lang === "es"
+                      ? "Configura tus zonas en el Perfil"
+                      : "Set up your zones in Profile"}
+                  </p>
+                )}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {activeZones.map((z) => (
+                    <ZoneCard
+                      key={z}
+                      zone={z}
+                      zoneName={t.today.zoneNames[z] || z}
+                      value={entry.inflammationZones?.[z] || 0}
+                      onChange={(v) =>
+                        updateEntry("inflammationZones", { ...entry.inflammationZones, [z]: v })
+                      }
+                    />
                   ))}
                 </div>
-                <div style={{ marginTop:8, fontSize:11, borderRadius:8, padding:"6px 10px",
-                  background: cycleActiveType ? C.creamFaint : "transparent",
-                  color: cycleActiveType ? C.sage : C.creamMuted,
-                  fontStyle: cycleActiveType ? "normal" : "italic",
-                  border: cycleActiveType ? `1px solid ${C.border}` : "1px solid transparent",
-                  transition:"all 0.2s",
-                }}>
-                  {cycleActiveType
-                    ? (lang==="es" ? "2. Toca los días del calendario · toca de nuevo para borrar" : "2. Tap days on the calendar · tap again to remove")
-                    : (lang==="es" ? "Selecciona un tipo arriba para empezar" : "Select a type above to start marking")}
+                <div style={{ marginTop: 14 }}>
+                  <label style={S.label}>{t.today.inflammationNote}</label>
+                  <textarea
+                    style={S.textarea}
+                    placeholder={t.today.inflammationNotePlaceholder}
+                    value={entry.inflammationNote}
+                    onChange={(e) => updateEntry("inflammationNote", e.target.value)}
+                  />
                 </div>
               </div>
 
-              {/* Month title */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:10 }}>
-  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo-2, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
-    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>&#8249;</button>
-  <div style={{ fontSize:13, fontWeight:700, color:C.creamMuted, minWidth:140, textAlign:"center" }}>
-    {(() => {
-      const [y,m] = cycleMonth.split("-").map(Number);
-      const months_es = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-      const months_en = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      return `${lang === "es" ? months_es[m-1] : months_en[m-1]} ${y}`;
-    })()}
-  </div>
-  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
-    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>&#8250;</button>
-</div>
+              {/* Measures */}
+              {activeZones.length > 0 && (
+                <div style={S.card}>
+                  <div style={S.cardTitle}>{t.today.measures}</div>
+                  <div style={S.grid2}>
+                    {activeZones.map((z) => (
+                      <div key={z}>
+                        <label style={S.label}>{t.today.zoneNames[z] || z}</label>
+                        <input
+                          style={S.input}
+                          type="number"
+                          step="0.5"
+                          placeholder="cm"
+                          value={entry.measures?.[z] || ""}
+                          onChange={(e) =>
+                            updateEntry("measures", { ...entry.measures, [z]: e.target.value })
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-              {/* Day headers */}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
-                {(lang === "es" ? ["L","M","X","J","V","S","D"] : ["M","T","W","T","F","S","S"]).map((d,i) => (
-                  <div key={i} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:C.creamMuted, padding:"4px 0" }}>{d}</div>
-                ))}
-              </div>
-
-              {/* Calendar grid */}
-              {(() => {
-                const [y, mo] = cycleMonth.split("-").map(Number);
-                const firstDay = new Date(y, mo-1, 1).getDay();
-                const offset = firstDay === 0 ? 6 : firstDay - 1;
-                const daysInMonth = new Date(y, mo, 0).getDate();
-                const cells = [];
-                for (let i = 0; i < offset; i++) cells.push(null);
-                for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-                while (cells.length % 7 !== 0) cells.push(null);
-                const typeColors = {
-                  period:    { bg:"#f5d0dc", border:"#c06080", text:"#7a1030" },
-                  spm:       { bg:"#f5ecd5", border:"#8a6c3a", text:"#8a6c3a" },
-                  retention: { bg:"#d0e4f0", border:"#5080a0", text:"#305070" },
-                };
-                const today = new Date().toISOString().slice(0,10);
-                return (
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
-                    {cells.map((day, idx) => {
-                      if (!day) return <div key={idx} />;
-                      const dateStr = `${y}-${String(mo).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-                      const type = cycleData[dateStr];
-                      const col = type ? typeColors[type] : null;
-                      const isToday = dateStr === today;
+              {/* Daily supps check */}
+              {activeSupps.length > 0 && (
+                <div style={S.card}>
+                  <div style={S.cardTitle}>{t.today.todaysSupps}</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {activeSupps.map((a) => {
+                      const def = allSuppsList.find((s) => s.key === a.key);
+                      if (!def) return null;
+                      const name = lang === "es" ? def.es : def.en;
+                      const taken = (entry.suppsTaken || []).includes(a.key);
                       return (
-                        <div key={idx}
+                        <div
+                          key={a.key}
                           onClick={() => {
-                            if (!cycleActiveType) return;
-                            if (type === cycleActiveType) {
-                              setCycleData(prev => {
-                                const next = { ...prev };
-                                delete next[dateStr];
-                                try { localStorage.setItem("lt_cycle", JSON.stringify(next)); } catch {}
-                                return next;
-                              });
-                            } else {
-                              toggleCycleDay(dateStr, cycleActiveType);
-                            }
+                            const curr = entry.suppsTaken || [];
+                            updateEntry(
+                              "suppsTaken",
+                              taken ? curr.filter((k) => k !== a.key) : [...curr, a.key]
+                            );
                           }}
                           style={{
-                            aspectRatio:"1", borderRadius:7,
-                            display:"flex", alignItems:"center", justifyContent:"center",
-                            fontSize:11, fontWeight: type ? 700 : 500,
-                            cursor: cycleActiveType ? "pointer" : "default",
-                            background: col ? col.bg : isToday ? C.creamFaint : "transparent",
-                            border:`1.5px solid ${col ? col.border : isToday ? C.sage : "transparent"}`,
-                            color: col ? col.text : isToday ? C.sage : C.cream,
-                            transition:"all 0.15s", userSelect:"none",
-                            opacity: cycleActiveType || type ? 1 : 0.7,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "6px 12px",
+                            borderRadius: 20,
+                            border: `1.5px solid ${taken ? C.sage : C.border}`,
+                            background: taken ? C.sage : C.bgInput,
+                            cursor: "pointer",
+                            transition: "all 0.2s",
                           }}
-                        >{day}</div>
+                        >
+                          <span style={{ fontSize: 16 }}>{def.icon}</span>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 600,
+                              color: taken ? "#fff" : C.cream,
+                            }}
+                          >
+                            {name}
+                          </span>
+                        </div>
                       );
                     })}
                   </div>
-                );
-              })()}
+                </div>
+              )}
 
-              {/* Legend */}
-              <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginTop:12, paddingTop:12, borderTop:`1px solid ${C.border}` }}>
-                {[
-                  { color:"#c06080", bg:"#f5d0dc", label: lang==="es" ? "Menstruación" : "Period" },
-                  { color:"#8a6c3a", bg:"#f5ecd5", label:"SPM / PMS" },
-                  { color:"#5080a0", bg:"#d0e4f0", label: lang==="es" ? "Retención" : "Retention" },
-                ].map(leg => (
-                  <div key={leg.label} style={{ display:"flex", alignItems:"center", gap:5 }}>
-                    <div style={{ width:12, height:12, borderRadius:3, background:leg.bg, border:`1.5px solid ${leg.color}` }}/>
-                    <span style={{ fontSize:11, color:C.creamMuted, fontWeight:600 }}>{leg.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Summary */}
-              {(() => {
-                const periodDays = Object.entries(cycleData).filter(([,v]) => v === "period").map(([k]) => k).sort();
-                if (periodDays.length < 1) return null;
-                let lastStart = null, lastEnd = null;
-                for (let i = 0; i < periodDays.length; i++) {
-                  const prev = i > 0 ? new Date(periodDays[i-1]) : null;
-                  if (!prev || (new Date(periodDays[i]) - prev) > 86400000 * 2) lastStart = periodDays[i];
-                  lastEnd = periodDays[i];
-                }
-                const duration = lastStart && lastEnd ? Math.round((new Date(lastEnd) - new Date(lastStart)) / 86400000) + 1 : null;
-                return (
-                  <div style={{ marginTop:12, padding:"10px 12px", background:C.creamFaint, borderRadius:10, border:`1px solid ${C.border}` }}>
-                    <div style={{ fontSize:11, fontWeight:800, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
-                      {lang==="es" ? "Resumen del ciclo" : "Cycle summary"}
-                    </div>
-                    <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
-                      {lastStart && <div><div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es" ? "Último inicio" : "Last start"}</div><div style={{ fontSize:13, fontWeight:700, color:C.cream }}>{lastStart.slice(8)}/{lastStart.slice(5,7)}</div></div>}
-                      {duration && <div><div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es" ? "Duración" : "Duration"}</div><div style={{ fontSize:13, fontWeight:700, color:C.cream }}>{duration} {lang==="es" ? "días" : "days"}</div></div>}
-                      <div><div style={{ fontSize:10, color:C.creamMuted }}>{lang==="es" ? "Días marcados" : "Days marked"}</div><div style={{ fontSize:13, fontWeight:700, color:C.cream }}>{periodDays.length}</div></div>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-
-
-            {/* Pill taken today */}
-            {profile.pillActive && (
+              {/* ── CICLO MENSTRUAL ── */}
               <div style={S.card}>
-                <div style={S.cardTitle}>{lang === "es" ? "Anticonceptivo" : "Contraceptive"}</div>
+                {/* Header */}
                 <div
-                  onClick={() => updateEntry("pillTaken", !entry.pillTaken)}
-                  style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 14px", borderRadius:12, border:`1.5px solid ${entry.pillTaken ? C.sage : C.border}`, background: entry.pillTaken ? C.creamFaint : "white", cursor:"pointer", transition:"all 0.2s", userSelect:"none" }}>
-                  <span style={{ fontSize:22 }}>💊</span>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontSize:13, fontWeight:700, color: entry.pillTaken ? C.sage : C.cream }}>
-                      {profile.pillBrand
-                        ? (lang==="es" ? `${profile.pillBrand} — tomada hoy` : `${profile.pillBrand} — taken today`)
-                        : (lang==="es" ? "Píldora tomada hoy" : "Pill taken today")}
-                    </div>
-                    <div style={{ fontSize:11, color:C.creamMuted, marginTop:1 }}>
-                      {entry.pillTaken
-                        ? (lang==="es" ? "✓ Marcada como tomada" : "✓ Marked as taken")
-                        : (lang==="es" ? "Toca para marcar como tomada" : "Tap to mark as taken")}
-                    </div>
-                  </div>
-                  <div style={{ width:22, height:22, borderRadius:"50%", border:`2px solid ${entry.pillTaken ? C.sage : C.border}`, background: entry.pillTaken ? C.sage : "transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    {entry.pillTaken && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 14,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={C.sage}
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18" />
+                    </svg>
+                    <span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 800,
+                        color: C.cream,
+                        letterSpacing: "-0.3px",
+                      }}
+                    >
+                      {lang === "es" ? "Ciclo menstrual" : "Menstrual cycle"}
+                    </span>
                   </div>
                 </div>
-              </div>
-            )}
 
-                        <button style={S.btn} onClick={saveLog}>{savedMsg || t.today.save}</button>
-          </>
-        )}
+                {/* Step 1: type selector */}
+                <div style={{ marginBottom: 14 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: C.creamMuted,
+                      marginBottom: 8,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    {lang === "es" ? "1. Elige qué quieres marcar" : "1. Choose what to mark"}
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {[
+                      {
+                        key: "period",
+                        color: "#c06080",
+                        bg: "#f5d0dc",
+                        label: lang === "es" ? "Menstruación" : "Period",
+                        emoji: "🩸",
+                      },
+                      {
+                        key: "spm",
+                        color: "#8a6c3a",
+                        bg: "#f5ecd5",
+                        label: "SPM / PMS",
+                        emoji: "🟡",
+                      },
+                      {
+                        key: "retention",
+                        color: "#5080a0",
+                        bg: "#d0e4f0",
+                        label: lang === "es" ? "Retención" : "Retention",
+                        emoji: "💧",
+                      },
+                    ].map((ctype) => (
+                      <button
+                        key={ctype.key}
+                        onClick={() =>
+                          setCycleActiveType((prev) => (prev === ctype.key ? null : ctype.key))
+                        }
+                        style={{
+                          flex: 1,
+                          padding: "8px 4px",
+                          borderRadius: 10,
+                          border: `2px solid ${cycleActiveType === ctype.key ? ctype.color : C.border}`,
+                          background: cycleActiveType === ctype.key ? ctype.bg : "white",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          color: cycleActiveType === ctype.key ? ctype.color : C.creamMuted,
+                          transition: "all 0.15s",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: 3,
+                        }}
+                      >
+                        <span style={{ fontSize: 16 }}>{ctype.emoji}</span>
+                        <span>{ctype.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      fontSize: 11,
+                      borderRadius: 8,
+                      padding: "6px 10px",
+                      background: cycleActiveType ? C.creamFaint : "transparent",
+                      color: cycleActiveType ? C.sage : C.creamMuted,
+                      fontStyle: cycleActiveType ? "normal" : "italic",
+                      border: cycleActiveType ? `1px solid ${C.border}` : "1px solid transparent",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {cycleActiveType
+                      ? lang === "es"
+                        ? "2. Toca los días del calendario · toca de nuevo para borrar"
+                        : "2. Tap days on the calendar · tap again to remove"
+                      : lang === "es"
+                        ? "Selecciona un tipo arriba para empezar"
+                        : "Select a type above to start marking"}
+                  </div>
+                </div>
 
-        {/* ── HISTORY ── */}
-        {tab === "history" && (() => {
-          const moodEmojis = ["😣","😟","😐","🙂","😊","😄","🤩"];
-          return (
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.history.title}</div>
-              {logs.length === 0 ? (
-                <p style={{ color: C.creamMuted, fontSize: 14 }}>{t.history.empty}</p>
-              ) : (
-                [...logs].reverse().map((l, i) => {
-                  const isOpen = openLog === l.date;
+                {/* Month title */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    marginBottom: 10,
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      setCycleMonth((m) => {
+                        const [y, mo] = m.split("-").map(Number);
+                        const d = new Date(y, mo - 2, 1);
+                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                      })
+                    }
+                    style={{
+                      background: "none",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 6,
+                      width: 26,
+                      height: 26,
+                      cursor: "pointer",
+                      color: C.creamMuted,
+                      fontSize: 13,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    &#8249;
+                  </button>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: C.creamMuted,
+                      minWidth: 140,
+                      textAlign: "center",
+                    }}
+                  >
+                    {(() => {
+                      const [y, m] = cycleMonth.split("-").map(Number);
+                      const months_es = [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre",
+                      ];
+                      const months_en = [
+                        "January",
+                        "February",
+                        "March",
+                        "April",
+                        "May",
+                        "June",
+                        "July",
+                        "August",
+                        "September",
+                        "October",
+                        "November",
+                        "December",
+                      ];
+                      return `${lang === "es" ? months_es[m - 1] : months_en[m - 1]} ${y}`;
+                    })()}
+                  </div>
+                  <button
+                    onClick={() =>
+                      setCycleMonth((m) => {
+                        const [y, mo] = m.split("-").map(Number);
+                        const d = new Date(y, mo, 1);
+                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                      })
+                    }
+                    style={{
+                      background: "none",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 6,
+                      width: 26,
+                      height: 26,
+                      cursor: "pointer",
+                      color: C.creamMuted,
+                      fontSize: 13,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    &#8250;
+                  </button>
+                </div>
+
+                {/* Day headers */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(7,1fr)",
+                    gap: 2,
+                    marginBottom: 4,
+                  }}
+                >
+                  {(lang === "es"
+                    ? ["L", "M", "X", "J", "V", "S", "D"]
+                    : ["M", "T", "W", "T", "F", "S", "S"]
+                  ).map((d, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        textAlign: "center",
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: C.creamMuted,
+                        padding: "4px 0",
+                      }}
+                    >
+                      {d}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar grid */}
+                {(() => {
+                  const [y, mo] = cycleMonth.split("-").map(Number);
+                  const firstDay = new Date(y, mo - 1, 1).getDay();
+                  const offset = firstDay === 0 ? 6 : firstDay - 1;
+                  const daysInMonth = new Date(y, mo, 0).getDate();
+                  const cells = [];
+                  for (let i = 0; i < offset; i++) cells.push(null);
+                  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+                  while (cells.length % 7 !== 0) cells.push(null);
+                  const typeColors = {
+                    period: { bg: "#f5d0dc", border: "#c06080", text: "#7a1030" },
+                    spm: { bg: "#f5ecd5", border: "#8a6c3a", text: "#8a6c3a" },
+                    retention: { bg: "#d0e4f0", border: "#5080a0", text: "#305070" },
+                  };
+                  const today = new Date().toISOString().slice(0, 10);
                   return (
-                    <div key={i} style={{ borderBottom: `1px solid ${C.border}`, overflow:"hidden" }}>
-                      {/* ── Row header — always visible, clickable ── */}
-                      <div onClick={() => setOpenLog(isOpen ? null : l.date)}
-                        style={{ padding:"12px 4px", display:"flex", justifyContent:"space-between", alignItems:"center", cursor:"pointer", userSelect:"none" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                          {/* Mood emoji */}
-                          <span style={{ fontSize:18 }}>{moodEmojis[l.mood ?? 2]}</span>
-                          <div>
-                            <div style={{ fontWeight:700, fontSize:13, color:C.cream }}>{l.date}</div>
-                            {/* Supp icons */}
-                            {l.suppsTaken?.length > 0 && (
-                              <div style={{ display:"flex", gap:2, marginTop:2 }}>
-                                {l.suppsTaken.slice(0,5).map(k => {
-                                  const d = allSuppsList.find(s => s.key === k);
-                                  return d ? <span key={k} style={{ fontSize:12 }}>{d.icon}</span> : null;
-                                })}
-                                {l.suppsTaken.length > 5 && <span style={{ fontSize:10, color:C.creamMuted }}>+{l.suppsTaken.length-5}</span>}
-                              </div>
-                            )}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+                      {cells.map((day, idx) => {
+                        if (!day) return <div key={idx} />;
+                        const dateStr = `${y}-${String(mo).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                        const type = cycleData[dateStr];
+                        const col = type ? typeColors[type] : null;
+                        const isToday = dateStr === today;
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              if (!cycleActiveType) return;
+                              if (type === cycleActiveType) {
+                                setCycleData((prev) => {
+                                  const next = { ...prev };
+                                  delete next[dateStr];
+                                  try {
+                                    localStorage.setItem("lt_cycle", JSON.stringify(next));
+                                  } catch {}
+                                  return next;
+                                });
+                              } else {
+                                toggleCycleDay(dateStr, cycleActiveType);
+                              }
+                            }}
+                            style={{
+                              aspectRatio: "1",
+                              borderRadius: 7,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 11,
+                              fontWeight: type ? 700 : 500,
+                              cursor: cycleActiveType ? "pointer" : "default",
+                              background: col ? col.bg : isToday ? C.creamFaint : "transparent",
+                              border: `1.5px solid ${col ? col.border : isToday ? C.sage : "transparent"}`,
+                              color: col ? col.text : isToday ? C.sage : C.cream,
+                              transition: "all 0.15s",
+                              userSelect: "none",
+                              opacity: cycleActiveType || type ? 1 : 0.7,
+                            }}
+                          >
+                            {day}
                           </div>
-                        </div>
-                        <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                          {l.weight && <span style={S.tag(C.cream)}>{l.weight}kg</span>}
-                          <span style={S.tag("#ef4444")}>dolor {l.pain}</span>
-                          <span style={S.tag(C.sage)}>energía {l.energy}</span>
-                          <span style={{ fontSize:13, color:C.creamMuted, marginLeft:4, transition:"transform 0.2s", display:"inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
-                        </div>
-                      </div>
-
-                      {/* ── Expanded detail ── */}
-                      {isOpen && (
-                        <div style={{ background:C.bg, borderTop:`1px solid ${C.border}`, padding:"14px 12px 16px", display:"flex", flexDirection:"column", gap:12 }}>
-
-                          {/* Stats row */}
-                          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                            {[
-                              { label: lang==="es"?"Peso":"Weight",  value: l.weight ? `${l.weight} kg` : "—" },
-                              { label: lang==="es"?"Dolor":"Pain",    value: `${l.pain} / 6` },
-                              { label: lang==="es"?"Energía":"Energy",value: `${l.energy} / 6` },
-                              { label: lang==="es"?"Estado":"Mood",   value: moodEmojis[l.mood ?? 2] },
-                            ].map(s => (
-                              <div key={s.label} style={{ flex:1, minWidth:60, background:"white", borderRadius:10, padding:"8px 10px", border:`1px solid ${C.border}`, textAlign:"center" }}>
-                                <div style={{ fontSize:9, color:C.creamMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.4px", marginBottom:3 }}>{s.label}</div>
-                                <div style={{ fontSize:14, fontWeight:800, color:C.cream }}>{s.value}</div>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Water */}
-                          {l.water > 0 && (
-                            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px", background:"#eaf4fb", borderRadius:8, border:"1px solid #a0c4e8" }}>
-                              <span style={{ fontSize:16 }}>💧</span>
-                              <span style={{ fontSize:12, fontWeight:600, color:"#305070" }}>
-                                {l.water} {lang==="es"?"vasos de agua":"glasses of water"}
-                                {l.water >= 8 && " ✓"}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Inflammation zones */}
-                          {l.inflammationZones && Object.keys(l.inflammationZones).length > 0 && (
-                            <div>
-                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
-                                {lang==="es"?"Inflamación por zonas":"Inflammation by zone"}
-                              </div>
-                              <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                                {Object.entries(l.inflammationZones).map(([zone, val]) => (
-                                  <div key={zone} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                                    <div style={{ fontSize:11, color:C.creamMuted, width:110, flexShrink:0 }}>{t.today.zoneNames[zone] || zone}</div>
-                                    <div style={{ flex:1, height:6, background:C.border, borderRadius:4, overflow:"hidden" }}>
-                                      <div style={{ width:`${(val/5)*100}%`, height:"100%", borderRadius:4, background: val >= 4 ? "#c06080" : val >= 2 ? C.accent : C.sage, transition:"width 0.3s" }}/>
-                                    </div>
-                                    <div style={{ fontSize:11, fontWeight:700, color:C.cream, width:20 }}>{val}</div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Body measures */}
-                          {l.measures && Object.values(l.measures).some(v => v) && (
-                            <div>
-                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
-                                {lang==="es"?"Medidas":"Measurements"}
-                              </div>
-                              <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                                {Object.entries(l.measures).filter(([,v]) => v).map(([zone, val]) => (
-                                  <div key={zone} style={{ background:"white", border:`1px solid ${C.border}`, borderRadius:8, padding:"5px 10px", fontSize:11 }}>
-                                    <span style={{ color:C.creamMuted }}>{t.today.zoneNames[zone] || zone}: </span>
-                                    <span style={{ fontWeight:700, color:C.cream }}>{val} cm</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Supplements taken */}
-                          {l.suppsTaken?.length > 0 && (
-                            <div>
-                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>
-                                {lang==="es"?"Suplementos tomados":"Supplements taken"}
-                              </div>
-                              <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-                                {l.suppsTaken.map(k => {
-                                  const d = allSuppsList.find(s => s.key === k);
-                                  return d ? (
-                                    <span key={k} style={{ fontSize:11, background:C.creamFaint, border:`1px solid ${C.border}`, borderRadius:20, padding:"3px 9px", color:C.sage, fontWeight:600 }}>
-                                      {d.icon} {lang==="es" ? d.es : d.en}
-                                    </span>
-                                  ) : null;
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Pill taken */}
-                          {l.pillTaken && (
-                            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px", background:C.creamFaint, borderRadius:8, border:`1px solid ${C.border}` }}>
-                              <span style={{ fontSize:16 }}>💊</span>
-                              <span style={{ fontSize:12, fontWeight:600, color:C.sage }}>
-                                {profile.pillBrand
-                                  ? (lang==="es" ? `${profile.pillBrand} tomada` : `${profile.pillBrand} taken`)
-                                  : (lang==="es" ? "Píldora tomada" : "Pill taken")}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Notes */}
-                          {(l.inflammationNote || l.notes) && (
-                            <div>
-                              <div style={{ fontSize:10, fontWeight:700, color:C.creamMuted, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>
-                                {lang==="es"?"Notas":"Notes"}
-                              </div>
-                              <div style={{ fontSize:12, color:C.cream, lineHeight:1.6, background:"white", borderRadius:8, padding:"8px 10px", border:`1px solid ${C.border}` }}>
-                                {l.inflammationNote || l.notes}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
                   );
-                })
-              )}
-            </div>
-          );
-        })()}
+                })()}
 
-        {/* ── CHARTS ── */}
-        {tab === "charts" && (
-          <>
-            {logs.length < 1 ? (
-              <div style={{ ...S.card, textAlign: "center", padding: 40 }}>
-                <div style={{ fontSize: 40 }}>📊</div>
-                <div style={{ color: C.creamMuted, marginTop: 8 }}>{t.charts.noData}</div>
+                {/* Legend */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    flexWrap: "wrap",
+                    marginTop: 12,
+                    paddingTop: 12,
+                    borderTop: `1px solid ${C.border}`,
+                  }}
+                >
+                  {[
+                    {
+                      color: "#c06080",
+                      bg: "#f5d0dc",
+                      label: lang === "es" ? "Menstruación" : "Period",
+                    },
+                    { color: "#8a6c3a", bg: "#f5ecd5", label: "SPM / PMS" },
+                    {
+                      color: "#5080a0",
+                      bg: "#d0e4f0",
+                      label: lang === "es" ? "Retención" : "Retention",
+                    },
+                  ].map((leg) => (
+                    <div key={leg.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                      <div
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: 3,
+                          background: leg.bg,
+                          border: `1.5px solid ${leg.color}`,
+                        }}
+                      />
+                      <span style={{ fontSize: 11, color: C.creamMuted, fontWeight: 600 }}>
+                        {leg.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Summary */}
+                {(() => {
+                  const periodDays = Object.entries(cycleData)
+                    .filter(([, v]) => v === "period")
+                    .map(([k]) => k)
+                    .sort();
+                  if (periodDays.length < 1) return null;
+                  let lastStart = null,
+                    lastEnd = null;
+                  for (let i = 0; i < periodDays.length; i++) {
+                    const prev = i > 0 ? new Date(periodDays[i - 1]) : null;
+                    if (!prev || new Date(periodDays[i]) - prev > 86400000 * 2)
+                      lastStart = periodDays[i];
+                    lastEnd = periodDays[i];
+                  }
+                  const duration =
+                    lastStart && lastEnd
+                      ? Math.round((new Date(lastEnd) - new Date(lastStart)) / 86400000) + 1
+                      : null;
+                  return (
+                    <div
+                      style={{
+                        marginTop: 12,
+                        padding: "10px 12px",
+                        background: C.creamFaint,
+                        borderRadius: 10,
+                        border: `1px solid ${C.border}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 800,
+                          color: C.creamMuted,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                          marginBottom: 6,
+                        }}
+                      >
+                        {lang === "es" ? "Resumen del ciclo" : "Cycle summary"}
+                      </div>
+                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                        {lastStart && (
+                          <div>
+                            <div style={{ fontSize: 10, color: C.creamMuted }}>
+                              {lang === "es" ? "Último inicio" : "Last start"}
+                            </div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.cream }}>
+                              {lastStart.slice(8)}/{lastStart.slice(5, 7)}
+                            </div>
+                          </div>
+                        )}
+                        {duration && (
+                          <div>
+                            <div style={{ fontSize: 10, color: C.creamMuted }}>
+                              {lang === "es" ? "Duración" : "Duration"}
+                            </div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.cream }}>
+                              {duration} {lang === "es" ? "días" : "days"}
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <div style={{ fontSize: 10, color: C.creamMuted }}>
+                            {lang === "es" ? "Días marcados" : "Days marked"}
+                          </div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.cream }}>
+                            {periodDays.length}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
-            ) : (
-              <>
-                {/* Weight chart — only if at least one weight entry */}
-                {chartData.some(d => d.weight) ? (
+
+              {/* Pill taken today */}
+              {profile.pillActive && (
+                <div style={S.card}>
+                  <div style={S.cardTitle}>
+                    {lang === "es" ? "Anticonceptivo" : "Contraceptive"}
+                  </div>
+                  <div
+                    onClick={() => updateEntry("pillTaken", !entry.pillTaken)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "10px 14px",
+                      borderRadius: 12,
+                      border: `1.5px solid ${entry.pillTaken ? C.sage : C.border}`,
+                      background: entry.pillTaken ? C.creamFaint : "white",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      userSelect: "none",
+                    }}
+                  >
+                    <span style={{ fontSize: 22 }}>💊</span>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: entry.pillTaken ? C.sage : C.cream,
+                        }}
+                      >
+                        {profile.pillBrand
+                          ? lang === "es"
+                            ? `${profile.pillBrand} — tomada hoy`
+                            : `${profile.pillBrand} — taken today`
+                          : lang === "es"
+                            ? "Píldora tomada hoy"
+                            : "Pill taken today"}
+                      </div>
+                      <div style={{ fontSize: 11, color: C.creamMuted, marginTop: 1 }}>
+                        {entry.pillTaken
+                          ? lang === "es"
+                            ? "✓ Marcada como tomada"
+                            : "✓ Marked as taken"
+                          : lang === "es"
+                            ? "Toca para marcar como tomada"
+                            : "Tap to mark as taken"}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: "50%",
+                        border: `2px solid ${entry.pillTaken ? C.sage : C.border}`,
+                        background: entry.pillTaken ? C.sage : "transparent",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {entry.pillTaken && (
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button style={S.btn} onClick={saveLog}>
+                {savedMsg || t.today.save}
+              </button>
+            </>
+          )}
+
+          {/* ── HISTORY ── */}
+          {tab === "history" &&
+            (() => {
+              const moodEmojis = ["😣", "😟", "😐", "🙂", "😊", "😄", "🤩"];
+              return (
+                <div style={S.card}>
+                  <div style={S.cardTitle}>{t.history.title}</div>
+                  {logs.length === 0 ? (
+                    <p style={{ color: C.creamMuted, fontSize: 14 }}>{t.history.empty}</p>
+                  ) : (
+                    [...logs].reverse().map((l, i) => {
+                      const isOpen = openLog === l.date;
+                      return (
+                        <div
+                          key={i}
+                          style={{ borderBottom: `1px solid ${C.border}`, overflow: "hidden" }}
+                        >
+                          {/* ── Row header — always visible, clickable ── */}
+                          <div
+                            onClick={() => setOpenLog(isOpen ? null : l.date)}
+                            style={{
+                              padding: "12px 4px",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              cursor: "pointer",
+                              userSelect: "none",
+                            }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                              {/* Mood emoji */}
+                              <span style={{ fontSize: 18 }}>{moodEmojis[l.mood ?? 2]}</span>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: 13, color: C.cream }}>
+                                  {l.date}
+                                </div>
+                                {/* Supp icons */}
+                                {l.suppsTaken?.length > 0 && (
+                                  <div style={{ display: "flex", gap: 2, marginTop: 2 }}>
+                                    {l.suppsTaken.slice(0, 5).map((k) => {
+                                      const d = allSuppsList.find((s) => s.key === k);
+                                      return d ? (
+                                        <span key={k} style={{ fontSize: 12 }}>
+                                          {d.icon}
+                                        </span>
+                                      ) : null;
+                                    })}
+                                    {l.suppsTaken.length > 5 && (
+                                      <span style={{ fontSize: 10, color: C.creamMuted }}>
+                                        +{l.suppsTaken.length - 5}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                              {l.weight && <span style={S.tag(C.cream)}>{l.weight}kg</span>}
+                              <span style={S.tag("#ef4444")}>dolor {l.pain}</span>
+                              <span style={S.tag(C.sage)}>energía {l.energy}</span>
+                              <span
+                                style={{
+                                  fontSize: 13,
+                                  color: C.creamMuted,
+                                  marginLeft: 4,
+                                  transition: "transform 0.2s",
+                                  display: "inline-block",
+                                  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                                }}
+                              >
+                                ▾
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* ── Expanded detail ── */}
+                          {isOpen && (
+                            <div
+                              style={{
+                                background: C.bg,
+                                borderTop: `1px solid ${C.border}`,
+                                padding: "14px 12px 16px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 12,
+                              }}
+                            >
+                              {/* Stats row */}
+                              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                {[
+                                  {
+                                    label: lang === "es" ? "Peso" : "Weight",
+                                    value: l.weight ? `${l.weight} kg` : "—",
+                                  },
+                                  {
+                                    label: lang === "es" ? "Dolor" : "Pain",
+                                    value: `${l.pain} / 6`,
+                                  },
+                                  {
+                                    label: lang === "es" ? "Energía" : "Energy",
+                                    value: `${l.energy} / 6`,
+                                  },
+                                  {
+                                    label: lang === "es" ? "Estado" : "Mood",
+                                    value: moodEmojis[l.mood ?? 2],
+                                  },
+                                ].map((s) => (
+                                  <div
+                                    key={s.label}
+                                    style={{
+                                      flex: 1,
+                                      minWidth: 60,
+                                      background: "white",
+                                      borderRadius: 10,
+                                      padding: "8px 10px",
+                                      border: `1px solid ${C.border}`,
+                                      textAlign: "center",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        fontSize: 9,
+                                        color: C.creamMuted,
+                                        fontWeight: 700,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.4px",
+                                        marginBottom: 3,
+                                      }}
+                                    >
+                                      {s.label}
+                                    </div>
+                                    <div style={{ fontSize: 14, fontWeight: 800, color: C.cream }}>
+                                      {s.value}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Water */}
+                              {l.water > 0 && (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    padding: "8px 12px",
+                                    background: "#eaf4fb",
+                                    borderRadius: 8,
+                                    border: "1px solid #a0c4e8",
+                                  }}
+                                >
+                                  <span style={{ fontSize: 16 }}>💧</span>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: "#305070" }}>
+                                    {l.water} {lang === "es" ? "vasos de agua" : "glasses of water"}
+                                    {l.water >= 8 && " ✓"}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Inflammation zones */}
+                              {l.inflammationZones &&
+                                Object.keys(l.inflammationZones).length > 0 && (
+                                  <div>
+                                    <div
+                                      style={{
+                                        fontSize: 10,
+                                        fontWeight: 700,
+                                        color: C.creamMuted,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.5px",
+                                        marginBottom: 6,
+                                      }}
+                                    >
+                                      {lang === "es"
+                                        ? "Inflamación por zonas"
+                                        : "Inflammation by zone"}
+                                    </div>
+                                    <div
+                                      style={{ display: "flex", flexDirection: "column", gap: 5 }}
+                                    >
+                                      {Object.entries(l.inflammationZones).map(([zone, val]) => (
+                                        <div
+                                          key={zone}
+                                          style={{ display: "flex", alignItems: "center", gap: 8 }}
+                                        >
+                                          <div
+                                            style={{
+                                              fontSize: 11,
+                                              color: C.creamMuted,
+                                              width: 110,
+                                              flexShrink: 0,
+                                            }}
+                                          >
+                                            {t.today.zoneNames[zone] || zone}
+                                          </div>
+                                          <div
+                                            style={{
+                                              flex: 1,
+                                              height: 6,
+                                              background: C.border,
+                                              borderRadius: 4,
+                                              overflow: "hidden",
+                                            }}
+                                          >
+                                            <div
+                                              style={{
+                                                width: `${(val / 5) * 100}%`,
+                                                height: "100%",
+                                                borderRadius: 4,
+                                                background:
+                                                  val >= 4
+                                                    ? "#c06080"
+                                                    : val >= 2
+                                                      ? C.accent
+                                                      : C.sage,
+                                                transition: "width 0.3s",
+                                              }}
+                                            />
+                                          </div>
+                                          <div
+                                            style={{
+                                              fontSize: 11,
+                                              fontWeight: 700,
+                                              color: C.cream,
+                                              width: 20,
+                                            }}
+                                          >
+                                            {val}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                              {/* Body measures */}
+                              {l.measures && Object.values(l.measures).some((v) => v) && (
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      color: C.creamMuted,
+                                      textTransform: "uppercase",
+                                      letterSpacing: "0.5px",
+                                      marginBottom: 6,
+                                    }}
+                                  >
+                                    {lang === "es" ? "Medidas" : "Measurements"}
+                                  </div>
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                    {Object.entries(l.measures)
+                                      .filter(([, v]) => v)
+                                      .map(([zone, val]) => (
+                                        <div
+                                          key={zone}
+                                          style={{
+                                            background: "white",
+                                            border: `1px solid ${C.border}`,
+                                            borderRadius: 8,
+                                            padding: "5px 10px",
+                                            fontSize: 11,
+                                          }}
+                                        >
+                                          <span style={{ color: C.creamMuted }}>
+                                            {t.today.zoneNames[zone] || zone}:{" "}
+                                          </span>
+                                          <span style={{ fontWeight: 700, color: C.cream }}>
+                                            {val} cm
+                                          </span>
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Supplements taken */}
+                              {l.suppsTaken?.length > 0 && (
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      color: C.creamMuted,
+                                      textTransform: "uppercase",
+                                      letterSpacing: "0.5px",
+                                      marginBottom: 6,
+                                    }}
+                                  >
+                                    {lang === "es" ? "Suplementos tomados" : "Supplements taken"}
+                                  </div>
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                                    {l.suppsTaken.map((k) => {
+                                      const d = allSuppsList.find((s) => s.key === k);
+                                      return d ? (
+                                        <span
+                                          key={k}
+                                          style={{
+                                            fontSize: 11,
+                                            background: C.creamFaint,
+                                            border: `1px solid ${C.border}`,
+                                            borderRadius: 20,
+                                            padding: "3px 9px",
+                                            color: C.sage,
+                                            fontWeight: 600,
+                                          }}
+                                        >
+                                          {d.icon} {lang === "es" ? d.es : d.en}
+                                        </span>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Pill taken */}
+                              {l.pillTaken && (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    padding: "8px 12px",
+                                    background: C.creamFaint,
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                  }}
+                                >
+                                  <span style={{ fontSize: 16 }}>💊</span>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: C.sage }}>
+                                    {profile.pillBrand
+                                      ? lang === "es"
+                                        ? `${profile.pillBrand} tomada`
+                                        : `${profile.pillBrand} taken`
+                                      : lang === "es"
+                                        ? "Píldora tomada"
+                                        : "Pill taken"}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Notes */}
+                              {(l.inflammationNote || l.notes) && (
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      color: C.creamMuted,
+                                      textTransform: "uppercase",
+                                      letterSpacing: "0.5px",
+                                      marginBottom: 4,
+                                    }}
+                                  >
+                                    {lang === "es" ? "Notas" : "Notes"}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: 12,
+                                      color: C.cream,
+                                      lineHeight: 1.6,
+                                      background: "white",
+                                      borderRadius: 8,
+                                      padding: "8px 10px",
+                                      border: `1px solid ${C.border}`,
+                                    }}
+                                  >
+                                    {l.inflammationNote || l.notes}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              );
+            })()}
+
+          {/* ── CHARTS ── */}
+          {tab === "charts" && (
+            <>
+              {logs.length < 1 ? (
+                <div style={{ ...S.card, textAlign: "center", padding: 40 }}>
+                  <div style={{ fontSize: 40 }}>📊</div>
+                  <div style={{ color: C.creamMuted, marginTop: 8 }}>{t.charts.noData}</div>
+                </div>
+              ) : (
+                <>
+                  {/* Weight chart — only if at least one weight entry */}
+                  {chartData.some((d) => d.weight) ? (
+                    <div style={S.card}>
+                      <div style={S.cardTitle}>{t.charts.weight}</div>
+                      <ResponsiveContainer width="100%" height={180}>
+                        <LineChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
+                          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                          <YAxis tick={{ fontSize: 10 }} domain={["auto", "auto"]} />
+                          <Tooltip />
+                          <Line
+                            type="monotone"
+                            dataKey="weight"
+                            stroke="#6366f1"
+                            strokeWidth={2.5}
+                            dot={{ r: 5 }}
+                            connectNulls
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        ...S.card,
+                        color: C.creamMuted,
+                        fontSize: 12,
+                        textAlign: "center",
+                        padding: "18px 16px",
+                      }}
+                    >
+                      {lang === "es"
+                        ? "Añade peso en el registro diario para ver esta gráfica"
+                        : "Add weight in your daily log to see this chart"}
+                    </div>
+                  )}
+
                   <div style={S.card}>
-                    <div style={S.cardTitle}>{t.charts.weight}</div>
+                    <div style={S.cardTitle}>{t.charts.painEnergy}</div>
+                    {logs.length === 1 && (
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: C.creamMuted,
+                          marginBottom: 8,
+                          fontStyle: "italic",
+                        }}
+                      >
+                        {lang === "es"
+                          ? "Con más registros verás la evolución en el tiempo"
+                          : "Add more entries to see your trend over time"}
+                      </div>
+                    )}
                     <ResponsiveContainer width="100%" height={180}>
                       <LineChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
                         <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                        <YAxis tick={{ fontSize: 10 }} domain={["auto","auto"]} />
+                        <YAxis tick={{ fontSize: 10 }} domain={[0, 6]} />
                         <Tooltip />
-                        <Line type="monotone" dataKey="weight" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 5 }} connectNulls />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="pain"
+                          stroke="#ef4444"
+                          strokeWidth={2}
+                          dot={{ r: 5 }}
+                          name={t.history.pain}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="energy"
+                          stroke="#22c55e"
+                          strokeWidth={2}
+                          dot={{ r: 5 }}
+                          name={t.history.energy}
+                        />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                ) : (
-                  <div style={{ ...S.card, color:C.creamMuted, fontSize:12, textAlign:"center", padding:"18px 16px" }}>
-                    {lang==="es" ? "Añade peso en el registro diario para ver esta gráfica" : "Add weight in your daily log to see this chart"}
-                  </div>
-                )}
 
-                <div style={S.card}>
-                  <div style={S.cardTitle}>{t.charts.painEnergy}</div>
-                  {logs.length === 1 && (
-                    <div style={{ fontSize:11, color:C.creamMuted, marginBottom:8, fontStyle:"italic" }}>
-                      {lang==="es" ? "Con más registros verás la evolución en el tiempo" : "Add more entries to see your trend over time"}
+                  {inflammationData.some((d) => d.value > 0) && (
+                    <div style={S.card}>
+                      <div style={S.cardTitle}>{t.charts.inflammation}</div>
+                      <ResponsiveContainer width="100%" height={220}>
+                        <RadarChart data={inflammationData}>
+                          <PolarGrid />
+                          <PolarAngleAxis dataKey="zone" tick={{ fontSize: 11 }} />
+                          <Radar
+                            dataKey="value"
+                            stroke="#f97316"
+                            fill="#f97316"
+                            fillOpacity={0.35}
+                            strokeWidth={2}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
                     </div>
                   )}
-                  <ResponsiveContainer width="100%" height={180}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-                      <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} domain={[0,6]} />
+
+                  {activeSupps.length > 0 && (
+                    <div style={S.card}>
+                      <div style={S.cardTitle}>{t.charts.suppAdherence}</div>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={suppChartData}>
+                          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                          <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                          <Tooltip />
+                          <Bar dataKey="taken" fill={C.sage} radius={[6, 6, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {suppFreqData.some((d) => d.count > 0) && (
+                    <div style={S.card}>
+                      <div style={S.cardTitle}>{t.charts.suppFrequency}</div>
+                      <ResponsiveContainer
+                        width="100%"
+                        height={Math.max(160, suppFreqData.length * 32)}
+                      >
+                        <BarChart data={suppFreqData} layout="vertical">
+                          <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10 }} />
+                          <YAxis
+                            dataKey="name"
+                            type="category"
+                            tick={{ fontSize: 11 }}
+                            width={120}
+                          />
+                          <Tooltip />
+                          <Bar dataKey="count" fill="#6366f1" radius={[0, 6, 6, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {foods.length > 0 && (
+                <div style={S.card}>
+                  <div style={S.cardTitle}>{t.charts.foods}</div>
+                  <ResponsiveContainer width="100%" height={160}>
+                    <BarChart data={foodReactions} layout="vertical">
+                      <XAxis type="number" tick={{ fontSize: 10 }} />
+                      <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={90} />
                       <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="pain" stroke="#ef4444" strokeWidth={2} dot={{ r: 5 }} name={t.history.pain} />
-                      <Line type="monotone" dataKey="energy" stroke="#22c55e" strokeWidth={2} dot={{ r: 5 }} name={t.history.energy} />
-                    </LineChart>
+                      <Bar dataKey="count" radius={[0, 6, 6, 0]} fill="#6366f1" label={false} />
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
-
-                {inflammationData.some(d => d.value > 0) && (
-                  <div style={S.card}>
-                    <div style={S.cardTitle}>{t.charts.inflammation}</div>
-                    <ResponsiveContainer width="100%" height={220}>
-                      <RadarChart data={inflammationData}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="zone" tick={{ fontSize: 11 }} />
-                        <Radar dataKey="value" stroke="#f97316" fill="#f97316" fillOpacity={0.35} strokeWidth={2} />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-
-                {activeSupps.length > 0 && (
-                  <div style={S.card}>
-                    <div style={S.cardTitle}>{t.charts.suppAdherence}</div>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <BarChart data={suppChartData}>
-                        <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                        <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
-                        <Tooltip />
-                        <Bar dataKey="taken" fill={C.sage} radius={[6,6,0,0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-
-                {suppFreqData.some(d => d.count > 0) && (
-                  <div style={S.card}>
-                    <div style={S.cardTitle}>{t.charts.suppFrequency}</div>
-                    <ResponsiveContainer width="100%" height={Math.max(160, suppFreqData.length * 32)}>
-                      <BarChart data={suppFreqData} layout="vertical">
-                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10 }} />
-                        <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={120} />
-                        <Tooltip />
-                        <Bar dataKey="count" fill="#6366f1" radius={[0,6,6,0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-              </>
-            )}
-
-            {foods.length > 0 && (
-              <div style={S.card}>
-                <div style={S.cardTitle}>{t.charts.foods}</div>
-                <ResponsiveContainer width="100%" height={160}>
-                  <BarChart data={foodReactions} layout="vertical">
-                    <XAxis type="number" tick={{ fontSize: 10 }} />
-                    <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={90} />
-                    <Tooltip />
-                    <Bar dataKey="count" radius={[0,6,6,0]}
-                      fill="#6366f1"
-                      label={false}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* ── FOODS ── */}
-        {tab === "foods" && (
-          <>
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.foods.add}</div>
-              <label style={S.label}>{t.foods.name}</label>
-              <input style={{ ...S.input, marginBottom: 10 }} placeholder={t.foods.namePlaceholder}
-                value={newFood.name} onChange={(e) => setNewFood({ ...newFood, name: e.target.value })} />
-              <label style={S.label}>{t.foods.category}</label>
-              <select style={{ ...S.input, marginBottom: 10 }} value={newFood.category} onChange={(e) => setNewFood({ ...newFood, category: e.target.value })}>
-                {Object.entries(t.foods.categories).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
-              <label style={S.label}>{t.foods.reaction}</label>
-              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                {["good","bad","neutral"].map((r) => (
-                  <button key={r} style={{ ...S.btnSm(newFood.reaction === r ? S.reactionColor[r] : null), flex: 1 }}
-                    onClick={() => setNewFood({ ...newFood, reaction: r })}>
-                    {t.foods[r]}
-                  </button>
-                ))}
-              </div>
-              <label style={S.label}>{t.foods.notes}</label>
-              <textarea style={{ ...S.textarea, marginBottom: 14 }} placeholder={t.foods.notesPlaceholder}
-                value={newFood.notes} onChange={(e) => setNewFood({ ...newFood, notes: e.target.value })} />
-              <button style={S.btn} onClick={addFood}>{t.foods.add}</button>
-            </div>
-
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.foods.list}</div>
-              {foods.length === 0 ? (
-                <p style={{ color: C.creamMuted, fontSize: 13 }}>{t.foods.empty}</p>
-              ) : (
-                foods.map((f) => (
-                  <div key={f.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 0", borderBottom: "1px solid #f3f4f6" }}>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 14 }}>{f.name}</div>
-                      <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-                        <span style={S.tag(S.reactionColor[f.reaction])}>{t.foods[f.reaction]}</span>
-                        <span style={S.tag(C.creamMuted)}>{t.foods.categories[f.category]}</span>
-                      </div>
-                      {f.notes && <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 4 }}>{f.notes}</div>}
-                    </div>
-                    <button onClick={() => removeFood(f.id)} style={{ background: "none", border: "none", cursor: "pointer", color: C.creamMuted, fontSize: 20, padding: "0 4px" }}>×</button>
-                  </div>
-                ))
               )}
-            </div>
-          </>
-        )}
+            </>
+          )}
 
-        {/* ── SUPPLEMENTS ── */}
-        {tab === "supps" && (
-          <>
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.supps.title}</div>
-              <p style={{ fontSize: 13, color: C.creamMuted, marginBottom: 16 }}>{t.supps.subtitle}</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {SUPPLEMENT_OPTIONS.map((supp) => {
-                  const isActive = activeSupps.some((a) => a.key === supp.key);
-                  const suppData = activeSupps.find((a) => a.key === supp.key);
-                  return (
-                    <SupplementCard key={supp.key} supp={supp} lang={lang} isActive={isActive} suppData={suppData}
-                      onToggle={() => toggleSupp(supp.key)}
-                      onUpdate={(patch) => updateSuppData(supp.key, patch)}
-                    />
-                  );
-                })}
-
-                {/* Custom supplements */}
-                {(supps.custom || []).map((c) => {
-                  const supp = { key: c.key, icon: c.icon, es: c.name, en: c.name, note_es: "", note_en: "" };
-                  const isActive = activeSupps.some((a) => a.key === c.key);
-                  const suppData = activeSupps.find((a) => a.key === c.key);
-                  return (
-                    <SupplementCard key={c.key} supp={supp} lang={lang} isActive={isActive} suppData={suppData}
-                      onToggle={() => toggleSupp(c.key)}
-                      onUpdate={(patch) => updateSuppData(c.key, patch)}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Add custom supplement */}
-            <div style={S.card}>
-              <div style={S.cardTitle}>{t.supps.custom}</div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input style={{ ...S.input, flex: 1 }} placeholder={t.supps.customPlaceholder}
-                  value={customSuppName} onChange={(e) => setCustomSuppName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addCustomSupp()}
+          {/* ── FOODS ── */}
+          {tab === "foods" && (
+            <>
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.foods.add}</div>
+                <label style={S.label}>{t.foods.name}</label>
+                <input
+                  style={{ ...S.input, marginBottom: 10 }}
+                  placeholder={t.foods.namePlaceholder}
+                  value={newFood.name}
+                  onChange={(e) => setNewFood({ ...newFood, name: e.target.value })}
                 />
-                <button style={{ ...S.btn, width: "auto", padding: "9px 18px" }} onClick={addCustomSupp}>
-                  {t.supps.addCustom}
-                </button>
-              </div>
-            </div>
-
-            <button style={S.btn} onClick={saveSupps}>{suppsSaved ? t.supps.saved : t.supps.save}</button>
-          </>
-        )}
-
-        {/* ── CENTERS ── */}
-        {tab === "centers" && (() => {
-          const SAMPLE_CENTERS = [
-            { id:"s1", name:"Clínica Linfovascular Madrid", address:"C/ Velázquez 12, Madrid", city:"Madrid", type: lang==="es"?"Cirugía linfática":"Lymphatic surgery", specialty: lang==="es"?"Cirugía linfática · Liposucción especializada":"Lymphatic surgery · Specialist liposuction", mapsUrl:"https://maps.google.com/?q=Clinica+Linfovascular+Madrid", notes:"", verified:true, status:"approved" },
-            { id:"s2", name:"Fisioterapia Integral Barcelona", address:"Av. Diagonal 200, Barcelona", city:"Barcelona", type: lang==="es"?"Fisioterapia / DLM":"Physiotherapy / MLD", specialty: lang==="es"?"Drenaje linfático manual · Presoterapia":"Manual lymphatic drainage · Pressotherapy", mapsUrl:"https://maps.google.com/?q=Fisioterapia+Integral+Barcelona", notes:"", verified:true, status:"approved" },
-            { id:"s3", name:"Centro Dermatológico Valencia", address:"C/ Colón 5, Valencia", city:"Valencia", type: lang==="es"?"Diagnóstico":"Diagnosis", specialty: lang==="es"?"Diagnóstico · Tratamiento conservador":"Diagnosis · Conservative treatment", mapsUrl:"https://maps.google.com/?q=Centro+Dermatologico+Valencia", notes:"", verified:false, status:"approved" },
-          ];
-          const allApproved = [...SAMPLE_CENTERS, ...userCenters.filter(c => c.status === "approved")];
-          const cities = ["all", ...new Set(allApproved.map(c => c.city))];
-          const filtered = centerFilter === "all" ? allApproved : allApproved.filter(c => c.city === centerFilter);
-          const TYPES_ES = ["Fisioterapia / DLM","Cirugía linfática","Nutrición","Diagnóstico","Endocrinología","Psicología","Otro"];
-          const TYPES_EN = ["Physiotherapy / MLD","Lymphatic surgery","Nutrition","Diagnosis","Endocrinology","Psychology","Other"];
-          const TYPES = lang==="es" ? TYPES_ES : TYPES_EN;
-
-          // ── LIST VIEW ──
-          if (centersView === "list") return (
-            <>
-              {/* Header */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-                <div>
-                  <div style={{ fontSize:16, fontWeight:800, color:C.cream, letterSpacing:"-0.3px" }}>
-                    {lang==="es" ? "Centros especializados" : "Specialist centres"}
-                  </div>
-                  <div style={{ fontSize:12, color:C.creamMuted, marginTop:2 }}>
-                    {allApproved.length} {lang==="es"?"centros en el directorio":"centres in directory"}
-                    {pendingCenters.length > 0 && (
-                      <button onClick={() => setCentersView("pending")}
-                        style={{ marginLeft:8, background:"#f5ecd5", border:`1px solid ${C.accent}`, borderRadius:20, padding:"1px 8px", fontSize:10, fontWeight:700, color:C.accent, cursor:"pointer", fontFamily:"inherit" }}>
-                        {pendingCenters.length} {lang==="es"?"pendientes":"pending"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <button onClick={() => setCentersView("propose")}
-                  style={{ padding:"8px 14px", borderRadius:10, border:`1.5px solid ${C.sage}`, background:C.sage, color:"white", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:6 }}>
-                  <span>+</span> {lang==="es"?"Proponer centro":"Propose centre"}
-                </button>
-              </div>
-
-              {/* Location pill */}
-              {(profile.country || profile.region) && (
-                <div style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 12px", background:C.creamFaint, borderRadius:10, marginBottom:14, border:`1px solid ${C.border}` }}>
-                  <Icon name="mappin" size={13} color={C.sage} />
-                  <span style={{ fontSize:12, color:C.cream, fontWeight:600 }}>{[profile.region, profile.country].filter(Boolean).join(", ")}</span>
-                  <button onClick={() => setTab("profile")} style={{ marginLeft:"auto", fontSize:11, color:C.creamMuted, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>
-                    {lang==="es"?"Cambiar":"Change"}
-                  </button>
-                </div>
-              )}
-
-              {/* City filter */}
-              <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:14 }}>
-                {cities.map(city => (
-                  <button key={city} onClick={() => setCenterFilter(city)}
-                    style={{ padding:"5px 12px", borderRadius:20, border:`1.5px solid ${centerFilter===city ? C.sage : C.border}`, background: centerFilter===city ? C.creamFaint : "white", fontSize:11, fontWeight:600, color: centerFilter===city ? C.sage : C.creamMuted, cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" }}>
-                    {city === "all" ? (lang==="es"?"Todos":"All") : city}
-                  </button>
-                ))}
-              </div>
-
-              {/* Center cards */}
-              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                {filtered.map(c => (
-                  <div key={c.id} style={{ background:"white", borderRadius:14, padding:"14px 16px", border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10, marginBottom:8 }}>
-                      <div style={{ flex:1 }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:3 }}>
-                          <span style={{ fontSize:13, fontWeight:800, color:C.cream }}>{c.name}</span>
-                          {c.verified && <span style={{ fontSize:9, fontWeight:700, color:C.sage, background:C.creamFaint, padding:"2px 6px", borderRadius:20 }}>✓ {lang==="es"?"Verificado":"Verified"}</span>}
-                        </div>
-                        {c.address && <div style={{ fontSize:11, color:C.creamMuted, marginBottom:5 }}>📍 {c.address}</div>}
-                        <div style={{ fontSize:11, color:C.creamMuted, lineHeight:1.5 }}>{c.specialty}</div>
-                      </div>
-                    </div>
-                    <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
-                      <span style={{ fontSize:10, fontWeight:700, color:C.sage, background:C.creamFaint, padding:"2px 8px", borderRadius:20 }}>{c.city}</span>
-                      <span style={{ fontSize:10, fontWeight:700, color:C.accent, background:`${C.accent}15`, padding:"2px 8px", borderRadius:20 }}>{c.type}</span>
-                    </div>
-                    {c.notes && <div style={{ fontSize:11, color:C.creamMuted, fontStyle:"italic", marginBottom:10 }}>{c.notes}</div>}
-                    {/* Action buttons */}
-                    <div style={{ display:"flex", gap:8 }}>
-                      {c.mapsUrl && (
-                        <a href={c.mapsUrl} target="_blank" rel="noopener noreferrer"
-                          style={{ flex:1, padding:"8px 0", borderRadius:8, border:`1.5px solid ${C.sage}`, background:C.sage, color:"white", fontSize:11, fontWeight:700, textAlign:"center", textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center", gap:5 }}>
-                          <Icon name="mappin" size={13} color="white" />
-                          {lang==="es"?"Ver en Google Maps":"Open in Google Maps"}
-                        </a>
-                      )}
-                      {c.mapsUrl && (
-                        <a href={`${c.mapsUrl}&reviews`} target="_blank" rel="noopener noreferrer"
-                          style={{ padding:"8px 12px", borderRadius:8, border:`1.5px solid ${C.border}`, background:"white", color:C.creamMuted, fontSize:11, fontWeight:700, textAlign:"center", textDecoration:"none", display:"flex", alignItems:"center", gap:4 }}>
-                          ⭐ {lang==="es"?"Reseñas":"Reviews"}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {filtered.length === 0 && (
-                  <div style={{ textAlign:"center", padding:"30px 20px", color:C.creamMuted, fontSize:13 }}>
-                    {lang==="es"?"No hay centros en esta ciudad todavía.":"No centres in this city yet."}
-                  </div>
-                )}
-              </div>
-            </>
-          );
-
-          // ── PROPOSE VIEW ──
-          if (centersView === "propose") return (
-            <>
-              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
-                <button onClick={() => setCentersView("list")} style={{ background:"none", border:"none", cursor:"pointer", color:C.creamMuted, fontSize:18, lineHeight:1, fontFamily:"inherit" }}>←</button>
-                <div style={{ fontSize:15, fontWeight:800, color:C.cream }}>{lang==="es"?"Proponer un centro":"Propose a centre"}</div>
-              </div>
-              <div style={{ background:"#fffbe6", borderRadius:10, padding:"10px 14px", marginBottom:16, border:"1px solid #f0d060", fontSize:12, color:"#7a6020", lineHeight:1.5 }}>
-                {lang==="es"
-                  ? "Tu propuesta será revisada antes de aparecer en el directorio. Solo centros con experiencia real en lipedema serán aprobados."
-                  : "Your proposal will be reviewed before appearing in the directory. Only centres with real lipedema experience will be approved."}
-              </div>
-              <div style={S.card}>
-                {/* Name */}
-                <label style={S.label}>{lang==="es"?"Nombre del centro *":"Centre name *"}</label>
-                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"Clínica / Consulta / Centro…":"Clinic / Practice / Centre…"}
-                  value={centerForm.name} onChange={e => setCenterForm({...centerForm, name:e.target.value})} />
-                {/* City */}
-                <label style={S.label}>{lang==="es"?"Ciudad *":"City *"}</label>
-                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"Madrid, Barcelona…":"Madrid, Barcelona…"}
-                  value={centerForm.city} onChange={e => setCenterForm({...centerForm, city:e.target.value})} />
-                {/* Address */}
-                <label style={S.label}>{lang==="es"?"Dirección":"Address"}</label>
-                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"Calle, número…":"Street, number…"}
-                  value={centerForm.address} onChange={e => setCenterForm({...centerForm, address:e.target.value})} />
-                {/* Maps URL */}
-                <label style={S.label}>{lang==="es"?"Enlace a Google Maps":"Google Maps link"}</label>
-                <input style={{ ...S.input, marginBottom:4 }} placeholder="https://maps.google.com/…"
-                  value={centerForm.mapsUrl} onChange={e => setCenterForm({...centerForm, mapsUrl:e.target.value})} />
-                <div style={{ fontSize:10, color:C.creamMuted, marginBottom:12 }}>
-                  {lang==="es"?"Busca el centro en Google Maps y copia el enlace de compartir":"Search the centre in Google Maps and paste the share link"}
-                </div>
-                {/* Type */}
-                <label style={S.label}>{lang==="es"?"Tipo de especialidad":"Specialty type"}</label>
-                <select style={{ ...S.input, marginBottom:12 }} value={centerForm.type} onChange={e => setCenterForm({...centerForm, type:e.target.value})}>
-                  <option value="">{lang==="es"?"Selecciona…":"Select…"}</option>
-                  {TYPES.map(typ => <option key={typ} value={typ}>{typ}</option>)}
+                <label style={S.label}>{t.foods.category}</label>
+                <select
+                  style={{ ...S.input, marginBottom: 10 }}
+                  value={newFood.category}
+                  onChange={(e) => setNewFood({ ...newFood, category: e.target.value })}
+                >
+                  {Object.entries(t.foods.categories).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
                 </select>
-                {/* Specialty description */}
-                <label style={S.label}>{lang==="es"?"Descripción de la especialidad":"Specialty description"}</label>
-                <input style={{ ...S.input, marginBottom:12 }} placeholder={lang==="es"?"DLM, presoterapia, cirugía…":"MLD, pressotherapy, surgery…"}
-                  value={centerForm.specialty} onChange={e => setCenterForm({...centerForm, specialty:e.target.value})} />
-                {/* Notes */}
-                <label style={S.label}>{lang==="es"?"Notas adicionales":"Additional notes"}</label>
-                <textarea style={{ ...S.textarea, marginBottom:20 }} placeholder={lang==="es"?"Experiencia con lipedema, info de cita, precios orientativos…":"Lipedema experience, booking info, approximate prices…"}
-                  value={centerForm.notes} onChange={e => setCenterForm({...centerForm, notes:e.target.value})} />
-                <button onClick={saveCenterProposal}
-                  disabled={!centerForm.name.trim() || !centerForm.city.trim()}
-                  style={{ ...S.btn, opacity: (!centerForm.name.trim() || !centerForm.city.trim()) ? 0.5 : 1 }}>
-                  {lang==="es"?"Enviar propuesta":"Submit proposal"}
-                </button>
-              </div>
-            </>
-          );
-
-          // ── PENDING VIEW (admin) ──
-          if (centersView === "pending") return (
-            <>
-              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
-                <button onClick={() => setCentersView("list")} style={{ background:"none", border:"none", cursor:"pointer", color:C.creamMuted, fontSize:18, lineHeight:1, fontFamily:"inherit" }}>←</button>
-                <div style={{ fontSize:15, fontWeight:800, color:C.cream }}>
-                  {lang==="es"?"Propuestas pendientes":"Pending proposals"} ({pendingCenters.length})
-                </div>
-              </div>
-              {pendingCenters.length === 0 ? (
-                <div style={{ textAlign:"center", padding:"30px 20px", color:C.creamMuted, fontSize:13 }}>
-                  {lang==="es"?"No hay propuestas pendientes":"No pending proposals"}
-                </div>
-              ) : (
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  {pendingCenters.map(c => (
-                    <div key={c.id} style={{ background:"white", borderRadius:14, padding:"14px 16px", border:`1.5px solid ${C.accent}`, boxShadow:"0 1px 4px rgba(74,110,87,0.06)" }}>
-                      <div style={{ fontSize:10, fontWeight:700, color:C.accent, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>
-                        ⏳ {lang==="es"?"Pendiente de revisión":"Pending review"} · {new Date(c.proposedAt).toLocaleDateString()}
-                      </div>
-                      <div style={{ fontSize:13, fontWeight:800, color:C.cream, marginBottom:4 }}>{c.name}</div>
-                      <div style={{ fontSize:11, color:C.creamMuted, marginBottom:3 }}>📍 {c.address} — {c.city}</div>
-                      {c.type && <div style={{ fontSize:11, color:C.creamMuted, marginBottom:3 }}>🏥 {c.type}</div>}
-                      {c.specialty && <div style={{ fontSize:11, color:C.creamMuted, marginBottom:3 }}>{c.specialty}</div>}
-                      {c.mapsUrl && <div style={{ fontSize:11, color:C.sage, marginBottom:3, wordBreak:"break-all" }}>🗺 {c.mapsUrl}</div>}
-                      {c.notes && <div style={{ fontSize:11, color:C.creamMuted, fontStyle:"italic", marginBottom:8 }}>{c.notes}</div>}
-                      <div style={{ display:"flex", gap:8, marginTop:10 }}>
-                        <button onClick={() => approveCenter(c.id)}
-                          style={{ flex:1, padding:"8px 0", borderRadius:8, border:"none", background:C.sage, color:"white", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                          ✓ {lang==="es"?"Aprobar":"Approve"}
-                        </button>
-                        <button onClick={() => rejectCenter(c.id)}
-                          style={{ flex:1, padding:"8px 0", borderRadius:8, border:`1px solid #c06080`, background:"white", color:"#c06080", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                          ✕ {lang==="es"?"Rechazar":"Reject"}
-                        </button>
-                      </div>
-                    </div>
+                <label style={S.label}>{t.foods.reaction}</label>
+                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                  {["good", "bad", "neutral"].map((r) => (
+                    <button
+                      key={r}
+                      style={{
+                        ...S.btnSm(newFood.reaction === r ? S.reactionColor[r] : null),
+                        flex: 1,
+                      }}
+                      onClick={() => setNewFood({ ...newFood, reaction: r })}
+                    >
+                      {t.foods[r]}
+                    </button>
                   ))}
                 </div>
-              )}
+                <label style={S.label}>{t.foods.notes}</label>
+                <textarea
+                  style={{ ...S.textarea, marginBottom: 14 }}
+                  placeholder={t.foods.notesPlaceholder}
+                  value={newFood.notes}
+                  onChange={(e) => setNewFood({ ...newFood, notes: e.target.value })}
+                />
+                <button style={S.btn} onClick={addFood}>
+                  {t.foods.add}
+                </button>
+              </div>
+
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.foods.list}</div>
+                {foods.length === 0 ? (
+                  <p style={{ color: C.creamMuted, fontSize: 13 }}>{t.foods.empty}</p>
+                ) : (
+                  foods.map((f) => (
+                    <div
+                      key={f.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        padding: "10px 0",
+                        borderBottom: "1px solid #f3f4f6",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 14 }}>{f.name}</div>
+                        <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                          <span style={S.tag(S.reactionColor[f.reaction])}>
+                            {t.foods[f.reaction]}
+                          </span>
+                          <span style={S.tag(C.creamMuted)}>{t.foods.categories[f.category]}</span>
+                        </div>
+                        {f.notes && (
+                          <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 4 }}>
+                            {f.notes}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => removeFood(f.id)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: C.creamMuted,
+                          fontSize: 20,
+                          padding: "0 4px",
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </>
-          );
+          )}
 
-          return null;
-        })()}
+          {/* ── SUPPLEMENTS ── */}
+          {tab === "supps" && (
+            <>
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.supps.title}</div>
+                <p style={{ fontSize: 13, color: C.creamMuted, marginBottom: 16 }}>
+                  {t.supps.subtitle}
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {SUPPLEMENT_OPTIONS.map((supp) => {
+                    const isActive = activeSupps.some((a) => a.key === supp.key);
+                    const suppData = activeSupps.find((a) => a.key === supp.key);
+                    return (
+                      <SupplementCard
+                        key={supp.key}
+                        supp={supp}
+                        lang={lang}
+                        isActive={isActive}
+                        suppData={suppData}
+                        onToggle={() => toggleSupp(supp.key)}
+                        onUpdate={(patch) => updateSuppData(supp.key, patch)}
+                      />
+                    );
+                  })}
 
-        {/* ── INFO ── */}
-        {tab === "info" && (
-          <>
-            {/* Visual Guide shortcut */}
-            <div
-              onClick={() => setShowGuide(true)}
-              style={{ background: "linear-gradient(135deg, #fdf4ff, #f0f9ff)", borderRadius: 14, padding: "16px 18px", marginBottom: 14, border: "1.5px solid #e9d5ff", cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
-            >
-              <div style={{ fontSize: 36 }}>🩺</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, color: C.cream, marginBottom: 2 }}>
-                  {lang === "es" ? "Guía visual del lipedema" : "Visual Lipedema Guide"}
-                </div>
-                <div style={{ fontSize: 12, color: C.creamMuted }}>
-                  {lang === "es" ? "Tipos, estadios, síntomas visuales explicados con ilustraciones →" : "Types, stages, visual symptoms explained with illustrations →"}
+                  {/* Custom supplements */}
+                  {(supps.custom || []).map((c) => {
+                    const supp = {
+                      key: c.key,
+                      icon: c.icon,
+                      es: c.name,
+                      en: c.name,
+                      note_es: "",
+                      note_en: "",
+                    };
+                    const isActive = activeSupps.some((a) => a.key === c.key);
+                    const suppData = activeSupps.find((a) => a.key === c.key);
+                    return (
+                      <SupplementCard
+                        key={c.key}
+                        supp={supp}
+                        lang={lang}
+                        isActive={isActive}
+                        suppData={suppData}
+                        onToggle={() => toggleSupp(c.key)}
+                        onUpdate={(patch) => updateSuppData(c.key, patch)}
+                      />
+                    );
+                  })}
                 </div>
               </div>
-            </div>
 
-            {/* Disclaimer */}
-            <div style={{ background: "#fefce8", borderRadius: 10, padding: "10px 14px", marginBottom: 16, border: "1px solid #fde047", fontSize: 12, color: "#854d0e" }}>
-              {t.info.disclaimer}
-            </div>
+              {/* Add custom supplement */}
+              <div style={S.card}>
+                <div style={S.cardTitle}>{t.supps.custom}</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    style={{ ...S.input, flex: 1 }}
+                    placeholder={t.supps.customPlaceholder}
+                    value={customSuppName}
+                    onChange={(e) => setCustomSuppName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addCustomSupp()}
+                  />
+                  <button
+                    style={{ ...S.btn, width: "auto", padding: "9px 18px" }}
+                    onClick={addCustomSupp}
+                  >
+                    {t.supps.addCustom}
+                  </button>
+                </div>
+              </div>
 
-            {/* Language filter */}
-            <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-              {[["all", t.info.filterAll], ["es", t.info.filterEs], ["en", t.info.filterEn]].map(([val, label]) => (
-                <button key={val} onClick={() => setInfoFilter(val)}
-                  style={{ padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, background: infoFilter === val ? C.sage : C.creamFaint, color: infoFilter === val ? "#fff" : C.creamMuted, transition: "all 0.2s" }}>
-                  {label}
-                </button>
-              ))}
-            </div>
+              <button style={S.btn} onClick={saveSupps}>
+                {suppsSaved ? t.supps.saved : t.supps.save}
+              </button>
+            </>
+          )}
 
-            {/* Sections */}
-            {Object.entries(INFO_RESOURCES).map(([sectionKey, section]) => {
-              const sectionName = lang === "es" ? section.es : section.en;
-              const filtered = section.items.filter(item =>
-                infoFilter === "all" ? true : item.lang === infoFilter
-              );
-              if (filtered.length === 0) return null;
-              return (
-                <div key={sectionKey} style={S.card}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                    <span style={{ fontSize: 20 }}>{section.icon}</span>
-                    <div style={S.cardTitle}>{sectionName}</div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {filtered.map((item, i) => {
-                      const desc = lang === "es" ? item.desc_es : item.desc_en;
-                      const typeLabel = t.info.tagTypes[item.type] || item.type;
-                      const langColor = item.lang === "es" ? "#6366f1" : "#0ea5e9";
-                      const typeColors = {
-                        review: "#8b5cf6", guideline: "#ef4444", research: "#f97316",
-                        guide: "#22c55e", clinical: "#14b8a6", association: "#6366f1",
-                        forum: "#f59e0b", influencer: "#ec4899", article: "#64748b", platform: "#0ea5e9",
-                      };
-                      return (
-                        <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
-                          style={{ display: "block", textDecoration: "none", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, background: C.bgInput, transition: "border-color 0.2s, background 0.2s" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = C.sage; e.currentTarget.style.background = C.bgCardHov; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bgInput; }}
+          {/* ── CENTERS ── */}
+          {tab === "centers" &&
+            (() => {
+              const SAMPLE_CENTERS = [
+                {
+                  id: "s1",
+                  name: "Clínica Linfovascular Madrid",
+                  address: "C/ Velázquez 12, Madrid",
+                  city: "Madrid",
+                  type: lang === "es" ? "Cirugía linfática" : "Lymphatic surgery",
+                  specialty:
+                    lang === "es"
+                      ? "Cirugía linfática · Liposucción especializada"
+                      : "Lymphatic surgery · Specialist liposuction",
+                  mapsUrl: "https://maps.google.com/?q=Clinica+Linfovascular+Madrid",
+                  notes: "",
+                  verified: true,
+                  status: "approved",
+                },
+                {
+                  id: "s2",
+                  name: "Fisioterapia Integral Barcelona",
+                  address: "Av. Diagonal 200, Barcelona",
+                  city: "Barcelona",
+                  type: lang === "es" ? "Fisioterapia / DLM" : "Physiotherapy / MLD",
+                  specialty:
+                    lang === "es"
+                      ? "Drenaje linfático manual · Presoterapia"
+                      : "Manual lymphatic drainage · Pressotherapy",
+                  mapsUrl: "https://maps.google.com/?q=Fisioterapia+Integral+Barcelona",
+                  notes: "",
+                  verified: true,
+                  status: "approved",
+                },
+                {
+                  id: "s3",
+                  name: "Centro Dermatológico Valencia",
+                  address: "C/ Colón 5, Valencia",
+                  city: "Valencia",
+                  type: lang === "es" ? "Diagnóstico" : "Diagnosis",
+                  specialty:
+                    lang === "es"
+                      ? "Diagnóstico · Tratamiento conservador"
+                      : "Diagnosis · Conservative treatment",
+                  mapsUrl: "https://maps.google.com/?q=Centro+Dermatologico+Valencia",
+                  notes: "",
+                  verified: false,
+                  status: "approved",
+                },
+              ];
+              const allApproved = [
+                ...SAMPLE_CENTERS,
+                ...userCenters.filter((c) => c.status === "approved"),
+              ];
+              const cities = ["all", ...new Set(allApproved.map((c) => c.city))];
+              const filtered =
+                centerFilter === "all"
+                  ? allApproved
+                  : allApproved.filter((c) => c.city === centerFilter);
+              const TYPES_ES = [
+                "Fisioterapia / DLM",
+                "Cirugía linfática",
+                "Nutrición",
+                "Diagnóstico",
+                "Endocrinología",
+                "Psicología",
+                "Otro",
+              ];
+              const TYPES_EN = [
+                "Physiotherapy / MLD",
+                "Lymphatic surgery",
+                "Nutrition",
+                "Diagnosis",
+                "Endocrinology",
+                "Psychology",
+                "Other",
+              ];
+              const TYPES = lang === "es" ? TYPES_ES : TYPES_EN;
+
+              // ── LIST VIEW ──
+              if (centersView === "list")
+                return (
+                  <>
+                    {/* Header */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 16,
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            fontSize: 16,
+                            fontWeight: 800,
+                            color: C.cream,
+                            letterSpacing: "-0.3px",
+                          }}
                         >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                          {lang === "es" ? "Centros especializados" : "Specialist centres"}
+                        </div>
+                        <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 2 }}>
+                          {allApproved.length}{" "}
+                          {lang === "es" ? "centros en el directorio" : "centres in directory"}
+                          {pendingCenters.length > 0 && (
+                            <button
+                              onClick={() => setCentersView("pending")}
+                              style={{
+                                marginLeft: 8,
+                                background: "#f5ecd5",
+                                border: `1px solid ${C.accent}`,
+                                borderRadius: 20,
+                                padding: "1px 8px",
+                                fontSize: 10,
+                                fontWeight: 700,
+                                color: C.accent,
+                                cursor: "pointer",
+                                fontFamily: "inherit",
+                              }}
+                            >
+                              {pendingCenters.length} {lang === "es" ? "pendientes" : "pending"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setCentersView("propose")}
+                        style={{
+                          padding: "8px 14px",
+                          borderRadius: 10,
+                          border: `1.5px solid ${C.sage}`,
+                          background: C.sage,
+                          color: "white",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                        }}
+                      >
+                        <span>+</span> {lang === "es" ? "Proponer centro" : "Propose centre"}
+                      </button>
+                    </div>
+
+                    {/* Location pill */}
+                    {(profile.country || profile.region) && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          padding: "8px 12px",
+                          background: C.creamFaint,
+                          borderRadius: 10,
+                          marginBottom: 14,
+                          border: `1px solid ${C.border}`,
+                        }}
+                      >
+                        <Icon name="mappin" size={13} color={C.sage} />
+                        <span style={{ fontSize: 12, color: C.cream, fontWeight: 600 }}>
+                          {[profile.region, profile.country].filter(Boolean).join(", ")}
+                        </span>
+                        <button
+                          onClick={() => setTab("profile")}
+                          style={{
+                            marginLeft: "auto",
+                            fontSize: 11,
+                            color: C.creamMuted,
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                          }}
+                        >
+                          {lang === "es" ? "Cambiar" : "Change"}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* City filter */}
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                      {cities.map((city) => (
+                        <button
+                          key={city}
+                          onClick={() => setCenterFilter(city)}
+                          style={{
+                            padding: "5px 12px",
+                            borderRadius: 20,
+                            border: `1.5px solid ${centerFilter === city ? C.sage : C.border}`,
+                            background: centerFilter === city ? C.creamFaint : "white",
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: centerFilter === city ? C.sage : C.creamMuted,
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            transition: "all 0.15s",
+                          }}
+                        >
+                          {city === "all" ? (lang === "es" ? "Todos" : "All") : city}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Center cards */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {filtered.map((c) => (
+                        <div
+                          key={c.id}
+                          style={{
+                            background: "white",
+                            borderRadius: 14,
+                            padding: "14px 16px",
+                            border: `1px solid ${C.border}`,
+                            boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              gap: 10,
+                              marginBottom: 8,
+                            }}
+                          >
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: C.cream, marginBottom: 3, lineHeight: 1.4 }}>
-                                {item.platform && <span style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}>{item.platform}</span>}
-                                {item.title}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 6,
+                                  flexWrap: "wrap",
+                                  marginBottom: 3,
+                                }}
+                              >
+                                <span style={{ fontSize: 13, fontWeight: 800, color: C.cream }}>
+                                  {c.name}
+                                </span>
+                                {c.verified && (
+                                  <span
+                                    style={{
+                                      fontSize: 9,
+                                      fontWeight: 700,
+                                      color: C.sage,
+                                      background: C.creamFaint,
+                                      padding: "2px 6px",
+                                      borderRadius: 20,
+                                    }}
+                                  >
+                                    ✓ {lang === "es" ? "Verificado" : "Verified"}
+                                  </span>
+                                )}
                               </div>
-                              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 6 }}>{item.authors}{item.year ? ` · ${item.year}` : ""}</div>
-                              <div style={{ fontSize: 12, color: C.cream, lineHeight: 1.5 }}>{desc}</div>
+                              {c.address && (
+                                <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 5 }}>
+                                  📍 {c.address}
+                                </div>
+                              )}
+                              <div style={{ fontSize: 11, color: C.creamMuted, lineHeight: 1.5 }}>
+                                {c.specialty}
+                              </div>
                             </div>
-                            <span style={{ fontSize: 14, color: C.creamMuted, flexShrink: 0, marginTop: 2 }}>↗</span>
                           </div>
-                          <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: langColor + "18", color: langColor }}>
-                              {item.lang === "es" ? "ES" : "EN"}
+                          <div
+                            style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}
+                          >
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                color: C.sage,
+                                background: C.creamFaint,
+                                padding: "2px 8px",
+                                borderRadius: 20,
+                              }}
+                            >
+                              {c.city}
                             </span>
-                            <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (typeColors[item.type] || C.creamMuted) + "28", color: typeColors[item.type] || C.creamMuted }}>
-                              {typeLabel}
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                color: C.accent,
+                                background: `${C.accent}15`,
+                                padding: "2px 8px",
+                                borderRadius: 20,
+                              }}
+                            >
+                              {c.type}
                             </span>
                           </div>
-                        </a>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </>
-        )}
-
-        {/* ── PROFILE ── */}
-        {tab === "profile" && (
-          <div style={S.card}>
-            <div style={S.cardTitle}>{t.profile.title}</div>
-            <label style={S.label}>{t.profile.name}</label>
-            <input style={{ ...S.input, marginBottom: 12 }} value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
-            <label style={S.label}>{t.profile.stage}</label>
-            <select style={{ ...S.input, marginBottom: 12 }} value={profile.stage} onChange={(e) => setProfile({ ...profile, stage: e.target.value })}>
-              {Object.entries(t.profile.stages).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
-            <label style={S.label}>{t.profile.diagnosis}</label>
-            <input style={{ ...S.input, marginBottom: 16 }} type="date" value={profile.diagnosis} onChange={(e) => setProfile({ ...profile, diagnosis: e.target.value })} />
-            <label style={S.label}>{lang === "es" ? "País" : "Country"}</label>
-            <input style={{ ...S.input, marginBottom: 8 }} placeholder={lang === "es" ? "España, México…" : "Spain, Mexico…"} value={profile.country || ""} onChange={(e) => setProfile({ ...profile, country: e.target.value })} />
-            <label style={S.label}>{lang === "es" ? "Provincia / Ciudad" : "Region / City"}</label>
-            <input style={{ ...S.input, marginBottom: 16 }} placeholder={lang === "es" ? "Madrid, Barcelona…" : "Madrid, Barcelona…"} value={profile.region || ""} onChange={(e) => setProfile({ ...profile, region: e.target.value })} />
-
-            {/* Pill / contraceptive */}
-            <label style={S.label}>{lang === "es" ? "Anticonceptivo hormonal (píldora)" : "Hormonal contraceptive (pill)"}</label>
-            <div style={{ display:"flex", gap:8, marginBottom:10 }}>
-              {[
-                { val:true,  label: lang==="es" ? "Sí, la tomo" : "Yes, I take it" },
-                { val:false, label: lang==="es" ? "No la tomo"  : "No, I don't"    },
-              ].map(o => (
-                <button key={String(o.val)}
-                  onClick={() => setProfile({ ...profile, pillActive: o.val })}
-                  style={{ flex:1, padding:"9px 12px", borderRadius:10, border:`1.5px solid ${profile.pillActive === o.val ? C.sage : C.border}`, background: profile.pillActive === o.val ? C.creamFaint : "white", fontSize:12, fontWeight:700, color: profile.pillActive === o.val ? C.sage : C.creamMuted, cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" }}>
-                  {o.label}
-                </button>
-              ))}
-            </div>
-            {profile.pillActive && (
-              <>
-                <label style={S.label}>{lang === "es" ? "Marca o nombre comercial" : "Brand or commercial name"}</label>
-                <input style={{ ...S.input, marginBottom: 16 }}
-                  placeholder={lang === "es" ? "Ej: Yasmin, Diane 35, Loette…" : "e.g. Yasmin, Microgynon, Cilest…"}
-                  value={profile.pillBrand || ""}
-                  onChange={(e) => setProfile({ ...profile, pillBrand: e.target.value })} />
-              </>
-            )}
-
-            <label style={S.label}>{t.profile.intolerances}</label>
-            <div style={{ fontSize:12, color:C.creamMuted, marginBottom:10 }}>{t.profile.intolerancesHint}</div>
-            <div style={S.grid2}>
-              {ALLERGENS.map((a) => {
-                const sel = (profile.intolerances || []).includes(a.key);
-                return (
-                  <div key={a.key} onClick={() => {
-                    const cur = profile.intolerances || [];
-                    const updated = sel ? cur.filter((x) => x !== a.key) : [...cur, a.key];
-                    setProfile({ ...profile, intolerances: updated });
-                  }}
-                    style={{ padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${sel ? C.sage : C.border}`, cursor: "pointer", fontSize: 13, fontWeight: sel ? 700 : 400, color: sel ? C.sageLight : C.creamMuted, background: sel ? C.creamFaint : C.bgInput, transition: "all 0.2s" }}>
-                    {a.icon} {sel ? "✓ " : ""}{lang === "es" ? a.es : a.en}
-                  </div>
+                          {c.notes && (
+                            <div
+                              style={{
+                                fontSize: 11,
+                                color: C.creamMuted,
+                                fontStyle: "italic",
+                                marginBottom: 10,
+                              }}
+                            >
+                              {c.notes}
+                            </div>
+                          )}
+                          {/* Action buttons */}
+                          <div style={{ display: "flex", gap: 8 }}>
+                            {c.mapsUrl && (
+                              <a
+                                href={c.mapsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  flex: 1,
+                                  padding: "8px 0",
+                                  borderRadius: 8,
+                                  border: `1.5px solid ${C.sage}`,
+                                  background: C.sage,
+                                  color: "white",
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  textAlign: "center",
+                                  textDecoration: "none",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  gap: 5,
+                                }}
+                              >
+                                <Icon name="mappin" size={13} color="white" />
+                                {lang === "es" ? "Ver en Google Maps" : "Open in Google Maps"}
+                              </a>
+                            )}
+                            {c.mapsUrl && (
+                              <a
+                                href={`${c.mapsUrl}&reviews`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  padding: "8px 12px",
+                                  borderRadius: 8,
+                                  border: `1.5px solid ${C.border}`,
+                                  background: "white",
+                                  color: C.creamMuted,
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  textAlign: "center",
+                                  textDecoration: "none",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 4,
+                                }}
+                              >
+                                ⭐ {lang === "es" ? "Reseñas" : "Reviews"}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {filtered.length === 0 && (
+                        <div
+                          style={{
+                            textAlign: "center",
+                            padding: "30px 20px",
+                            color: C.creamMuted,
+                            fontSize: 13,
+                          }}
+                        >
+                          {lang === "es"
+                            ? "No hay centros en esta ciudad todavía."
+                            : "No centres in this city yet."}
+                        </div>
+                      )}
+                    </div>
+                  </>
                 );
-              })}
-            </div>
 
-            <label style={{ ...S.label, marginTop: 16 }}>{t.profile.activeZones}</label>
-            <div style={S.grid2}>
-              {ALL_ZONES.map((z) => {
-                const active = activeZones.includes(z);
+              // ── PROPOSE VIEW ──
+              if (centersView === "propose")
                 return (
-                  <div key={z} onClick={() => {
-                    const updated = active ? activeZones.filter((x) => x !== z) : [...activeZones, z];
-                    setProfile({ ...profile, activeZones: updated });
-                  }}
-                    style={{ padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${active ? C.sage : C.border}`, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 400, color: active ? C.sageLight : C.creamMuted, background: active ? C.creamFaint : C.bgInput, transition: "all 0.2s" }}>
-                    {active ? "✓ " : ""}{t.today.zoneNames[z] || z}
-                  </div>
+                  <>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}
+                    >
+                      <button
+                        onClick={() => setCentersView("list")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: C.creamMuted,
+                          fontSize: 18,
+                          lineHeight: 1,
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        ←
+                      </button>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: C.cream }}>
+                        {lang === "es" ? "Proponer un centro" : "Propose a centre"}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#fffbe6",
+                        borderRadius: 10,
+                        padding: "10px 14px",
+                        marginBottom: 16,
+                        border: "1px solid #f0d060",
+                        fontSize: 12,
+                        color: "#7a6020",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {lang === "es"
+                        ? "Tu propuesta será revisada antes de aparecer en el directorio. Solo centros con experiencia real en lipedema serán aprobados."
+                        : "Your proposal will be reviewed before appearing in the directory. Only centres with real lipedema experience will be approved."}
+                    </div>
+                    <div style={S.card}>
+                      {/* Name */}
+                      <label style={S.label}>
+                        {lang === "es" ? "Nombre del centro *" : "Centre name *"}
+                      </label>
+                      <input
+                        style={{ ...S.input, marginBottom: 12 }}
+                        placeholder={
+                          lang === "es"
+                            ? "Clínica / Consulta / Centro…"
+                            : "Clinic / Practice / Centre…"
+                        }
+                        value={centerForm.name}
+                        onChange={(e) => setCenterForm({ ...centerForm, name: e.target.value })}
+                      />
+                      {/* City */}
+                      <label style={S.label}>{lang === "es" ? "Ciudad *" : "City *"}</label>
+                      <input
+                        style={{ ...S.input, marginBottom: 12 }}
+                        placeholder={lang === "es" ? "Madrid, Barcelona…" : "Madrid, Barcelona…"}
+                        value={centerForm.city}
+                        onChange={(e) => setCenterForm({ ...centerForm, city: e.target.value })}
+                      />
+                      {/* Address */}
+                      <label style={S.label}>{lang === "es" ? "Dirección" : "Address"}</label>
+                      <input
+                        style={{ ...S.input, marginBottom: 12 }}
+                        placeholder={lang === "es" ? "Calle, número…" : "Street, number…"}
+                        value={centerForm.address}
+                        onChange={(e) => setCenterForm({ ...centerForm, address: e.target.value })}
+                      />
+                      {/* Maps URL */}
+                      <label style={S.label}>
+                        {lang === "es" ? "Enlace a Google Maps" : "Google Maps link"}
+                      </label>
+                      <input
+                        style={{ ...S.input, marginBottom: 4 }}
+                        placeholder="https://maps.google.com/…"
+                        value={centerForm.mapsUrl}
+                        onChange={(e) => setCenterForm({ ...centerForm, mapsUrl: e.target.value })}
+                      />
+                      <div style={{ fontSize: 10, color: C.creamMuted, marginBottom: 12 }}>
+                        {lang === "es"
+                          ? "Busca el centro en Google Maps y copia el enlace de compartir"
+                          : "Search the centre in Google Maps and paste the share link"}
+                      </div>
+                      {/* Type */}
+                      <label style={S.label}>
+                        {lang === "es" ? "Tipo de especialidad" : "Specialty type"}
+                      </label>
+                      <select
+                        style={{ ...S.input, marginBottom: 12 }}
+                        value={centerForm.type}
+                        onChange={(e) => setCenterForm({ ...centerForm, type: e.target.value })}
+                      >
+                        <option value="">{lang === "es" ? "Selecciona…" : "Select…"}</option>
+                        {TYPES.map((typ) => (
+                          <option key={typ} value={typ}>
+                            {typ}
+                          </option>
+                        ))}
+                      </select>
+                      {/* Specialty description */}
+                      <label style={S.label}>
+                        {lang === "es" ? "Descripción de la especialidad" : "Specialty description"}
+                      </label>
+                      <input
+                        style={{ ...S.input, marginBottom: 12 }}
+                        placeholder={
+                          lang === "es"
+                            ? "DLM, presoterapia, cirugía…"
+                            : "MLD, pressotherapy, surgery…"
+                        }
+                        value={centerForm.specialty}
+                        onChange={(e) =>
+                          setCenterForm({ ...centerForm, specialty: e.target.value })
+                        }
+                      />
+                      {/* Notes */}
+                      <label style={S.label}>
+                        {lang === "es" ? "Notas adicionales" : "Additional notes"}
+                      </label>
+                      <textarea
+                        style={{ ...S.textarea, marginBottom: 20 }}
+                        placeholder={
+                          lang === "es"
+                            ? "Experiencia con lipedema, info de cita, precios orientativos…"
+                            : "Lipedema experience, booking info, approximate prices…"
+                        }
+                        value={centerForm.notes}
+                        onChange={(e) => setCenterForm({ ...centerForm, notes: e.target.value })}
+                      />
+                      <button
+                        onClick={saveCenterProposal}
+                        disabled={!centerForm.name.trim() || !centerForm.city.trim()}
+                        style={{
+                          ...S.btn,
+                          opacity: !centerForm.name.trim() || !centerForm.city.trim() ? 0.5 : 1,
+                        }}
+                      >
+                        {lang === "es" ? "Enviar propuesta" : "Submit proposal"}
+                      </button>
+                    </div>
+                  </>
                 );
-              })}
-            </div>
-            {(() => {
-              const hasArms = activeZones.some(z => z.includes("Arm"));
-              const hasLegs = activeZones.some(z =>
-                ["leftThigh","rightThigh","leftCalf","rightCalf","ankles","hips"].includes(z));
-              if (hasArms && hasLegs) return (
-                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5, display:"flex", alignItems:"flex-start", gap:6 }}>
-                  <Icon name="lightbulb" size={14} color={C.sage} />
-                  <span>{lang==="es"
-                    ? "Tipo combinado (Brazos + Piernas) — El lipedema puede afectar extremidades superiores e inferiores simultáneamente. Cada zona puede progresar de forma diferente y requerir compresión y tratamiento específicos."
-                    : "Combined type (Arms + Legs) — Lipedema can affect upper and lower limbs simultaneously. Each area may progress differently and require specific compression and treatment."}</span>
-                </div>
-              );
-              if (hasArms) return (
-                <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:C.creamFaint, border:`1px solid ${C.border}`, fontSize:12, color:C.cream, lineHeight:1.5, display:"flex", alignItems:"flex-start", gap:6 }}>
-                  <Icon name="lightbulb" size={14} color={C.sage} />
-                  <span>{lang==="es"
-                    ? "Tipo 4 (Brazos) — El lipedema en brazos suele afectar del hombro al codo. Puede presentarse solo o junto con afectación en piernas."
-                    : "Type 4 (Arms) — Arm lipedema typically affects shoulder to elbow. It can occur alone or alongside leg involvement."}</span>
-                </div>
-              );
+
+              // ── PENDING VIEW (admin) ──
+              if (centersView === "pending")
+                return (
+                  <>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}
+                    >
+                      <button
+                        onClick={() => setCentersView("list")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: C.creamMuted,
+                          fontSize: 18,
+                          lineHeight: 1,
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        ←
+                      </button>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: C.cream }}>
+                        {lang === "es" ? "Propuestas pendientes" : "Pending proposals"} (
+                        {pendingCenters.length})
+                      </div>
+                    </div>
+                    {pendingCenters.length === 0 ? (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "30px 20px",
+                          color: C.creamMuted,
+                          fontSize: 13,
+                        }}
+                      >
+                        {lang === "es" ? "No hay propuestas pendientes" : "No pending proposals"}
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {pendingCenters.map((c) => (
+                          <div
+                            key={c.id}
+                            style={{
+                              background: "white",
+                              borderRadius: 14,
+                              padding: "14px 16px",
+                              border: `1.5px solid ${C.accent}`,
+                              boxShadow: "0 1px 4px rgba(74,110,87,0.06)",
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                color: C.accent,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                                marginBottom: 8,
+                              }}
+                            >
+                              ⏳ {lang === "es" ? "Pendiente de revisión" : "Pending review"} ·{" "}
+                              {new Date(c.proposedAt).toLocaleDateString()}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 800,
+                                color: C.cream,
+                                marginBottom: 4,
+                              }}
+                            >
+                              {c.name}
+                            </div>
+                            <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>
+                              📍 {c.address} — {c.city}
+                            </div>
+                            {c.type && (
+                              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>
+                                🏥 {c.type}
+                              </div>
+                            )}
+                            {c.specialty && (
+                              <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 3 }}>
+                                {c.specialty}
+                              </div>
+                            )}
+                            {c.mapsUrl && (
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: C.sage,
+                                  marginBottom: 3,
+                                  wordBreak: "break-all",
+                                }}
+                              >
+                                🗺 {c.mapsUrl}
+                              </div>
+                            )}
+                            {c.notes && (
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: C.creamMuted,
+                                  fontStyle: "italic",
+                                  marginBottom: 8,
+                                }}
+                              >
+                                {c.notes}
+                              </div>
+                            )}
+                            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                              <button
+                                onClick={() => approveCenter(c.id)}
+                                style={{
+                                  flex: 1,
+                                  padding: "8px 0",
+                                  borderRadius: 8,
+                                  border: "none",
+                                  background: C.sage,
+                                  color: "white",
+                                  fontSize: 12,
+                                  fontWeight: 700,
+                                  cursor: "pointer",
+                                  fontFamily: "inherit",
+                                }}
+                              >
+                                ✓ {lang === "es" ? "Aprobar" : "Approve"}
+                              </button>
+                              <button
+                                onClick={() => rejectCenter(c.id)}
+                                style={{
+                                  flex: 1,
+                                  padding: "8px 0",
+                                  borderRadius: 8,
+                                  border: `1px solid #c06080`,
+                                  background: "white",
+                                  color: "#c06080",
+                                  fontSize: 12,
+                                  fontWeight: 700,
+                                  cursor: "pointer",
+                                  fontFamily: "inherit",
+                                }}
+                              >
+                                ✕ {lang === "es" ? "Rechazar" : "Reject"}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+
               return null;
             })()}
-            <button style={{ ...S.btn, marginTop: 20 }} onClick={saveProfile}>
-              {profileSaved ? t.profile.saved : t.profile.save}
-            </button>
-          </div>
-        )}
 
+          {/* ── INFO ── */}
+          {tab === "info" && (
+            <>
+              {/* Visual Guide shortcut */}
+              <div
+                onClick={() => setShowGuide(true)}
+                style={{
+                  background: "linear-gradient(135deg, #fdf4ff, #f0f9ff)",
+                  borderRadius: 14,
+                  padding: "16px 18px",
+                  marginBottom: 14,
+                  border: "1.5px solid #e9d5ff",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                }}
+              >
+                <div style={{ fontSize: 36 }}>🩺</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: C.cream, marginBottom: 2 }}>
+                    {lang === "es" ? "Guía visual del lipedema" : "Visual Lipedema Guide"}
+                  </div>
+                  <div style={{ fontSize: 12, color: C.creamMuted }}>
+                    {lang === "es"
+                      ? "Tipos, estadios, síntomas visuales explicados con ilustraciones →"
+                      : "Types, stages, visual symptoms explained with illustrations →"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Disclaimer */}
+              <div
+                style={{
+                  background: "#fefce8",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  marginBottom: 16,
+                  border: "1px solid #fde047",
+                  fontSize: 12,
+                  color: "#854d0e",
+                }}
+              >
+                {t.info.disclaimer}
+              </div>
+
+              {/* Language filter */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+                {[
+                  ["all", t.info.filterAll],
+                  ["es", t.info.filterEs],
+                  ["en", t.info.filterEn],
+                ].map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setInfoFilter(val)}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 8,
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: infoFilter === val ? C.sage : C.creamFaint,
+                      color: infoFilter === val ? "#fff" : C.creamMuted,
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Sections */}
+              {Object.entries(INFO_RESOURCES).map(([sectionKey, section]) => {
+                const sectionName = lang === "es" ? section.es : section.en;
+                const filtered = section.items.filter((item) =>
+                  infoFilter === "all" ? true : item.lang === infoFilter
+                );
+                if (filtered.length === 0) return null;
+                return (
+                  <div key={sectionKey} style={S.card}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}
+                    >
+                      <span style={{ fontSize: 20 }}>{section.icon}</span>
+                      <div style={S.cardTitle}>{sectionName}</div>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {filtered.map((item, i) => {
+                        const desc = lang === "es" ? item.desc_es : item.desc_en;
+                        const typeLabel = t.info.tagTypes[item.type] || item.type;
+                        const langColor = item.lang === "es" ? "#6366f1" : "#0ea5e9";
+                        const typeColors = {
+                          review: "#8b5cf6",
+                          guideline: "#ef4444",
+                          research: "#f97316",
+                          guide: "#22c55e",
+                          clinical: "#14b8a6",
+                          association: "#6366f1",
+                          forum: "#f59e0b",
+                          influencer: "#ec4899",
+                          article: "#64748b",
+                          platform: "#0ea5e9",
+                        };
+                        return (
+                          <a
+                            key={i}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "block",
+                              textDecoration: "none",
+                              padding: "12px 14px",
+                              borderRadius: 10,
+                              border: `1.5px solid ${C.border}`,
+                              background: C.bgInput,
+                              transition: "border-color 0.2s, background 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = C.sage;
+                              e.currentTarget.style.background = C.bgCardHov;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = C.border;
+                              e.currentTarget.style.background = C.bgInput;
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                gap: 8,
+                              }}
+                            >
+                              <div style={{ flex: 1 }}>
+                                <div
+                                  style={{
+                                    fontWeight: 700,
+                                    fontSize: 13,
+                                    color: C.cream,
+                                    marginBottom: 3,
+                                    lineHeight: 1.4,
+                                  }}
+                                >
+                                  {item.platform && (
+                                    <span
+                                      style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}
+                                    >
+                                      {item.platform}
+                                    </span>
+                                  )}
+                                  {item.title}
+                                </div>
+                                <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 6 }}>
+                                  {item.authors}
+                                  {item.year ? ` · ${item.year}` : ""}
+                                </div>
+                                <div style={{ fontSize: 12, color: C.cream, lineHeight: 1.5 }}>
+                                  {desc}
+                                </div>
+                              </div>
+                              <span
+                                style={{
+                                  fontSize: 14,
+                                  color: C.creamMuted,
+                                  flexShrink: 0,
+                                  marginTop: 2,
+                                }}
+                              >
+                                ↗
+                              </span>
+                            </div>
+                            <div
+                              style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}
+                            >
+                              <span
+                                style={{
+                                  padding: "2px 7px",
+                                  borderRadius: 20,
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  background: langColor + "18",
+                                  color: langColor,
+                                }}
+                              >
+                                {item.lang === "es" ? "ES" : "EN"}
+                              </span>
+                              <span
+                                style={{
+                                  padding: "2px 7px",
+                                  borderRadius: 20,
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  background: (typeColors[item.type] || C.creamMuted) + "28",
+                                  color: typeColors[item.type] || C.creamMuted,
+                                }}
+                              >
+                                {typeLabel}
+                              </span>
+                            </div>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
+
+          {/* ── PROFILE ── */}
+          {tab === "profile" && (
+            <div style={S.card}>
+              <div style={S.cardTitle}>{t.profile.title}</div>
+              <label style={S.label}>{t.profile.name}</label>
+              <input
+                style={{ ...S.input, marginBottom: 12 }}
+                value={profile.name}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+              />
+              <label style={S.label}>{t.profile.stage}</label>
+              <select
+                style={{ ...S.input, marginBottom: 12 }}
+                value={profile.stage}
+                onChange={(e) => setProfile({ ...profile, stage: e.target.value })}
+              >
+                {Object.entries(t.profile.stages).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+              <label style={S.label}>{t.profile.diagnosis}</label>
+              <input
+                style={{ ...S.input, marginBottom: 16 }}
+                type="date"
+                value={profile.diagnosis}
+                onChange={(e) => setProfile({ ...profile, diagnosis: e.target.value })}
+              />
+              <label style={S.label}>{lang === "es" ? "País" : "Country"}</label>
+              <input
+                style={{ ...S.input, marginBottom: 8 }}
+                placeholder={lang === "es" ? "España, México…" : "Spain, Mexico…"}
+                value={profile.country || ""}
+                onChange={(e) => setProfile({ ...profile, country: e.target.value })}
+              />
+              <label style={S.label}>
+                {lang === "es" ? "Provincia / Ciudad" : "Region / City"}
+              </label>
+              <input
+                style={{ ...S.input, marginBottom: 16 }}
+                placeholder={lang === "es" ? "Madrid, Barcelona…" : "Madrid, Barcelona…"}
+                value={profile.region || ""}
+                onChange={(e) => setProfile({ ...profile, region: e.target.value })}
+              />
+
+              {/* Pill / contraceptive */}
+              <label style={S.label}>
+                {lang === "es"
+                  ? "Anticonceptivo hormonal (píldora)"
+                  : "Hormonal contraceptive (pill)"}
+              </label>
+              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                {[
+                  { val: true, label: lang === "es" ? "Sí, la tomo" : "Yes, I take it" },
+                  { val: false, label: lang === "es" ? "No la tomo" : "No, I don't" },
+                ].map((o) => (
+                  <button
+                    key={String(o.val)}
+                    onClick={() => setProfile({ ...profile, pillActive: o.val })}
+                    style={{
+                      flex: 1,
+                      padding: "9px 12px",
+                      borderRadius: 10,
+                      border: `1.5px solid ${profile.pillActive === o.val ? C.sage : C.border}`,
+                      background: profile.pillActive === o.val ? C.creamFaint : "white",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: profile.pillActive === o.val ? C.sage : C.creamMuted,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+              {profile.pillActive && (
+                <>
+                  <label style={S.label}>
+                    {lang === "es" ? "Marca o nombre comercial" : "Brand or commercial name"}
+                  </label>
+                  <input
+                    style={{ ...S.input, marginBottom: 16 }}
+                    placeholder={
+                      lang === "es"
+                        ? "Ej: Yasmin, Diane 35, Loette…"
+                        : "e.g. Yasmin, Microgynon, Cilest…"
+                    }
+                    value={profile.pillBrand || ""}
+                    onChange={(e) => setProfile({ ...profile, pillBrand: e.target.value })}
+                  />
+                </>
+              )}
+
+              <label style={S.label}>{t.profile.intolerances}</label>
+              <div style={{ fontSize: 12, color: C.creamMuted, marginBottom: 10 }}>
+                {t.profile.intolerancesHint}
+              </div>
+              <div style={S.grid2}>
+                {ALLERGENS.map((a) => {
+                  const sel = (profile.intolerances || []).includes(a.key);
+                  return (
+                    <div
+                      key={a.key}
+                      onClick={() => {
+                        const cur = profile.intolerances || [];
+                        const updated = sel ? cur.filter((x) => x !== a.key) : [...cur, a.key];
+                        setProfile({ ...profile, intolerances: updated });
+                      }}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: `1.5px solid ${sel ? C.sage : C.border}`,
+                        cursor: "pointer",
+                        fontSize: 13,
+                        fontWeight: sel ? 700 : 400,
+                        color: sel ? C.sageLight : C.creamMuted,
+                        background: sel ? C.creamFaint : C.bgInput,
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {a.icon} {sel ? "✓ " : ""}
+                      {lang === "es" ? a.es : a.en}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <label style={{ ...S.label, marginTop: 16 }}>{t.profile.activeZones}</label>
+              <div style={S.grid2}>
+                {ALL_ZONES.map((z) => {
+                  const active = activeZones.includes(z);
+                  return (
+                    <div
+                      key={z}
+                      onClick={() => {
+                        const updated = active
+                          ? activeZones.filter((x) => x !== z)
+                          : [...activeZones, z];
+                        setProfile({ ...profile, activeZones: updated });
+                      }}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: `1.5px solid ${active ? C.sage : C.border}`,
+                        cursor: "pointer",
+                        fontSize: 13,
+                        fontWeight: active ? 700 : 400,
+                        color: active ? C.sageLight : C.creamMuted,
+                        background: active ? C.creamFaint : C.bgInput,
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {active ? "✓ " : ""}
+                      {t.today.zoneNames[z] || z}
+                    </div>
+                  );
+                })}
+              </div>
+              {(() => {
+                const hasArms = activeZones.some((z) => z.includes("Arm"));
+                const hasLegs = activeZones.some((z) =>
+                  ["leftThigh", "rightThigh", "leftCalf", "rightCalf", "ankles", "hips"].includes(z)
+                );
+                if (hasArms && hasLegs)
+                  return (
+                    <div
+                      style={{
+                        marginTop: 12,
+                        padding: "12px 14px",
+                        borderRadius: 10,
+                        background: C.creamFaint,
+                        border: `1px solid ${C.border}`,
+                        fontSize: 12,
+                        color: C.cream,
+                        lineHeight: 1.5,
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 6,
+                      }}
+                    >
+                      <Icon name="lightbulb" size={14} color={C.sage} />
+                      <span>
+                        {lang === "es"
+                          ? "Tipo combinado (Brazos + Piernas) — El lipedema puede afectar extremidades superiores e inferiores simultáneamente. Cada zona puede progresar de forma diferente y requerir compresión y tratamiento específicos."
+                          : "Combined type (Arms + Legs) — Lipedema can affect upper and lower limbs simultaneously. Each area may progress differently and require specific compression and treatment."}
+                      </span>
+                    </div>
+                  );
+                if (hasArms)
+                  return (
+                    <div
+                      style={{
+                        marginTop: 12,
+                        padding: "12px 14px",
+                        borderRadius: 10,
+                        background: C.creamFaint,
+                        border: `1px solid ${C.border}`,
+                        fontSize: 12,
+                        color: C.cream,
+                        lineHeight: 1.5,
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 6,
+                      }}
+                    >
+                      <Icon name="lightbulb" size={14} color={C.sage} />
+                      <span>
+                        {lang === "es"
+                          ? "Tipo 4 (Brazos) — El lipedema en brazos suele afectar del hombro al codo. Puede presentarse solo o junto con afectación en piernas."
+                          : "Type 4 (Arms) — Arm lipedema typically affects shoulder to elbow. It can occur alone or alongside leg involvement."}
+                      </span>
+                    </div>
+                  );
+                return null;
+              })()}
+              <button style={{ ...S.btn, marginTop: 20 }} onClick={saveProfile}>
+                {profileSaved ? t.profile.saved : t.profile.save}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      </div>{/* /layout */}
+      {/* /layout */}
 
       {/* ── BOTTOM NAV (mobile) ── */}
       {!isDesktop && (
         <nav style={S.bottomNav}>
           {BOTTOM_NAV_KEYS.map((key) => {
-            const item = NAV_ITEMS.find(n => n.key === key);
+            const item = NAV_ITEMS.find((n) => n.key === key);
             if (!item) return null;
             const active = tab === key;
             return (
               <button key={key} style={S.bnItem(active)} onClick={() => setTab(key)}>
                 <Icon name={item.icon} size={20} color={active ? C.sage : C.creamMuted} />
-                <span style={{ fontSize: 9, fontWeight: active ? 700 : 500 }}>{lang === "es" ? item.es : item.en}</span>
+                <span style={{ fontSize: 9, fontWeight: active ? 700 : 500 }}>
+                  {lang === "es" ? item.es : item.en}
+                </span>
               </button>
             );
           })}
