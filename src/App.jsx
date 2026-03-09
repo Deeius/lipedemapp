@@ -3314,6 +3314,7 @@ export default function App() {
               setInfoFilter={setInfoFilter}
               setShowGuide={setShowGuide}
               INFO_RESOURCES={INFO_RESOURCES}
+              profile={profile}
               lang={lang}
               C={C}
               S={S}

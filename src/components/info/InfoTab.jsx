@@ -1,11 +1,12 @@
 import ResourceItem from "./ResourceItem";
-import Testimonials from "../home/Testimonials";
+import CommunityForum from "./CommunityForum";
 
 export default function InfoTab({
   infoFilter,
   setInfoFilter,
   setShowGuide,
   INFO_RESOURCES,
+  profile,
   lang,
   C,
   S,
@@ -105,7 +106,7 @@ export default function InfoTab({
         );
       })}
       {/* Experiencias reales */}
-      <Testimonials lang={lang} C={C} />
+      <CommunityForum lang={lang} C={C} profile={profile} />
     </>
   );
 }
