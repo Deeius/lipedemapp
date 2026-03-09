@@ -1,5 +1,7 @@
+import { useState } from "react";
 import ResourceItem from "./ResourceItem";
 import CommunityForum from "./CommunityForum";
+import CentersSection from "./CentersSection";
 
 export default function InfoTab({
   infoFilter,
@@ -7,11 +9,31 @@ export default function InfoTab({
   setShowGuide,
   INFO_RESOURCES,
   profile,
+  userCenters,
+  pendingCenters,
+  centerFilter,
+  setCenterFilter,
+  centersView,
+  setCentersView,
+  centerForm,
+  setCenterForm,
+  saveCenterProposal,
+  approveCenter,
+  rejectCenter,
+  setTab,
   lang,
   C,
   S,
   t,
 }) {
+  const [section, setSection] = useState("recursos");
+
+  const SECTIONS = [
+    { id: "recursos", label: lang === "es" ? "Recursos" : "Resources" },
+    { id: "foro", label: lang === "es" ? "Foro" : "Forum" },
+    { id: "centros", label: lang === "es" ? "Centros" : "Centres" },
+  ];
+
   return (
     <>
       {/* Visual Guide shortcut */}
@@ -42,41 +64,23 @@ export default function InfoTab({
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div
-        style={{
-          background: "#fefce8",
-          borderRadius: 10,
-          padding: "10px 14px",
-          marginBottom: 16,
-          border: "1px solid #fde047",
-          fontSize: 12,
-          color: "#854d0e",
-        }}
-      >
-        {t.info.disclaimer}
-      </div>
-
-      {/* Language filter */}
+      {/* Section pills */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-        {[
-          ["all", t.info.filterAll],
-          ["es", t.info.filterEs],
-          ["en", t.info.filterEn],
-        ].map(([val, label]) => (
+        {SECTIONS.map(({ id, label }) => (
           <button
-            key={val}
-            onClick={() => setInfoFilter(val)}
+            key={id}
+            onClick={() => setSection(id)}
             style={{
-              padding: "7px 14px",
-              borderRadius: 8,
-              border: "none",
-              cursor: "pointer",
+              padding: "7px 16px",
+              borderRadius: 20,
+              border: `1.5px solid ${section === id ? C.sage : C.border}`,
+              background: section === id ? C.sage : "white",
+              color: section === id ? "#fff" : C.creamMuted,
               fontSize: 12,
-              fontWeight: 600,
-              background: infoFilter === val ? C.sage : C.creamFaint,
-              color: infoFilter === val ? "#fff" : C.creamMuted,
-              transition: "all 0.2s",
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "all 0.15s",
             }}
           >
             {label}
@@ -84,29 +88,96 @@ export default function InfoTab({
         ))}
       </div>
 
-      {/* Sections */}
-      {Object.entries(INFO_RESOURCES).map(([sectionKey, section]) => {
-        const sectionName = lang === "es" ? section.es : section.en;
-        const filtered = section.items.filter((item) =>
-          infoFilter === "all" ? true : item.lang === infoFilter
-        );
-        if (filtered.length === 0) return null;
-        return (
-          <div key={sectionKey} style={S.card}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <span style={{ fontSize: 20 }}>{section.icon}</span>
-              <div style={S.cardTitle}>{sectionName}</div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {filtered.map((item, i) => (
-                <ResourceItem key={i} item={item} lang={lang} C={C} t={t} />
-              ))}
-            </div>
+      {/* ── RECURSOS ── */}
+      {section === "recursos" && (
+        <>
+          <div
+            style={{
+              background: "#fefce8",
+              borderRadius: 10,
+              padding: "10px 14px",
+              marginBottom: 16,
+              border: "1px solid #fde047",
+              fontSize: 12,
+              color: "#854d0e",
+            }}
+          >
+            {t.info.disclaimer}
           </div>
-        );
-      })}
-      {/* Experiencias reales */}
-      <CommunityForum lang={lang} C={C} profile={profile} />
+
+          <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+            {[
+              ["all", t.info.filterAll],
+              ["es", t.info.filterEs],
+              ["en", t.info.filterEn],
+            ].map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setInfoFilter(val)}
+                style={{
+                  padding: "7px 14px",
+                  borderRadius: 8,
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: infoFilter === val ? C.sage : C.creamFaint,
+                  color: infoFilter === val ? "#fff" : C.creamMuted,
+                  transition: "all 0.2s",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {Object.entries(INFO_RESOURCES).map(([sectionKey, sec]) => {
+            const sectionName = lang === "es" ? sec.es : sec.en;
+            const filtered = sec.items.filter((item) =>
+              infoFilter === "all" ? true : item.lang === infoFilter
+            );
+            if (filtered.length === 0) return null;
+            return (
+              <div key={sectionKey} style={S.card}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 20 }}>{sec.icon}</span>
+                  <div style={S.cardTitle}>{sectionName}</div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {filtered.map((item, i) => (
+                    <ResourceItem key={i} item={item} lang={lang} C={C} t={t} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
+
+      {/* ── FORO ── */}
+      {section === "foro" && <CommunityForum lang={lang} C={C} profile={profile} />}
+
+      {/* ── CENTROS ── */}
+      {section === "centros" && (
+        <CentersSection
+          profile={profile}
+          userCenters={userCenters}
+          pendingCenters={pendingCenters}
+          centerFilter={centerFilter}
+          setCenterFilter={setCenterFilter}
+          centersView={centersView}
+          setCentersView={setCentersView}
+          centerForm={centerForm}
+          setCenterForm={setCenterForm}
+          saveCenterProposal={saveCenterProposal}
+          approveCenter={approveCenter}
+          rejectCenter={rejectCenter}
+          setTab={setTab}
+          lang={lang}
+          C={C}
+          S={S}
+        />
+      )}
     </>
   );
 }
