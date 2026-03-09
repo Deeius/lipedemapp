@@ -1,9 +1,7 @@
 export default function PillTracker({ entry, updateEntry, profile, lang, C, S }) {
   return (
     <>
-      <div style={S.cardTitle}>
-        {lang === "es" ? "Anticonceptivo" : "Contraceptive"}
-      </div>
+      <div style={S.cardTitle}>{lang === "es" ? "Anticonceptivo" : "Contraceptive"}</div>
       <div
         onClick={() => updateEntry("pillTaken", !entry.pillTaken)}
         style={{
@@ -32,8 +30,12 @@ export default function PillTracker({ entry, updateEntry, profile, lang, C, S })
           </div>
           <div style={{ fontSize: 11, color: C.creamMuted, marginTop: 1 }}>
             {entry.pillTaken
-              ? lang === "es" ? "✓ Marcada como tomada" : "✓ Marked as taken"
-              : lang === "es" ? "Toca para marcar como tomada" : "Tap to mark as taken"}
+              ? lang === "es"
+                ? "✓ Marcada como tomada"
+                : "✓ Marked as taken"
+              : lang === "es"
+                ? "Toca para marcar como tomada"
+                : "Tap to mark as taken"}
           </div>
         </div>
         <div

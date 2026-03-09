@@ -23,13 +23,7 @@ export default function FoodsTab({
         S={S}
         t={t}
       />
-      <FoodsList
-        foods={foods}
-        removeFood={removeFood}
-        C={C}
-        S={S}
-        t={t}
-      />
+      <FoodsList foods={foods} removeFood={removeFood} C={C} S={S} t={t} />
     </>
   );
 }

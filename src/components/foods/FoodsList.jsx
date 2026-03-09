@@ -29,8 +29,12 @@ export default function FoodsList({ foods, removeFood, C, S, t }) {
             <button
               onClick={() => removeFood(f.id)}
               style={{
-                background: "none", border: "none", cursor: "pointer",
-                color: C.creamMuted, fontSize: 20, padding: "0 4px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: C.creamMuted,
+                fontSize: 20,
+                padding: "0 4px",
               }}
             >
               ×

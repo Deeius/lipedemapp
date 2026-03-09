@@ -129,7 +129,13 @@ export default function HealthSummary({ logs, lang, C, setTab }) {
             return (
               <div
                 key={i}
-                style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  alignItems: "center",
+                }}
               >
                 <div
                   style={{
@@ -171,14 +177,26 @@ export default function HealthSummary({ logs, lang, C, setTab }) {
               </div>
             );
           })}
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, paddingLeft: 6 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 4,
+              paddingLeft: 6,
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: "#f5d0dc" }} />
-              <span style={{ fontSize: 9, color: C.creamMuted }}>{lang === "es" ? "Dolor" : "Pain"}</span>
+              <span style={{ fontSize: 9, color: C.creamMuted }}>
+                {lang === "es" ? "Dolor" : "Pain"}
+              </span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: `${C.sage}60` }} />
-              <span style={{ fontSize: 9, color: C.creamMuted }}>{lang === "es" ? "Energía" : "Energy"}</span>
+              <span style={{ fontSize: 9, color: C.creamMuted }}>
+                {lang === "es" ? "Energía" : "Energy"}
+              </span>
             </div>
           </div>
         </div>

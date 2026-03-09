@@ -18,7 +18,9 @@ export default function AddFoodForm({ newFood, setNewFood, addFood, lang, C, S, 
         onChange={(e) => setNewFood({ ...newFood, category: e.target.value })}
       >
         {Object.entries(t.foods.categories).map(([k, v]) => (
-          <option key={k} value={k}>{v}</option>
+          <option key={k} value={k}>
+            {v}
+          </option>
         ))}
       </select>
 

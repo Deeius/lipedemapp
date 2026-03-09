@@ -39,26 +39,62 @@ export default function ResourceItem({ item, lang, C, t }) {
         e.currentTarget.style.background = C.bgInput;
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 8,
+        }}
+      >
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 13, color: C.cream, marginBottom: 3, lineHeight: 1.4 }}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 13,
+              color: C.cream,
+              marginBottom: 3,
+              lineHeight: 1.4,
+            }}
+          >
             {item.platform && (
-              <span style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}>{item.platform}</span>
+              <span style={{ fontSize: 11, color: C.creamMuted, marginRight: 6 }}>
+                {item.platform}
+              </span>
             )}
             {item.title}
           </div>
           <div style={{ fontSize: 11, color: C.creamMuted, marginBottom: 6 }}>
-            {item.authors}{item.year ? ` · ${item.year}` : ""}
+            {item.authors}
+            {item.year ? ` · ${item.year}` : ""}
           </div>
           <div style={{ fontSize: 12, color: C.cream, lineHeight: 1.5 }}>{desc}</div>
         </div>
         <span style={{ fontSize: 14, color: C.creamMuted, flexShrink: 0, marginTop: 2 }}>↗</span>
       </div>
       <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-        <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: langColor + "18", color: langColor }}>
+        <span
+          style={{
+            padding: "2px 7px",
+            borderRadius: 20,
+            fontSize: 10,
+            fontWeight: 700,
+            background: langColor + "18",
+            color: langColor,
+          }}
+        >
           {item.lang === "es" ? "ES" : "EN"}
         </span>
-        <span style={{ padding: "2px 7px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (TYPE_COLORS[item.type] || C.creamMuted) + "28", color: TYPE_COLORS[item.type] || C.creamMuted }}>
+        <span
+          style={{
+            padding: "2px 7px",
+            borderRadius: 20,
+            fontSize: 10,
+            fontWeight: 700,
+            background: (TYPE_COLORS[item.type] || C.creamMuted) + "28",
+            color: TYPE_COLORS[item.type] || C.creamMuted,
+          }}
+        >
           {typeLabel}
         </span>
       </div>
