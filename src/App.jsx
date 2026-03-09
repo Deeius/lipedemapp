@@ -2114,19 +2114,13 @@ export default function App() {
             <div style={S.card}>
               {/* Header */}
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.sage} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg>
-                  <span style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px" }}>
-                    {lang === "es" ? "Ciclo menstrual" : "Menstrual cycle"}
-                  </span>
-                </div>
-                <div style={{ display:"flex", gap:4 }}>
-                  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo-2, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
-                    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>&#8249;</button>
-                  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
-                    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>&#8250;</button>
-                </div>
-              </div>
+  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.sage} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg>
+    <span style={{ fontSize:14, fontWeight:800, color:C.cream, letterSpacing:"-0.3px" }}>
+      {lang === "es" ? "Ciclo menstrual" : "Menstrual cycle"}
+    </span>
+  </div>
+</div>
 
               {/* Step 1: type selector */}
               <div style={{ marginBottom:14 }}>
@@ -2168,14 +2162,20 @@ export default function App() {
               </div>
 
               {/* Month title */}
-              <div style={{ fontSize:13, fontWeight:700, color:C.creamMuted, textAlign:"center", marginBottom:10 }}>
-                {(() => {
-                  const [y,m] = cycleMonth.split("-").map(Number);
-                  const months_es = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-                  const months_en = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                  return `${lang === "es" ? months_es[m-1] : months_en[m-1]} ${y}`;
-                })()}
-              </div>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:10 }}>
+  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo-2, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
+    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>&#8249;</button>
+  <div style={{ fontSize:13, fontWeight:700, color:C.creamMuted, minWidth:140, textAlign:"center" }}>
+    {(() => {
+      const [y,m] = cycleMonth.split("-").map(Number);
+      const months_es = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      const months_en = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      return `${lang === "es" ? months_es[m-1] : months_en[m-1]} ${y}`;
+    })()}
+  </div>
+  <button onClick={() => setCycleMonth(m => { const [y,mo] = m.split("-").map(Number); const d = new Date(y, mo, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })}
+    style={{ background:"none", border:`1px solid ${C.border}`, borderRadius:6, width:26, height:26, cursor:"pointer", color:C.creamMuted, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>&#8250;</button>
+</div>
 
               {/* Day headers */}
               <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>

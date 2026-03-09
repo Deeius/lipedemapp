@@ -2,11 +2,15 @@
   "name": "lipedema-tracker",
   "version": "1.0.3",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "release": "standard-version"
+    "release": "standard-version",
+    "lint": "eslint src/",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
@@ -15,7 +19,12 @@
     "recharts": "^2.10.3"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.8.1",
     "standard-version": "^9.5.0",
     "vite": "^5.0.8"
   }
