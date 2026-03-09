@@ -1155,7 +1155,7 @@ export default function App() {
             <span style={{ fontSize: 15, fontWeight: 300, color: C.sageLight, letterSpacing: "-0.2px" }}>
               {" "}tracker
             </span>
-            <span style={{ fontSize: 9, color: C.creamMuted, marginLeft: 4, verticalAlign: "middle" }}>v2.4</span>
+            <span style={{ fontSize: 9, color: C.creamMuted, marginLeft: 4, verticalAlign: "middle" }}>v{__APP_VERSION__}</span>
           </div>
         </div>
 
