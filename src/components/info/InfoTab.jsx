@@ -1,4 +1,5 @@
 import ResourceItem from "./ResourceItem";
+import Testimonials from "../home/Testimonials";
 
 export default function InfoTab({
   infoFilter,
@@ -103,6 +104,8 @@ export default function InfoTab({
           </div>
         );
       })}
+      {/* Experiencias reales */}
+      <Testimonials lang={lang} C={C} />
     </>
   );
 }
