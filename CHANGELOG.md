@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.12](https://github.com/Deeius/lipedemapp/compare/v1.0.11...v1.0.12) (2026-03-09)
+
+
+### Bug Fixes
+
+* added forum ([644075b](https://github.com/Deeius/lipedemapp/commit/644075bfb092fe4751dbffecddd5465345086282))
+
 ### [1.0.11](https://github.com/Deeius/lipedemapp/compare/v1.0.10...v1.0.11) (2026-03-09)
 
 
