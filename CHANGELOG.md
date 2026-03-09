@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.6](https://github.com/Deeius/lipedemapp/compare/v1.0.5...v1.0.6) (2026-03-09)
+
+
+### Bug Fixes
+
+* change order in country selection list ([52ba583](https://github.com/Deeius/lipedemapp/commit/52ba5832947f857be27887f0bd8a4e1a9087acd7))
+
 ### [1.0.5](https://github.com/Deeius/lipedemapp/compare/v1.0.4...v1.0.5) (2026-03-09)
 
 ### [1.0.4](https://github.com/Deeius/lipedemapp/compare/v1.0.3...v1.0.4) (2026-03-09)
