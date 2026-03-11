@@ -22,6 +22,7 @@ import HistoryTab from "./components/history/HistoryTab";
 import ProfileTab from "./components/profile/ProfileTab";
 import FoodsTab from "./components/foods/FoodsTab";
 import InfoTab from "./components/info/InfoTab";
+import CentersSection from "./components/info/CentersSection";
 import Onboarding from "./Onboarding";
 
 import { useAuth } from "./hooks/useAuth";
@@ -1201,6 +1202,7 @@ export default function App() {
   const [openLog, setOpenLog] = useState(null);
   const [avatarMenu, setAvatarMenu] = useState(false);
   const [centersView, setCentersView] = useState("list"); // "list" | "propose" | "pending"
+  const [infoSection, setInfoSection] = useState("recursos"); // "recursos" | "foro"
   const [centerForm, setCenterForm] = useState({
     name: "",
     address: "",
@@ -2625,13 +2627,9 @@ export default function App() {
             </>
           )}
 
-          {/* ── INFO ── */}
-          {tab === "info" && (
-            <InfoTab
-              infoFilter={infoFilter}
-              setInfoFilter={setInfoFilter}
-              setShowGuide={setShowGuide}
-              INFO_RESOURCES={INFO_RESOURCES}
+          {/* ── CENTERS ── */}
+          {tab === "centers" && (
+            <CentersSection
               profile={profile}
               userCenters={userCenters}
               pendingCenters={pendingCenters}
@@ -2645,6 +2643,22 @@ export default function App() {
               approveCenter={approveCenter}
               rejectCenter={rejectCenter}
               setTab={setTab}
+              lang={lang}
+              C={C}
+              S={S}
+            />
+          )}
+
+          {/* ── INFO ── */}
+          {tab === "info" && (
+            <InfoTab
+              infoFilter={infoFilter}
+              setInfoFilter={setInfoFilter}
+              setShowGuide={setShowGuide}
+              INFO_RESOURCES={INFO_RESOURCES}
+              profile={profile}
+              infoSection={infoSection}
+              setInfoSection={setInfoSection}
               lang={lang}
               C={C}
               S={S}

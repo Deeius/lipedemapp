@@ -1,6 +1,5 @@
 import ResourceItem from "./ResourceItem";
 import CommunityForum from "./CommunityForum";
-import CentersSection from "./CentersSection";
 
 export default function InfoTab({
   infoFilter,
@@ -8,18 +7,6 @@ export default function InfoTab({
   setShowGuide,
   INFO_RESOURCES,
   profile,
-  userCenters,
-  pendingCenters,
-  centerFilter,
-  setCenterFilter,
-  centersView,
-  setCentersView,
-  centerForm,
-  setCenterForm,
-  saveCenterProposal,
-  approveCenter,
-  rejectCenter,
-  setTab,
   infoSection,
   setInfoSection,
   lang,
@@ -33,7 +20,6 @@ export default function InfoTab({
   const SECTIONS = [
     { id: "recursos", label: lang === "es" ? "Recursos" : "Resources" },
     { id: "foro", label: lang === "es" ? "Foro" : "Forum" },
-    { id: "centros", label: lang === "es" ? "Centros" : "Centres" },
   ];
 
   return (
@@ -158,28 +144,6 @@ export default function InfoTab({
 
       {/* ── FORO ── */}
       {section === "foro" && <CommunityForum lang={lang} C={C} profile={profile} />}
-
-      {/* ── CENTROS ── */}
-      {section === "centros" && (
-        <CentersSection
-          profile={profile}
-          userCenters={userCenters}
-          pendingCenters={pendingCenters}
-          centerFilter={centerFilter}
-          setCenterFilter={setCenterFilter}
-          centersView={centersView}
-          setCentersView={setCentersView}
-          centerForm={centerForm}
-          setCenterForm={setCenterForm}
-          saveCenterProposal={saveCenterProposal}
-          approveCenter={approveCenter}
-          rejectCenter={rejectCenter}
-          setTab={setTab}
-          lang={lang}
-          C={C}
-          S={S}
-        />
-      )}
     </>
   );
 }
