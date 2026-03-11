@@ -132,3 +132,40 @@ export async function migrateFromLocalStorage(userId) {
     return false;
   }
 }
+
+// ── FORUM POSTS ───────────────────────────────────────────
+export async function getForumPosts() {
+  const { data, error } = await supabase
+    .from("forum_posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) console.error("getForumPosts:", error);
+  return data ?? [];
+}
+
+export async function insertForumPost(userId, post) {
+  const { data, error } = await supabase
+    .from("forum_posts")
+    .insert({ user_id: userId, ...post })
+    .select()
+    .single();
+  if (error) console.error("insertForumPost:", error);
+  return data ?? null;
+}
+
+export async function updateForumReactions(postId, reactions) {
+  const { error } = await supabase
+    .from("forum_posts")
+    .update({ reactions })
+    .eq("id", postId);
+  if (error) console.error("updateForumReactions:", error);
+}
+
+export async function deleteForumPost(userId, postId) {
+  const { error } = await supabase
+    .from("forum_posts")
+    .delete()
+    .eq("id", postId)
+    .eq("user_id", userId);
+  if (error) console.error("deleteForumPost:", error);
+}
