@@ -2656,7 +2656,9 @@ export default function App() {
           )}
 
           {/* ── FORUM ── */}
-          {tab === "forum" && <CommunityForum lang={lang} C={C} profile={profile} />}
+          {tab === "forum" && (
+            <CommunityForum lang={lang} C={C} profile={profile} userId={user?.id} />
+          )}
 
           {/* ── INFO ── */}
           {tab === "info" && (
