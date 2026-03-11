@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ResourceItem from "./ResourceItem";
 import CommunityForum from "./CommunityForum";
 import CentersSection from "./CentersSection";
@@ -21,12 +20,15 @@ export default function InfoTab({
   approveCenter,
   rejectCenter,
   setTab,
+  infoSection,
+  setInfoSection,
   lang,
   C,
   S,
   t,
 }) {
-  const [section, setSection] = useState("recursos");
+  const section = infoSection;
+  const setSection = setInfoSection;
 
   const SECTIONS = [
     { id: "recursos", label: lang === "es" ? "Recursos" : "Resources" },
