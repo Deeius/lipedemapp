@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { supabase } from "./lib/supabase";
 
-// ─── PALETTE (mirrors App.jsx C) ─────────────────────────────────────────────
+// ─── PALETTE ─────────────────────────────────────────────────────────────────
 const C = {
   bg: "#f0f5f2",
   bgCard: "#ffffff",
@@ -8,13 +9,13 @@ const C = {
   border: "#d6e5dd",
   sage: "#4d8a6e",
   sageDark: "#3a6e57",
-  sageLight: "#3a6e57",
   cream: "#1c2b24",
   creamMuted: "#5a7568",
   creamFaint: "#e4eeea",
   accent: "#8a6c3a",
 };
 
+// ─── DATA ────────────────────────────────────────────────────────────────────
 const STEPS_ES = [
   { id: "name", title: "¿Cómo te llamas?", sub: "Así personalizaremos tu experiencia." },
   {
@@ -42,6 +43,11 @@ const STEPS_ES = [
     title: "¿Cómo es tu jornada habitual?",
     sub: "La postura durante el día afecta mucho al lipedema.",
   },
+  {
+    id: "lipedema_type",
+    title: "¿Cuál es tu tipo de lipedema?",
+    sub: "Selecciona el que mejor describe tu caso. Lo guardaremos en tu perfil.",
+  },
 ];
 
 const STEPS_EN = [
@@ -67,84 +73,57 @@ const STEPS_EN = [
     title: "What does your typical day look like?",
     sub: "Your daily posture has a big impact on lipedema.",
   },
+  {
+    id: "lipedema_type",
+    title: "What type of lipedema do you have?",
+    sub: "Select the one that best describes your case. We'll save it to your profile.",
+  },
 ];
 
 const COUNTRIES_ES = [
-  "Alemania",
-  "Argentina",
-  "Australia",
-  "Austria",
-  "Bélgica",
-  "Bolivia",
-  "Brasil",
-  "Canadá",
-  "Chile",
-  "Colombia",
-  "Costa Rica",
-  "Cuba",
-  "Ecuador",
-  "El Salvador",
   "España",
-  "Estados Unidos",
-  "Francia",
+  "México",
+  "Argentina",
+  "Colombia",
+  "Chile",
+  "Perú",
+  "Venezuela",
+  "Ecuador",
+  "Bolivia",
+  "Uruguay",
+  "Paraguay",
   "Guatemala",
   "Honduras",
-  "Irlanda",
-  "Italia",
-  "México",
+  "El Salvador",
   "Nicaragua",
-  "Nueva Zelanda",
-  "Países Bajos",
+  "Costa Rica",
   "Panamá",
-  "Paraguay",
-  "Perú",
-  "Portugal",
-  "Puerto Rico",
+  "Cuba",
   "Rep. Dominicana",
-  "Reino Unido",
-  "Suecia",
-  "Suiza",
-  "Uruguay",
-  "Venezuela",
+  "Puerto Rico",
   "Otro",
 ];
 const COUNTRIES_EN = [
+  "Spain",
+  "Mexico",
   "Argentina",
-  "Australia",
-  "Austria",
-  "Belgium",
-  "Bolivia",
-  "Brazil",
-  "Canada",
-  "Chile",
   "Colombia",
-  "Costa Rica",
-  "Cuba",
-  "Dominican Rep.",
+  "Chile",
+  "Peru",
+  "Venezuela",
   "Ecuador",
-  "El Salvador",
-  "France",
-  "Germany",
+  "Bolivia",
+  "Uruguay",
+  "Paraguay",
   "Guatemala",
   "Honduras",
-  "Ireland",
-  "Italy",
-  "Mexico",
-  "Netherlands",
-  "New Zealand",
+  "El Salvador",
   "Nicaragua",
+  "Costa Rica",
   "Panama",
-  "Paraguay",
-  "Peru",
-  "Portugal",
+  "Cuba",
+  "Dominican Rep.",
   "Puerto Rico",
-  "Spain",
-  "Sweden",
-  "Switzerland",
-  "United Kingdom",
-  "United States",
-  "Uruguay",
-  "Venezuela",
   "Other",
 ];
 
@@ -167,7 +146,109 @@ const STAGES_EN = [
   { val: "suspected", label: "Suspected, unconfirmed", desc: "Symptoms but no official diagnosis" },
 ];
 
-// ─── ICON ────────────────────────────────────────────────────────────────────
+const LIPEDEMA_TYPES_ES = [
+  {
+    val: "type1",
+    emoji: "🦵",
+    label: "Tipo I — Caderas y glúteos",
+    desc: "Acumulación en zona de cadera, glúteos y parte superior de muslos. El más frecuente.",
+    color: "#f0f9f4",
+    border: "#4d8a6e",
+  },
+  {
+    val: "type2",
+    emoji: "🦿",
+    label: "Tipo II — Muslos y rodillas",
+    desc: "Desde caderas hasta rodillas. Puede haber acumulación interna en la rodilla.",
+    color: "#f5f0f9",
+    border: "#8a6c3a",
+  },
+  {
+    val: "type3",
+    emoji: "🦶",
+    label: "Tipo III — Caderas hasta tobillos",
+    desc: "Afecta toda la pierna desde cadera hasta tobillo. El pie no suele estar afectado.",
+    color: "#f9f5f0",
+    border: "#8a4d6e",
+  },
+  {
+    val: "type4",
+    emoji: "💪",
+    label: "Tipo IV — Incluye brazos",
+    desc: "Lipedema en brazos (desde hombros hasta muñecas) junto con piernas.",
+    color: "#f0f5f9",
+    border: "#4d6e8a",
+  },
+  {
+    val: "type5",
+    emoji: "🦵🦿",
+    label: "Tipo V — Solo pantorrillas y pies",
+    desc: "Afectación de la parte inferior de la pierna incluyendo el pie. Menos frecuente.",
+    color: "#f9f0f5",
+    border: "#6e4d8a",
+  },
+  {
+    val: "unknown",
+    emoji: "❓",
+    label: "No lo sé todavía",
+    desc: "Aún no he recibido información sobre mi tipo específico.",
+    color: "#f5f5f5",
+    border: "#d6e5dd",
+  },
+];
+
+const LIPEDEMA_TYPES_EN = [
+  {
+    val: "type1",
+    emoji: "🦵",
+    label: "Type I — Hips and buttocks",
+    desc: "Accumulation in hips, buttocks and upper thighs. The most common type.",
+    color: "#f0f9f4",
+    border: "#4d8a6e",
+  },
+  {
+    val: "type2",
+    emoji: "🦿",
+    label: "Type II — Thighs and knees",
+    desc: "From hips to knees. May include inner knee accumulation.",
+    color: "#f5f0f9",
+    border: "#8a6c3a",
+  },
+  {
+    val: "type3",
+    emoji: "🦶",
+    label: "Type III — Hips to ankles",
+    desc: "Affects the entire leg from hip to ankle. Feet usually unaffected.",
+    color: "#f9f5f0",
+    border: "#8a4d6e",
+  },
+  {
+    val: "type4",
+    emoji: "💪",
+    label: "Type IV — Includes arms",
+    desc: "Lipedema in arms (shoulder to wrist) along with legs.",
+    color: "#f0f5f9",
+    border: "#4d6e8a",
+  },
+  {
+    val: "type5",
+    emoji: "🦵🦿",
+    label: "Type V — Lower legs and feet",
+    desc: "Affects lower legs including feet. Less common.",
+    color: "#f9f0f5",
+    border: "#6e4d8a",
+  },
+  {
+    val: "unknown",
+    emoji: "❓",
+    label: "I don't know yet",
+    desc: "I haven't received information about my specific type.",
+    color: "#f5f5f5",
+    border: "#d6e5dd",
+  },
+];
+
+// ─── ICON ─────────────────────────────────────────────────────────────────────
 function Icon({ name, size = 20, color = C.sage }) {
   const s = { width: size, height: size, display: "block", flexShrink: 0 };
   const p = {
@@ -223,23 +304,79 @@ function Icon({ name, size = 20, color = C.sage }) {
       <svg style={s} viewBox="0 0 24 24" {...p}>
         <rect x="2" y="7" width="20" height="14" rx="2" />
         <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-        <line x1="12" y1="12" x2="12" y2="12" strokeWidth="2" />
+      </svg>
+    ),
+    mail: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <rect x="2" y="4" width="20" height="16" rx="2" />
+        <polyline points="2,4 12,13 22,4" />
+      </svg>
+    ),
+    sparkles: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
       </svg>
     ),
   };
   return icons[name] || null;
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function Onboarding({ initialLang = "es", onComplete }) {
+// ─── LOGO ────────────────────────────────────────────────────────────────────
+function Logo() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#e4eeea" stroke="#d6e5dd" strokeWidth="1" />
+        <path
+          d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z"
+          fill="none"
+          stroke="#4d8a6e"
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+        <line
+          x1="14"
+          y1="6"
+          x2="14"
+          y2="22"
+          stroke="#4d8a6e"
+          strokeWidth="0.9"
+          strokeLinecap="round"
+        />
+      </svg>
+      <span
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          color: C.creamMuted,
+          fontFamily: "'DM Sans',sans-serif",
+        }}
+      >
+        lipedema <span style={{ fontWeight: 300 }}>tracker</span>
+      </span>
+    </div>
+  );
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
+export default function Onboarding({ initialLang = "es", onComplete, loginWithGoogle }) {
+  // auth screen state
+  const [screen, setScreen] = useState("welcome"); // "welcome" | "magic"
+  const [email, setEmail] = useState("");
+  const [magicSent, setMagicSent] = useState(false);
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [magicError, setMagicError] = useState("");
+
+  // profile steps state
   const [step, setStep] = useState(0);
   const [lang, setLang] = useState(initialLang);
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [stage, setStage] = useState("unknown");
-  const [compression, setCompression] = useState(""); // none | occasional | daily | prescribed
-  const [posture, setPosture] = useState([]); // standing | sitting | mixed | active | sedentary
+  const [compression, setCompression] = useState("");
+  const [posture, setPosture] = useState([]);
+  const [lipedemaType, setLipedemaType] = useState("");
   const [locLoading, setLocLoading] = useState(false);
   const [locDetected, setLocDetected] = useState(false);
 
@@ -248,8 +385,9 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
   const current = steps[step];
   const countries = lang === "es" ? COUNTRIES_ES : COUNTRIES_EN;
   const stages = lang === "es" ? STAGES_ES : STAGES_EN;
+  const lipedemaTypes = lang === "es" ? LIPEDEMA_TYPES_ES : LIPEDEMA_TYPES_EN;
 
-  // Auto-detect location via browser geolocation + reverse geocode
+  // ── Location ──
   const detectLocation = () => {
     if (!navigator.geolocation) return;
     setLocLoading(true);
@@ -262,13 +400,11 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           );
           const data = await res.json();
           const addr = data.address || {};
-          const detectedCountry = addr.country || "";
-          const detectedRegion = addr.state || addr.county || "";
-          setCountry(detectedCountry);
-          setRegion(detectedRegion);
+          setCountry(addr.country || "");
+          setRegion(addr.state || addr.county || "");
           setLocDetected(true);
         } catch {
-          /* silent fail */
+          /* silent */
         } finally {
           setLocLoading(false);
         }
@@ -278,6 +414,28 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
     );
   };
 
+  // ── Magic link ──
+  const sendMagicLink = async () => {
+    if (!email.trim()) return;
+    setMagicLoading(true);
+    setMagicError("");
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.origin },
+    });
+    if (error) {
+      setMagicError(
+        lang === "es"
+          ? "Error al enviar el email. Inténtalo de nuevo."
+          : "Error sending email. Please try again."
+      );
+    } else {
+      setMagicSent(true);
+    }
+    setMagicLoading(false);
+  };
+
+  // ── Navigation ──
   const canAdvance = () => {
     if (current.id === "name") return name.trim().length >= 2;
     if (current.id === "language") return true;
@@ -285,11 +443,21 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
     if (current.id === "stage") return true;
     if (current.id === "compression") return compression !== "";
     if (current.id === "posture") return posture.length > 0;
+    if (current.id === "lipedema_type") return lipedemaType !== "";
     return true;
   };
 
   const handleComplete = () => {
-    onComplete({ name: name.trim(), lang, country, region, stage, compression, posture });
+    onComplete({
+      name: name.trim(),
+      lang,
+      country,
+      region,
+      stage,
+      compression,
+      posture,
+      lipedemaType,
+    });
   };
 
   const advance = () => {
@@ -299,7 +467,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
 
   const isLast = step === total - 1;
 
-  // ── STYLES ────────────────────────────────────────────────────────────────
+  // ── Styles ──
   const S = {
     wrap: {
       minHeight: "100vh",
@@ -321,11 +489,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
       boxShadow: "0 4px 32px rgba(58,110,87,0.10)",
       border: `1px solid ${C.border}`,
     },
-    progress: {
-      display: "flex",
-      gap: 6,
-      marginBottom: 32,
-    },
+    progress: { display: "flex", gap: 6, marginBottom: 32 },
     dot: (active, done) => ({
       height: 4,
       borderRadius: 4,
@@ -461,12 +625,245 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
     stage: "activity",
     compression: "layers",
     posture: "briefcase",
+    lipedema_type: "sparkles",
   };
 
+  // ────────────────────────────────────────────────────────────────────────────
+  // SCREEN: WELCOME
+  // ────────────────────────────────────────────────────────────────────────────
+  if (screen === "welcome") {
+    return (
+      <div style={S.wrap}>
+        <div style={{ ...S.card, textAlign: "center" }}>
+          <Logo />
+
+          <div
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              letterSpacing: "-0.5px",
+              marginBottom: 8,
+              lineHeight: 1.2,
+            }}
+          >
+            {lang === "es" ? "Bienvenida 🌿" : "Welcome 🌿"}
+          </div>
+          <div style={{ fontSize: 14, color: C.creamMuted, marginBottom: 32, lineHeight: 1.6 }}>
+            {lang === "es"
+              ? "Tu compañera de seguimiento para vivir mejor con lipedema."
+              : "Your tracking companion for living better with lipedema."}
+          </div>
+
+          {/* Google */}
+          <button
+            onClick={loginWithGoogle}
+            style={{
+              width: "100%",
+              padding: "14px 16px",
+              borderRadius: 12,
+              border: `1.5px solid ${C.border}`,
+              background: "white",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              color: C.cream,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              marginBottom: 10,
+              transition: "border-color 0.2s",
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path
+                fill="#EA4335"
+                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+              />
+              <path
+                fill="#4285F4"
+                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+              />
+            </svg>
+            {lang === "es" ? "Continuar con Google" : "Continue with Google"}
+          </button>
+
+          {/* Magic link */}
+          <button
+            onClick={() => setScreen("magic")}
+            style={{
+              width: "100%",
+              padding: "14px 16px",
+              borderRadius: 12,
+              border: `1.5px solid ${C.border}`,
+              background: C.creamFaint,
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              color: C.sage,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              marginBottom: 20,
+              transition: "all 0.2s",
+            }}
+          >
+            <Icon name="mail" size={18} color={C.sage} />
+            {lang === "es" ? "Continuar con email" : "Continue with email"}
+          </button>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <div style={{ flex: 1, height: 1, background: C.border }} />
+            <span style={{ fontSize: 12, color: C.creamMuted }}>{lang === "es" ? "o" : "or"}</span>
+            <div style={{ flex: 1, height: 1, background: C.border }} />
+          </div>
+
+          {/* Guest */}
+          <button onClick={() => onComplete(null)} style={S.btnSecondary}>
+            {lang === "es" ? "Explorar sin cuenta →" : "Explore without account →"}
+          </button>
+
+          {/* Lang toggle */}
+          <div style={{ display: "flex", gap: 8, marginTop: 28, justifyContent: "center" }}>
+            <button
+              onClick={() => setLang("es")}
+              style={{
+                ...S.btnSecondary,
+                fontWeight: lang === "es" ? 800 : 400,
+                color: lang === "es" ? C.sage : C.creamMuted,
+              }}
+            >
+              🇪🇸 ES
+            </button>
+            <button
+              onClick={() => setLang("en")}
+              style={{
+                ...S.btnSecondary,
+                fontWeight: lang === "en" ? 800 : 400,
+                color: lang === "en" ? C.sage : C.creamMuted,
+              }}
+            >
+              🇬🇧 EN
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // SCREEN: MAGIC LINK
+  // ────────────────────────────────────────────────────────────────────────────
+  if (screen === "magic") {
+    return (
+      <div style={S.wrap}>
+        <div style={S.card}>
+          <Logo />
+          <button
+            onClick={() => setScreen("welcome")}
+            style={{
+              ...S.btnSecondary,
+              marginBottom: 16,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            ← {lang === "es" ? "Volver" : "Back"}
+          </button>
+
+          {!magicSent ? (
+            <>
+              <div style={S.stepIcon}>
+                <Icon name="mail" size={22} color={C.sage} />
+              </div>
+              <h2 style={S.h1}>{lang === "es" ? "Accede con tu email" : "Sign in with email"}</h2>
+              <p style={S.sub}>
+                {lang === "es"
+                  ? "Te enviaremos un enlace mágico. Sin contraseña, sin complicaciones."
+                  : "We'll send you a magic link. No password needed."}
+              </p>
+              <input
+                style={S.input}
+                type="email"
+                placeholder={lang === "es" ? "tu@email.com" : "your@email.com"}
+                value={email}
+                autoFocus
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMagicLink()}
+              />
+              {magicError && (
+                <div style={{ fontSize: 12, color: "#c06080", marginBottom: 8 }}>{magicError}</div>
+              )}
+              <button
+                onClick={sendMagicLink}
+                disabled={!email.trim() || magicLoading}
+                style={{
+                  ...S.btnPrimary,
+                  background: email.trim() && !magicLoading ? C.sage : C.border,
+                  color: email.trim() && !magicLoading ? "#fff" : C.creamMuted,
+                  cursor: email.trim() && !magicLoading ? "pointer" : "default",
+                }}
+              >
+                {magicLoading
+                  ? lang === "es"
+                    ? "Enviando…"
+                    : "Sending…"
+                  : lang === "es"
+                    ? "Enviar enlace"
+                    : "Send link"}
+              </button>
+            </>
+          ) : (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>📬</div>
+              <h2 style={{ ...S.h1, textAlign: "center" }}>
+                {lang === "es" ? "¡Revisa tu email!" : "Check your inbox!"}
+              </h2>
+              <p style={{ ...S.sub, textAlign: "center" }}>
+                {lang === "es"
+                  ? `Hemos enviado un enlace a ${email}. Haz clic en él para acceder.`
+                  : `We've sent a link to ${email}. Click it to sign in.`}
+              </p>
+              <div style={{ fontSize: 12, color: C.creamMuted, marginTop: 16 }}>
+                {lang === "es"
+                  ? "¿No lo ves? Revisa la carpeta de spam."
+                  : "Can't find it? Check your spam folder."}
+              </div>
+              <button
+                onClick={() => {
+                  setMagicSent(false);
+                  setEmail("");
+                }}
+                style={{ ...S.btnSecondary, marginTop: 16 }}
+              >
+                {lang === "es" ? "Usar otro email" : "Use a different email"}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // SCREEN: PROFILE STEPS
+  // ────────────────────────────────────────────────────────────────────────────
   return (
     <div style={S.wrap}>
       <div style={S.card}>
-        {/* Progress bar */}
+        {/* Progress */}
         <div style={S.progress}>
           {steps.map((_, i) => (
             <div key={i} style={S.dot(i === step, i < step)} />
@@ -481,7 +878,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
         <h2 style={S.h1}>{current.title}</h2>
         <p style={S.sub}>{current.sub}</p>
 
-        {/* ── STEP: NAME ── */}
+        {/* ── NAME ── */}
         {current.id === "name" && (
           <div>
             <input
@@ -498,7 +895,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           </div>
         )}
 
-        {/* ── STEP: LANGUAGE ── */}
+        {/* ── LANGUAGE ── */}
         {current.id === "language" && (
           <div style={{ display: "flex", gap: 10 }}>
             <button style={S.langBtn(lang === "es")} onClick={() => setLang("es")}>
@@ -510,7 +907,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           </div>
         )}
 
-        {/* ── STEP: LOCATION ── */}
+        {/* ── LOCATION ── */}
         {current.id === "location" && (
           <div>
             {!locDetected ? (
@@ -556,8 +953,6 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
                 </div>
               </div>
             )}
-
-            {/* Manual selector */}
             {!locDetected && (
               <>
                 <div
@@ -598,7 +993,6 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
                 )}
               </>
             )}
-
             <div style={{ fontSize: 11, color: C.creamMuted, marginTop: 4 }}>
               {lang === "es"
                 ? "Solo se usa para filtrar centros. No la compartimos con nadie."
@@ -607,7 +1001,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           </div>
         )}
 
-        {/* ── STEP: STAGE ── */}
+        {/* ── STAGE ── */}
         {current.id === "stage" && (
           <div>
             {stages.map((s) => (
@@ -644,7 +1038,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           </div>
         )}
 
-        {/* ── STEP: COMPRESSION ── */}
+        {/* ── COMPRESSION ── */}
         {current.id === "compression" &&
           (() => {
             const opts =
@@ -745,7 +1139,7 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
             );
           })()}
 
-        {/* ── STEP: POSTURE / ACTIVITY ── */}
+        {/* ── POSTURE ── */}
         {current.id === "posture" &&
           (() => {
             const opts =
@@ -871,6 +1265,59 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
             );
           })()}
 
+        {/* ── LIPEDEMA TYPE ── */}
+        {current.id === "lipedema_type" && (
+          <div>
+            {lipedemaTypes.map((t) => (
+              <div
+                key={t.val}
+                onClick={() => setLipedemaType(t.val)}
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: 12,
+                  border: `2px solid ${lipedemaType === t.val ? t.border : C.border}`,
+                  background: lipedemaType === t.val ? t.color : "white",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  marginBottom: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <span style={{ fontSize: 22, flexShrink: 0 }}>{t.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: lipedemaType === t.val ? t.border : C.cream,
+                    }}
+                  >
+                    {t.label}
+                  </div>
+                  <div style={{ fontSize: 11, color: C.creamMuted, marginTop: 1 }}>{t.desc}</div>
+                </div>
+                <div
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: "50%",
+                    border: `2px solid ${lipedemaType === t.val ? t.border : C.border}`,
+                    background: lipedemaType === t.val ? t.border : "transparent",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  {lipedemaType === t.val && <Icon name="check" size={10} color="#fff" />}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* CTA */}
         <button style={S.btnPrimary} onClick={advance} disabled={!canAdvance()}>
           {isLast
@@ -883,7 +1330,6 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           {!isLast && <Icon name="arrow" size={16} color={canAdvance() ? "#fff" : C.creamMuted} />}
         </button>
 
-        {/* Skip step (location only) */}
         {current.id === "location" && (
           <div style={{ textAlign: "center", marginTop: 10 }}>
             <button style={S.btnSecondary} onClick={advance}>
@@ -892,13 +1338,11 @@ export default function Onboarding({ initialLang = "es", onComplete }) {
           </div>
         )}
 
-        {/* Step counter */}
         <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: C.creamMuted }}>
           {step + 1} / {total}
         </div>
       </div>
 
-      {/* Branding below card */}
       <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 8, opacity: 0.5 }}>
         <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
           <circle cx="14" cy="14" r="13" fill="#e4eeea" stroke="#d6e5dd" strokeWidth="1" />
