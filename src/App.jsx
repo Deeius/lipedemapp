@@ -23,6 +23,7 @@ import ProfileTab from "./components/profile/ProfileTab";
 import FoodsTab from "./components/foods/FoodsTab";
 import InfoTab from "./components/info/InfoTab";
 import CentersSection from "./components/info/CentersSection";
+import CommunityForum from "./components/info/CommunityForum";
 import Onboarding from "./Onboarding";
 
 import { useAuth } from "./hooks/useAuth";
@@ -1044,6 +1045,7 @@ const NAV_ITEMS = [
   { key: "foods", icon: "utensils", es: "Alimentos", en: "Foods" },
   { key: "supps", icon: "pill", es: "Suplementos", en: "Supplements" },
   { key: "centers", icon: "mappin", es: "Centros", en: "Centers" },
+  { key: "forum", icon: "message", es: "Foro", en: "Forum" },
   { key: "info", icon: "book", es: "Información", en: "Info" },
   { key: "profile", icon: "user", es: "Perfil", en: "Profile" },
 ];
@@ -1120,6 +1122,11 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
         <line x1="3" y1="6" x2="21" y2="6" />
         <line x1="3" y1="12" x2="21" y2="12" />
         <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    ),
+    message: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
     ),
     x: (
@@ -1202,7 +1209,6 @@ export default function App() {
   const [openLog, setOpenLog] = useState(null);
   const [avatarMenu, setAvatarMenu] = useState(false);
   const [centersView, setCentersView] = useState("list"); // "list" | "propose" | "pending"
-  const [infoSection, setInfoSection] = useState("recursos"); // "recursos" | "foro"
   const [centerForm, setCenterForm] = useState({
     name: "",
     address: "",
@@ -1742,7 +1748,7 @@ export default function App() {
       keys: ["home", "today", "history", "charts"],
     },
     { label: lang === "es" ? "Salud" : "Health", keys: ["foods", "supps"] },
-    { label: lang === "es" ? "Recursos" : "Resources", keys: ["centers", "info"] },
+    { label: lang === "es" ? "Recursos" : "Resources", keys: ["centers", "forum", "info"] },
     { label: lang === "es" ? "Cuenta" : "Account", keys: ["profile"] },
   ];
 
@@ -2649,6 +2655,9 @@ export default function App() {
             />
           )}
 
+          {/* ── FORUM ── */}
+          {tab === "forum" && <CommunityForum lang={lang} C={C} profile={profile} />}
+
           {/* ── INFO ── */}
           {tab === "info" && (
             <InfoTab
@@ -2656,9 +2665,6 @@ export default function App() {
               setInfoFilter={setInfoFilter}
               setShowGuide={setShowGuide}
               INFO_RESOURCES={INFO_RESOURCES}
-              profile={profile}
-              infoSection={infoSection}
-              setInfoSection={setInfoSection}
               lang={lang}
               C={C}
               S={S}
