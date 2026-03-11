@@ -154,10 +154,7 @@ export async function insertForumPost(userId, post) {
 }
 
 export async function updateForumReactions(postId, reactions) {
-  const { error } = await supabase
-    .from("forum_posts")
-    .update({ reactions })
-    .eq("id", postId);
+  const { error } = await supabase.from("forum_posts").update({ reactions }).eq("id", postId);
   if (error) console.error("updateForumReactions:", error);
 }
 

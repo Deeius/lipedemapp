@@ -146,7 +146,9 @@ export default function CommunityForum({ lang, C, profile, userId }) {
           </div>
           <div style={{ fontSize: 12, color: C.creamMuted }}>
             {loading
-              ? lang === "es" ? "Cargando…" : "Loading…"
+              ? lang === "es"
+                ? "Cargando…"
+                : "Loading…"
               : lang === "es"
                 ? `${posts.length} historias compartidas`
                 : `${posts.length} stories shared`}
@@ -169,8 +171,12 @@ export default function CommunityForum({ lang, C, profile, userId }) {
             }}
           >
             {showForm
-              ? lang === "es" ? "Cancelar" : "Cancel"
-              : lang === "es" ? "+ Compartir" : "+ Share"}
+              ? lang === "es"
+                ? "Cancelar"
+                : "Cancel"
+              : lang === "es"
+                ? "+ Compartir"
+                : "+ Share"}
           </button>
         ) : (
           <div style={{ fontSize: 11, color: C.creamMuted, fontStyle: "italic" }}>
@@ -208,7 +214,16 @@ export default function CommunityForum({ lang, C, profile, userId }) {
           }}
         >
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.creamMuted, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.creamMuted,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                marginBottom: 5,
+              }}
+            >
               {lang === "es" ? "Tu historia *" : "Your story *"}
             </div>
             <textarea
@@ -239,26 +254,67 @@ export default function CommunityForum({ lang, C, profile, userId }) {
 
           <div style={{ display: "flex", gap: 8 }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.creamMuted, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.creamMuted,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  marginBottom: 5,
+                }}
+              >
                 {lang === "es" ? "Estadio" : "Stage"}
               </div>
               <select
-                style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontSize: 12, fontFamily: "inherit", background: "white", color: C.cream, outline: "none" }}
+                style={{
+                  width: "100%",
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  border: `1.5px solid ${C.border}`,
+                  fontSize: 12,
+                  fontFamily: "inherit",
+                  background: "white",
+                  color: C.cream,
+                  outline: "none",
+                }}
                 value={form.stage}
                 onChange={(e) => setForm({ ...form, stage: e.target.value })}
               >
                 <option value="">{lang === "es" ? "Selecciona…" : "Select…"}</option>
                 {STAGES.map((s) => (
-                  <option key={s} value={s}>{lang === "es" ? `Estadio ${s}` : `Stage ${s}`}</option>
+                  <option key={s} value={s}>
+                    {lang === "es" ? `Estadio ${s}` : `Stage ${s}`}
+                  </option>
                 ))}
               </select>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.creamMuted, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.creamMuted,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  marginBottom: 5,
+                }}
+              >
                 {lang === "es" ? "País" : "Country"}
               </div>
               <input
-                style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontSize: 12, fontFamily: "inherit", background: "white", color: C.cream, outline: "none", boxSizing: "border-box" }}
+                style={{
+                  width: "100%",
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  border: `1.5px solid ${C.border}`,
+                  fontSize: 12,
+                  fontFamily: "inherit",
+                  background: "white",
+                  color: C.cream,
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
                 placeholder={lang === "es" ? "España, México…" : "Spain, Mexico…"}
                 value={form.country}
                 onChange={(e) => setForm({ ...form, country: e.target.value })}
@@ -267,7 +323,16 @@ export default function CommunityForum({ lang, C, profile, userId }) {
           </div>
 
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.creamMuted, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.creamMuted,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                marginBottom: 5,
+              }}
+            >
               {lang === "es" ? "Tema" : "Topic"}
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -311,8 +376,12 @@ export default function CommunityForum({ lang, C, profile, userId }) {
             }}
           >
             {submitting
-              ? lang === "es" ? "Publicando…" : "Posting…"
-              : lang === "es" ? "Publicar" : "Post"}
+              ? lang === "es"
+                ? "Publicando…"
+                : "Posting…"
+              : lang === "es"
+                ? "Publicar"
+                : "Post"}
           </button>
         </div>
       )}
@@ -325,8 +394,12 @@ export default function CommunityForum({ lang, C, profile, userId }) {
           </div>
         )}
         {!loading && posts.length === 0 && (
-          <div style={{ textAlign: "center", padding: "30px 20px", color: C.creamMuted, fontSize: 13 }}>
-            {lang === "es" ? "Sé la primera en compartir tu historia 💪" : "Be the first to share your story 💪"}
+          <div
+            style={{ textAlign: "center", padding: "30px 20px", color: C.creamMuted, fontSize: 13 }}
+          >
+            {lang === "es"
+              ? "Sé la primera en compartir tu historia 💪"
+              : "Be the first to share your story 💪"}
           </div>
         )}
         {posts.map((post) => {
@@ -342,34 +415,86 @@ export default function CommunityForum({ lang, C, profile, userId }) {
               }}
             >
               {/* Author */}
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.sage, marginBottom: 6, display: "flex", alignItems: "center", gap: 5 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.sage,
+                  marginBottom: 6,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                }}
+              >
                 <span style={{ fontSize: 14 }}>🌸</span>
                 {post.author_name || (lang === "es" ? "Anónima" : "Anonymous")}
               </div>
 
               {/* Text */}
-              <p style={{ fontSize: 13, color: C.cream, lineHeight: 1.6, fontStyle: "italic", margin: "0 0 10px" }}>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: C.cream,
+                  lineHeight: 1.6,
+                  fontStyle: "italic",
+                  margin: "0 0 10px",
+                }}
+              >
                 "{post.text}"
               </p>
 
               {/* Tags */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
                 {post.stage && (
-                  <span style={{ fontSize: 10, fontWeight: 700, color: C.sage, background: C.creamFaint, padding: "2px 8px", borderRadius: 20 }}>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.sage,
+                      background: C.creamFaint,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                    }}
+                  >
                     {lang === "es" ? `Estadio ${post.stage}` : `Stage ${post.stage}`}
                   </span>
                 )}
                 {post.country && (
-                  <span style={{ fontSize: 10, fontWeight: 700, color: C.creamMuted, background: C.creamFaint, padding: "2px 8px", borderRadius: 20 }}>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.creamMuted,
+                      background: C.creamFaint,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                    }}
+                  >
                     {post.country}
                   </span>
                 )}
                 {post.treatment && treatmentsMap[post.treatment] && (
-                  <span style={{ fontSize: 10, fontWeight: 700, color: C.accent, background: `${C.accent}15`, padding: "2px 8px", borderRadius: 20 }}>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.accent,
+                      background: `${C.accent}15`,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                    }}
+                  >
                     {treatmentsMap[post.treatment]}
                   </span>
                 )}
-                <span style={{ fontSize: 10, color: C.creamMuted, marginLeft: "auto", alignSelf: "center" }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    color: C.creamMuted,
+                    marginLeft: "auto",
+                    alignSelf: "center",
+                  }}
+                >
                   {formatDate(post.created_at, lang)}
                 </span>
               </div>
