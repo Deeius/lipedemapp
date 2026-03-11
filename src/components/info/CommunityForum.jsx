@@ -1,91 +1,5 @@
 import { useState, useEffect } from "react";
-
-const SEED_POSTS = {
-  es: [
-    {
-      id: "seed-1",
-      author: "María G.",
-      text: "Después de 2 años con DLM semanal y compresión, el dolor al caminar ha bajado de un 8 a un 3. No me lo creía posible.",
-      stage: "2",
-      country: "España",
-      treatment: "conservative",
-      date: "2025-11-03",
-      reactions: { "💪": 14, "❤️": 9, "🙏": 5 },
-    },
-    {
-      id: "seed-2",
-      author: "Laura M.",
-      text: "La cirugía WAL me cambió la vida. Tardé 6 meses en recuperarme bien, pero por fin puedo hacer senderismo.",
-      stage: "3",
-      country: "México",
-      treatment: "surgical",
-      date: "2025-10-18",
-      reactions: { "💪": 22, "❤️": 17, "🙏": 8 },
-    },
-    {
-      id: "seed-3",
-      author: "Ana P.",
-      text: "Empecé la dieta antiinflamatoria hace 4 meses. No he perdido volumen pero la sensación de pesadez ha mejorado muchísimo.",
-      stage: "1",
-      country: "Argentina",
-      treatment: "diet",
-      date: "2025-12-01",
-      reactions: { "💪": 10, "❤️": 12, "🙏": 3 },
-    },
-    {
-      id: "seed-4",
-      author: "Carmen R.",
-      text: "Lo más difícil fue encontrar un médico que me tomara en serio. Una vez con el diagnóstico, todo cambió.",
-      stage: "2",
-      country: "Colombia",
-      treatment: "diagnosis",
-      date: "2026-01-14",
-      reactions: { "💪": 31, "❤️": 28, "🙏": 19 },
-    },
-  ],
-  en: [
-    {
-      id: "seed-1",
-      author: "María G.",
-      text: "After 2 years of weekly MLD and compression, the pain when walking has gone from an 8 to a 3. I couldn't believe it was possible.",
-      stage: "2",
-      country: "Spain",
-      treatment: "conservative",
-      date: "2025-11-03",
-      reactions: { "💪": 14, "❤️": 9, "🙏": 5 },
-    },
-    {
-      id: "seed-2",
-      author: "Laura M.",
-      text: "WAL surgery changed my life. It took 6 months to recover properly, but I can finally go hiking.",
-      stage: "3",
-      country: "Mexico",
-      treatment: "surgical",
-      date: "2025-10-18",
-      reactions: { "💪": 22, "❤️": 17, "🙏": 8 },
-    },
-    {
-      id: "seed-3",
-      author: "Ana P.",
-      text: "I started the anti-inflammatory diet 4 months ago. I haven't lost volume but the heaviness has improved enormously.",
-      stage: "1",
-      country: "Argentina",
-      treatment: "diet",
-      date: "2025-12-01",
-      reactions: { "💪": 10, "❤️": 12, "🙏": 3 },
-    },
-    {
-      id: "seed-4",
-      author: "Carmen R.",
-      text: "The hardest part was finding a doctor who took me seriously. Once I had the diagnosis, everything changed.",
-      stage: "2",
-      country: "Colombia",
-      treatment: "diagnosis",
-      date: "2026-01-14",
-      reactions: { "💪": 31, "❤️": 28, "🙏": 19 },
-    },
-  ],
-};
+import { getForumPosts, insertForumPost, updateForumReactions } from "../../lib/db";
 
 const TREATMENTS_MAP = {
   es: {
@@ -104,14 +18,8 @@ const TREATMENTS_MAP = {
   },
 };
 
-const STAGES = {
-  es: ["1", "2", "3", "4", "No sé"],
-  en: ["1", "2", "3", "4", "Unknown"],
-};
-
+const STAGES = ["1", "2", "3", "4"];
 const REACTIONS = ["💪", "❤️", "🙏"];
-
-const STORAGE_KEY = "lt_forum_posts";
 const REACTIONS_KEY = "lt_forum_reactions";
 
 function formatDate(dateStr, lang) {
@@ -126,33 +34,34 @@ function formatDate(dateStr, lang) {
   }
 }
 
-export default function CommunityForum({ lang, C, profile }) {
-  const [userPosts, setUserPosts] = useState([]);
+export default function CommunityForum({ lang, C, profile, userId }) {
+  const [posts, setPosts] = useState([]);
   const [myReactions, setMyReactions] = useState({});
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    text: "",
-    stage: "",
-    country: "",
-    treatment: "",
-  });
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ text: "", stage: "", country: "", treatment: "" });
 
-  const seedPosts = SEED_POSTS[lang] || SEED_POSTS.es;
   const treatmentsMap = TREATMENTS_MAP[lang] || TREATMENTS_MAP.es;
-  const stages = STAGES[lang] || STAGES.es;
 
-  // Load from localStorage
+  // Load posts from Supabase
+  useEffect(() => {
+    getForumPosts().then((data) => {
+      setPosts(data);
+      setLoading(false);
+    });
+  }, []);
+
+  // Load my reactions from localStorage
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) setUserPosts(JSON.parse(stored));
-      const reacts = localStorage.getItem(REACTIONS_KEY);
-      if (reacts) setMyReactions(JSON.parse(reacts));
+      const stored = localStorage.getItem(REACTIONS_KEY);
+      if (stored) setMyReactions(JSON.parse(stored));
     } catch {}
   }, []);
 
-  // Pre-fill country from profile
+  // Pre-fill from profile
   useEffect(() => {
     if (profile?.country && !form.country) {
       setForm((f) => ({ ...f, country: profile.country }));
@@ -162,71 +71,43 @@ export default function CommunityForum({ lang, C, profile }) {
     }
   }, [profile]);
 
-  const allPosts = [
-    ...seedPosts.map((p) => ({ ...p, isSeed: true })),
-    ...userPosts.map((p) => ({ ...p, isSeed: false })),
-  ].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  const handleReact = (postId, emoji) => {
-    const key = `${postId}-${emoji}`;
-    const already = myReactions[key];
-
-    // Update local reactions state (for seeds + user posts display)
-    setMyReactions((prev) => {
-      const updated = { ...prev, [key]: !already };
-      try {
-        localStorage.setItem(REACTIONS_KEY, JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
-
-    // If user post, update the stored count
-    setUserPosts((prev) => {
-      const updated = prev.map((p) => {
-        if (p.id !== postId) return p;
-        const delta = already ? -1 : 1;
-        return {
-          ...p,
-          reactions: { ...p.reactions, [emoji]: Math.max(0, (p.reactions[emoji] || 0) + delta) },
-        };
-      });
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
-  };
-
-  const getReactionCount = (post, emoji) => {
-    const base = post.reactions?.[emoji] || 0;
-    if (!post.isSeed) return base;
-    // For seed posts, adjust count based on my reaction
+  const handleReact = async (post, emoji) => {
+    if (!userId) return;
     const key = `${post.id}-${emoji}`;
-    const reacted = myReactions[key];
-    return reacted ? base + 1 : base;
+    const already = myReactions[key];
+    const delta = already ? -1 : 1;
+    const newCount = Math.max(0, (post.reactions?.[emoji] || 0) + delta);
+    const newReactions = { ...post.reactions, [emoji]: newCount };
+
+    // Optimistic update
+    setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, reactions: newReactions } : p)));
+    const updatedMyReactions = { ...myReactions, [key]: !already };
+    setMyReactions(updatedMyReactions);
+    try {
+      localStorage.setItem(REACTIONS_KEY, JSON.stringify(updatedMyReactions));
+    } catch {}
+
+    await updateForumReactions(post.id, newReactions);
   };
 
-  const handleSubmit = () => {
-    if (!form.text.trim()) return;
-    const newPost = {
-      id: `user-${Date.now()}`,
-      author: profile?.name?.trim() || (lang === "es" ? "Anónima" : "Anonymous"),
+  const handleSubmit = async () => {
+    if (!form.text.trim() || !userId) return;
+    setSubmitting(true);
+    const newPost = await insertForumPost(userId, {
+      author_name: profile?.name?.trim() || (lang === "es" ? "Anónima" : "Anonymous"),
       text: form.text.trim(),
-      stage: form.stage || (lang === "es" ? "No sé" : "Unknown"),
-      country: form.country.trim() || "—",
-      treatment: form.treatment || "other",
-      date: new Date().toISOString().split("T")[0],
-      reactions: { "💪": 0, "❤️": 0, "🙏": 0 },
-    };
-    const updated = [...userPosts, newPost];
-    setUserPosts(updated);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
-    setForm({ text: "", stage: form.stage, country: form.country, treatment: "" });
-    setShowForm(false);
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+      stage: form.stage || null,
+      country: form.country.trim() || null,
+      treatment: form.treatment || null,
+    });
+    if (newPost) {
+      setPosts((prev) => [newPost, ...prev]);
+      setForm({ text: "", stage: form.stage, country: form.country, treatment: "" });
+      setShowForm(false);
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 3000);
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -264,37 +145,47 @@ export default function CommunityForum({ lang, C, profile }) {
             💬 {lang === "es" ? "Experiencias reales" : "Real experiences"}
           </div>
           <div style={{ fontSize: 12, color: C.creamMuted }}>
-            {lang === "es"
-              ? `${allPosts.length} historias compartidas`
-              : `${allPosts.length} stories shared`}
+            {loading
+              ? lang === "es"
+                ? "Cargando…"
+                : "Loading…"
+              : lang === "es"
+                ? `${posts.length} historias compartidas`
+                : `${posts.length} stories shared`}
           </div>
         </div>
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          style={{
-            padding: "8px 14px",
-            borderRadius: 10,
-            border: `1.5px solid ${showForm ? C.border : C.sage}`,
-            background: showForm ? C.creamFaint : C.sage,
-            color: showForm ? C.creamMuted : "#fff",
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: "pointer",
-            fontFamily: "inherit",
-            transition: "all 0.15s",
-          }}
-        >
-          {showForm
-            ? lang === "es"
-              ? "Cancelar"
-              : "Cancel"
-            : lang === "es"
-              ? "+ Compartir mi historia"
-              : "+ Share my story"}
-        </button>
+        {userId ? (
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 10,
+              border: `1.5px solid ${showForm ? C.border : C.sage}`,
+              background: showForm ? C.creamFaint : C.sage,
+              color: showForm ? C.creamMuted : "#fff",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "all 0.15s",
+            }}
+          >
+            {showForm
+              ? lang === "es"
+                ? "Cancelar"
+                : "Cancel"
+              : lang === "es"
+                ? "+ Compartir"
+                : "+ Share"}
+          </button>
+        ) : (
+          <div style={{ fontSize: 11, color: C.creamMuted, fontStyle: "italic" }}>
+            {lang === "es" ? "Inicia sesión para participar" : "Sign in to participate"}
+          </div>
+        )}
       </div>
 
-      {/* Success message */}
+      {/* Success */}
       {submitted && (
         <div
           style={{
@@ -306,15 +197,12 @@ export default function CommunityForum({ lang, C, profile }) {
             color: C.sage,
           }}
         >
-          ✓{" "}
-          {lang === "es"
-            ? "¡Gracias por compartir tu historia!"
-            : "Thank you for sharing your story!"}
+          ✓ {lang === "es" ? "¡Gracias por compartir tu historia!" : "Thank you for sharing!"}
         </div>
       )}
 
-      {/* New post form */}
-      {showForm && (
+      {/* Form */}
+      {showForm && userId && (
         <div
           style={{
             padding: "16px 18px",
@@ -356,8 +244,8 @@ export default function CommunityForum({ lang, C, profile }) {
               }}
               placeholder={
                 lang === "es"
-                  ? "Comparte tu experiencia con el diagnóstico, tratamiento o día a día con lipedema..."
-                  : "Share your experience with diagnosis, treatment or daily life with lipedema..."
+                  ? "Comparte tu experiencia con el diagnóstico, tratamiento o día a día..."
+                  : "Share your experience with diagnosis, treatment or daily life..."
               }
               value={form.text}
               onChange={(e) => setForm({ ...form, text: e.target.value })}
@@ -365,7 +253,6 @@ export default function CommunityForum({ lang, C, profile }) {
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
-            {/* Stage */}
             <div style={{ flex: 1 }}>
               <div
                 style={{
@@ -395,15 +282,13 @@ export default function CommunityForum({ lang, C, profile }) {
                 onChange={(e) => setForm({ ...form, stage: e.target.value })}
               >
                 <option value="">{lang === "es" ? "Selecciona…" : "Select…"}</option>
-                {stages.map((s) => (
+                {STAGES.map((s) => (
                   <option key={s} value={s}>
                     {lang === "es" ? `Estadio ${s}` : `Stage ${s}`}
                   </option>
                 ))}
               </select>
             </div>
-
-            {/* Country */}
             <div style={{ flex: 1 }}>
               <div
                 style={{
@@ -437,7 +322,6 @@ export default function CommunityForum({ lang, C, profile }) {
             </div>
           </div>
 
-          {/* Treatment */}
           <div>
             <div
               style={{
@@ -449,7 +333,7 @@ export default function CommunityForum({ lang, C, profile }) {
                 marginBottom: 5,
               }}
             >
-              {lang === "es" ? "Sobre qué trata" : "Topic"}
+              {lang === "es" ? "Tema" : "Topic"}
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {Object.entries(treatmentsMap).map(([key, label]) => (
@@ -477,155 +361,175 @@ export default function CommunityForum({ lang, C, profile }) {
 
           <button
             onClick={handleSubmit}
-            disabled={!form.text.trim()}
+            disabled={!form.text.trim() || submitting}
             style={{
               padding: "10px 0",
               borderRadius: 10,
               border: "none",
-              background: form.text.trim() ? C.sage : C.border,
-              color: form.text.trim() ? "#fff" : C.creamMuted,
+              background: form.text.trim() && !submitting ? C.sage : C.border,
+              color: form.text.trim() && !submitting ? "#fff" : C.creamMuted,
               fontSize: 13,
               fontWeight: 700,
-              cursor: form.text.trim() ? "pointer" : "default",
+              cursor: form.text.trim() && !submitting ? "pointer" : "default",
               fontFamily: "inherit",
               transition: "all 0.15s",
             }}
           >
-            {lang === "es" ? "Publicar" : "Post"}
+            {submitting
+              ? lang === "es"
+                ? "Publicando…"
+                : "Posting…"
+              : lang === "es"
+                ? "Publicar"
+                : "Post"}
           </button>
         </div>
       )}
 
       {/* Posts list */}
       <div style={{ padding: "12px 18px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-        {allPosts.map((post) => (
+        {loading && (
+          <div style={{ textAlign: "center", padding: "20px", color: C.creamMuted, fontSize: 13 }}>
+            {lang === "es" ? "Cargando historias…" : "Loading stories…"}
+          </div>
+        )}
+        {!loading && posts.length === 0 && (
           <div
-            key={post.id}
-            style={{
-              padding: "12px 14px",
-              background: C.bg,
-              borderRadius: 10,
-              border: `1px solid ${C.border}`,
-            }}
+            style={{ textAlign: "center", padding: "30px 20px", color: C.creamMuted, fontSize: 13 }}
           >
-            {/* Author */}
+            {lang === "es"
+              ? "Sé la primera en compartir tu historia 💪"
+              : "Be the first to share your story 💪"}
+          </div>
+        )}
+        {posts.map((post) => {
+          const reacted = (emoji) => myReactions[`${post.id}-${emoji}`];
+          return (
             <div
+              key={post.id}
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: C.sage,
-                marginBottom: 6,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
+                padding: "12px 14px",
+                background: C.bg,
+                borderRadius: 10,
+                border: `1px solid ${C.border}`,
               }}
             >
-              <span style={{ fontSize: 14 }}>🌸</span>
-              {post.author || (lang === "es" ? "Anónima" : "Anonymous")}
-            </div>
-
-            {/* Text */}
-            <p
-              style={{
-                fontSize: 13,
-                color: C.cream,
-                lineHeight: 1.6,
-                fontStyle: "italic",
-                margin: "0 0 10px",
-              }}
-            >
-              "{post.text}"
-            </p>
-
-            {/* Tags */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
-              {post.stage && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: C.sage,
-                    background: C.creamFaint,
-                    padding: "2px 8px",
-                    borderRadius: 20,
-                  }}
-                >
-                  {lang === "es" ? `Estadio ${post.stage}` : `Stage ${post.stage}`}
-                </span>
-              )}
-              {post.country && post.country !== "—" && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: C.creamMuted,
-                    background: C.creamFaint,
-                    padding: "2px 8px",
-                    borderRadius: 20,
-                  }}
-                >
-                  {post.country}
-                </span>
-              )}
-              {post.treatment && treatmentsMap[post.treatment] && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: C.accent,
-                    background: `${C.accent}15`,
-                    padding: "2px 8px",
-                    borderRadius: 20,
-                  }}
-                >
-                  {treatmentsMap[post.treatment]}
-                </span>
-              )}
-              <span
+              {/* Author */}
+              <div
                 style={{
-                  fontSize: 10,
-                  color: C.creamMuted,
-                  marginLeft: "auto",
-                  alignSelf: "center",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.sage,
+                  marginBottom: 6,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
                 }}
               >
-                {formatDate(post.date, lang)}
-              </span>
-            </div>
+                <span style={{ fontSize: 14 }}>🌸</span>
+                {post.author_name || (lang === "es" ? "Anónima" : "Anonymous")}
+              </div>
 
-            {/* Reactions */}
-            <div style={{ display: "flex", gap: 6 }}>
-              {REACTIONS.map((emoji) => {
-                const count = getReactionCount(post, emoji);
-                const reacted = myReactions[`${post.id}-${emoji}`];
-                return (
+              {/* Text */}
+              <p
+                style={{
+                  fontSize: 13,
+                  color: C.cream,
+                  lineHeight: 1.6,
+                  fontStyle: "italic",
+                  margin: "0 0 10px",
+                }}
+              >
+                "{post.text}"
+              </p>
+
+              {/* Tags */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
+                {post.stage && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.sage,
+                      background: C.creamFaint,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                    }}
+                  >
+                    {lang === "es" ? `Estadio ${post.stage}` : `Stage ${post.stage}`}
+                  </span>
+                )}
+                {post.country && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.creamMuted,
+                      background: C.creamFaint,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                    }}
+                  >
+                    {post.country}
+                  </span>
+                )}
+                {post.treatment && treatmentsMap[post.treatment] && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: C.accent,
+                      background: `${C.accent}15`,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                    }}
+                  >
+                    {treatmentsMap[post.treatment]}
+                  </span>
+                )}
+                <span
+                  style={{
+                    fontSize: 10,
+                    color: C.creamMuted,
+                    marginLeft: "auto",
+                    alignSelf: "center",
+                  }}
+                >
+                  {formatDate(post.created_at, lang)}
+                </span>
+              </div>
+
+              {/* Reactions */}
+              <div style={{ display: "flex", gap: 6 }}>
+                {REACTIONS.map((emoji) => (
                   <button
                     key={emoji}
-                    onClick={() => handleReact(post.id, emoji)}
+                    onClick={() => handleReact(post, emoji)}
+                    disabled={!userId}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: 4,
                       padding: "4px 10px",
                       borderRadius: 20,
-                      border: `1.5px solid ${reacted ? C.sage : C.border}`,
-                      background: reacted ? C.creamFaint : "white",
+                      border: `1.5px solid ${reacted(emoji) ? C.sage : C.border}`,
+                      background: reacted(emoji) ? C.creamFaint : "white",
                       fontSize: 12,
-                      cursor: "pointer",
+                      cursor: userId ? "pointer" : "default",
                       fontFamily: "inherit",
-                      color: reacted ? C.sage : C.creamMuted,
-                      fontWeight: reacted ? 700 : 500,
+                      color: reacted(emoji) ? C.sage : C.creamMuted,
+                      fontWeight: reacted(emoji) ? 700 : 500,
                       transition: "all 0.15s",
                     }}
                   >
                     <span>{emoji}</span>
-                    <span style={{ fontSize: 11 }}>{count}</span>
+                    <span style={{ fontSize: 11 }}>{post.reactions?.[emoji] || 0}</span>
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
