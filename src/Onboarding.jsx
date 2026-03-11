@@ -730,7 +730,7 @@ export default function Onboarding({ initialLang = "es", onComplete, loginWithGo
           </div>
 
           {/* Guest */}
-          <button onClick={() => onComplete(null)} style={S.btnSecondary}>
+          <button onClick={() => setScreen("lipedema_info")} style={S.btnSecondary}>
             {lang === "es" ? "Explorar sin cuenta →" : "Explore without account →"}
           </button>
 
@@ -852,6 +852,74 @@ export default function Onboarding({ initialLang = "es", onComplete, loginWithGo
               </button>
             </div>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // SCREEN: LIPEDEMA INFO (guest)
+  // ────────────────────────────────────────────────────────────────────────────
+  if (screen === "lipedema_info") {
+    const types = lang === "es" ? LIPEDEMA_TYPES_ES : LIPEDEMA_TYPES_EN;
+    return (
+      <div style={S.wrap}>
+        <div style={{ ...S.card, maxWidth: 480 }}>
+          <Logo />
+
+          <div style={S.stepIcon}>
+            <Icon name="sparkles" size={22} color={C.sage} />
+          </div>
+
+          <h2 style={S.h1}>{lang === "es" ? "Tipos de lipedema" : "Types of lipedema"}</h2>
+          <p style={S.sub}>
+            {lang === "es"
+              ? "El lipedema se clasifica según las zonas del cuerpo afectadas. Conocerlos puede ayudarte a identificar mejor tu caso."
+              : "Lipedema is classified by the body areas affected. Knowing the types can help you better identify your case."}
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
+            {types
+              .filter((t) => t.val !== "unknown")
+              .map((t) => (
+                <div
+                  key={t.val}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: 12,
+                    border: `1.5px solid ${t.border}20`,
+                    background: t.color,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                >
+                  <span style={{ fontSize: 22, flexShrink: 0 }}>{t.emoji}</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: t.border }}>{t.label}</div>
+                    <div
+                      style={{ fontSize: 11, color: C.creamMuted, marginTop: 2, lineHeight: 1.4 }}
+                    >
+                      {t.desc}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          <button
+            onClick={() => onComplete(null)}
+            style={{ ...S.btnPrimary, background: C.sage, color: "#fff", cursor: "pointer" }}
+          >
+            {lang === "es" ? "Entrar a la app" : "Enter the app"}
+            <Icon name="arrow" size={16} color="#fff" />
+          </button>
+
+          <div style={{ textAlign: "center", marginTop: 12 }}>
+            <button onClick={() => setScreen("welcome")} style={S.btnSecondary}>
+              ← {lang === "es" ? "Volver" : "Back"}
+            </button>
+          </div>
         </div>
       </div>
     );
