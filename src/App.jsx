@@ -1296,39 +1296,45 @@ export default function App() {
     setShowOnboarding(true);
   }, []);
 
-  const handleOnboardingComplete = useCallback(
-    (data) => {
-      // null = explorar sin cuenta (guest)
-      if (data === null) {
-        try {
-          localStorage.setItem("lt_onboarding_done", "1");
-        } catch {}
-        setShowOnboarding(false);
-        return;
-      }
-      const { name, lang: newLang, country, region, stage, compression, posture, lipedemaType } = data;
-      const updatedProfile = {
-        ...defaultProfile,
-        name,
-        stage,
-        country,
-        region,
-        compression,
-        posture,
-        lipedemaType: lipedemaType || "",
-      };
-      setProfile(updatedProfile);
-      setLang(newLang);
+  const handleOnboardingComplete = useCallback((data) => {
+    // null = explorar sin cuenta (guest)
+    if (data === null) {
       try {
-        localStorage.setItem("lt_profile", JSON.stringify(updatedProfile));
-        localStorage.setItem("lt_lang", newLang);
         localStorage.setItem("lt_onboarding_done", "1");
-        if (country) localStorage.setItem("lt_location", JSON.stringify({ country, region }));
       } catch {}
       setShowOnboarding(false);
-    },
-    []
-  );
+      return;
+    }
+    const {
+      name,
+      lang: newLang,
+      country,
+      region,
+      stage,
+      compression,
+      posture,
+      lipedemaType,
+    } = data;
+    const updatedProfile = {
+      ...defaultProfile,
+      name,
+      stage,
+      country,
+      region,
+      compression,
+      posture,
+      lipedemaType: lipedemaType || "",
+    };
+    setProfile(updatedProfile);
+    setLang(newLang);
+    try {
+      localStorage.setItem("lt_profile", JSON.stringify(updatedProfile));
+      localStorage.setItem("lt_lang", newLang);
+      localStorage.setItem("lt_onboarding_done", "1");
+      if (country) localStorage.setItem("lt_location", JSON.stringify({ country, region }));
+    } catch {}
+    setShowOnboarding(false);
+  }, []);
 
   const persist = useCallback((key, val) => {
     try {
@@ -1779,7 +1785,13 @@ export default function App() {
   }
 
   if (showOnboarding) {
-    return <Onboarding initialLang={lang} onComplete={handleOnboardingComplete} loginWithGoogle={loginWithGoogle} />;
+    return (
+      <Onboarding
+        initialLang={lang}
+        onComplete={handleOnboardingComplete}
+        loginWithGoogle={loginWithGoogle}
+      />
+    );
   }
 
   return (
