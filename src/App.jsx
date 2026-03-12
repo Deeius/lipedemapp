@@ -2251,12 +2251,6 @@ export default function App() {
                   strokeLinecap="round"
                 />
               </svg>
-              <span
-                style={{ fontSize: 12, fontWeight: 700, color: C.creamMuted, cursor: "pointer" }}
-                onClick={() => setTab("home")}
-              >
-                {lang === "es" ? "Resumen" : "Summary"}
-              </span>
             </div>
             {NAV_GROUPS.map((group) => (
               <div key={group.label}>
