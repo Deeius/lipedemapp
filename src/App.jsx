@@ -1111,6 +1111,11 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
         <line x1="12" y1="10" x2="16" y2="10" />
       </svg>
     ),
+    message: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
     user: (
       <svg style={s} viewBox="0 0 24 24" {...p}>
         <circle cx="12" cy="8" r="4" />
