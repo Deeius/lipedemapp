@@ -133,6 +133,34 @@ export async function migrateFromLocalStorage(userId) {
   }
 }
 
+// ── SUGGESTIONS ───────────────────────────────────────────
+export async function insertSuggestion({ user_id, type, description, email }) {
+  const { error } = await supabase.from("suggestions").insert({
+    user_id,
+    type,
+    description,
+    email,
+  });
+  if (error) {
+    console.error("insertSuggestion:", error);
+    throw error;
+  }
+}
+
+export async function getSuggestions() {
+  const { data, error } = await supabase
+    .from("suggestions")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) console.error("getSuggestions:", error);
+  return data ?? [];
+}
+
+export async function updateSuggestionStatus(id, status) {
+  const { error } = await supabase.from("suggestions").update({ status }).eq("id", id);
+  if (error) console.error("updateSuggestionStatus:", error);
+}
+
 // ── FORUM POSTS ───────────────────────────────────────────
 export async function getForumPosts() {
   const { data, error } = await supabase
@@ -143,26 +171,25 @@ export async function getForumPosts() {
   return data ?? [];
 }
 
-export async function insertForumPost(userId, post) {
+export async function insertForumPost({ user_id, author_name, text, stage, country, treatment }) {
   const { data, error } = await supabase
     .from("forum_posts")
-    .insert({ user_id: userId, ...post })
+    .insert({ user_id, author_name, text, stage, country, treatment })
     .select()
     .single();
-  if (error) console.error("insertForumPost:", error);
-  return data ?? null;
+  if (error) {
+    console.error("insertForumPost:", error);
+    throw error;
+  }
+  return data;
 }
 
-export async function updateForumReactions(postId, reactions) {
-  const { error } = await supabase.from("forum_posts").update({ reactions }).eq("id", postId);
+export async function updateForumReactions(id, reactions) {
+  const { error } = await supabase.from("forum_posts").update({ reactions }).eq("id", id);
   if (error) console.error("updateForumReactions:", error);
 }
 
-export async function deleteForumPost(userId, postId) {
-  const { error } = await supabase
-    .from("forum_posts")
-    .delete()
-    .eq("id", postId)
-    .eq("user_id", userId);
+export async function deleteForumPost(id) {
+  const { error } = await supabase.from("forum_posts").delete().eq("id", id);
   if (error) console.error("deleteForumPost:", error);
 }
