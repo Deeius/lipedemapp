@@ -2212,46 +2212,6 @@ export default function App() {
         {/* ── SIDEBAR (desktop) ── */}
         {isDesktop && (
           <aside style={S.sidebar(true)}>
-            {/* Mini logo in sidebar */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "4px 12px 16px",
-                borderBottom: `1px solid ${C.border}`,
-                marginBottom: 8,
-                cursor: "pointer",
-              }}
-              onClick={() => setTab("home")}
-            >
-              <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
-                <circle
-                  cx="14"
-                  cy="14"
-                  r="13"
-                  fill={C.creamFaint}
-                  stroke={C.border}
-                  strokeWidth="1"
-                />
-                <path
-                  d="M14 6 Q20 10 20 16 Q20 21 14 22 Q8 21 8 16 Q8 10 14 6Z"
-                  fill="none"
-                  stroke={C.sage}
-                  strokeWidth="1.4"
-                  strokeLinejoin="round"
-                />
-                <line
-                  x1="14"
-                  y1="6"
-                  x2="14"
-                  y2="22"
-                  stroke={C.sage}
-                  strokeWidth="0.9"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
             {NAV_GROUPS.map((group) => (
               <div key={group.label}>
                 <div style={S.sbSection}>{group.label}</div>
