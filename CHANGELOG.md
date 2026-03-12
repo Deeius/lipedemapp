@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.28](https://github.com/Deeius/lipedemapp/compare/v1.0.27...v1.0.28) (2026-03-12)
+
+
+### Bug Fixes
+
+* fixed onboarding path ([d2fbeac](https://github.com/Deeius/lipedemapp/commit/d2fbeac973cef078cb5b9ae583900567c2d9db2f))
+* fixed onboarding path ([8d25ebb](https://github.com/Deeius/lipedemapp/commit/8d25ebbf3d2e29169901811761b96245ae793b4c))
+
 ### [1.0.27](https://github.com/Deeius/lipedemapp/compare/v1.0.26...v1.0.27) (2026-03-12)
 
 
