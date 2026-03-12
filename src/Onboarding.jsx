@@ -149,7 +149,6 @@ const STAGES_EN = [
 const LIPEDEMA_TYPES_ES = [
   {
     val: "type1",
-    emoji: "🦵",
     label: "Tipo I — Caderas y glúteos",
     desc: "Acumulación en zona de cadera, glúteos y parte superior de muslos. El más frecuente.",
     color: "#f0f9f4",
@@ -157,7 +156,6 @@ const LIPEDEMA_TYPES_ES = [
   },
   {
     val: "type2",
-    emoji: "🦿",
     label: "Tipo II — Muslos y rodillas",
     desc: "Desde caderas hasta rodillas. Puede haber acumulación interna en la rodilla.",
     color: "#f5f0f9",
@@ -165,7 +163,6 @@ const LIPEDEMA_TYPES_ES = [
   },
   {
     val: "type3",
-    emoji: "🦶",
     label: "Tipo III — Caderas hasta tobillos",
     desc: "Afecta toda la pierna desde cadera hasta tobillo. El pie no suele estar afectado.",
     color: "#f9f5f0",
@@ -173,7 +170,6 @@ const LIPEDEMA_TYPES_ES = [
   },
   {
     val: "type4",
-    emoji: "💪",
     label: "Tipo IV — Incluye brazos",
     desc: "Lipedema en brazos (desde hombros hasta muñecas) junto con piernas.",
     color: "#f0f5f9",
@@ -181,7 +177,6 @@ const LIPEDEMA_TYPES_ES = [
   },
   {
     val: "type5",
-    emoji: "🦵🦿",
     label: "Tipo V — Solo pantorrillas y pies",
     desc: "Afectación de la parte inferior de la pierna incluyendo el pie. Menos frecuente.",
     color: "#f9f0f5",
@@ -189,7 +184,6 @@ const LIPEDEMA_TYPES_ES = [
   },
   {
     val: "unknown",
-    emoji: "❓",
     label: "No lo sé todavía",
     desc: "Aún no he recibido información sobre mi tipo específico.",
     color: "#f5f5f5",
@@ -200,7 +194,6 @@ const LIPEDEMA_TYPES_ES = [
 const LIPEDEMA_TYPES_EN = [
   {
     val: "type1",
-    emoji: "🦵",
     label: "Type I — Hips and buttocks",
     desc: "Accumulation in hips, buttocks and upper thighs. The most common type.",
     color: "#f0f9f4",
@@ -208,7 +201,6 @@ const LIPEDEMA_TYPES_EN = [
   },
   {
     val: "type2",
-    emoji: "🦿",
     label: "Type II — Thighs and knees",
     desc: "From hips to knees. May include inner knee accumulation.",
     color: "#f5f0f9",
@@ -216,7 +208,6 @@ const LIPEDEMA_TYPES_EN = [
   },
   {
     val: "type3",
-    emoji: "🦶",
     label: "Type III — Hips to ankles",
     desc: "Affects the entire leg from hip to ankle. Feet usually unaffected.",
     color: "#f9f5f0",
@@ -224,7 +215,6 @@ const LIPEDEMA_TYPES_EN = [
   },
   {
     val: "type4",
-    emoji: "💪",
     label: "Type IV — Includes arms",
     desc: "Lipedema in arms (shoulder to wrist) along with legs.",
     color: "#f0f5f9",
@@ -232,7 +222,6 @@ const LIPEDEMA_TYPES_EN = [
   },
   {
     val: "type5",
-    emoji: "🦵🦿",
     label: "Type V — Lower legs and feet",
     desc: "Affects lower legs including feet. Less common.",
     color: "#f9f0f5",
@@ -240,13 +229,178 @@ const LIPEDEMA_TYPES_EN = [
   },
   {
     val: "unknown",
-    emoji: "❓",
     label: "I don't know yet",
     desc: "I haven't received information about my specific type.",
     color: "#f5f5f5",
     border: "#d6e5dd",
   },
 ];
+
+// ─── BODY SILHOUETTES ─────────────────────────────────────────────────────────
+// Silueta femenina simplificada. Las zonas afectadas se colorean en sage.
+// Zonas: head, torso, arms, hips, upper_thighs, lower_thighs, knees, calves, feet
+function BodySilhouette({ zones = [], size = 52 }) {
+  const sage = "#4d8a6e";
+  const sageLight = "#a8cdbf";
+  const body = "#e8eeec";
+  const stroke = "#c5d9d2";
+
+  const active = (zone) => zones.includes(zone);
+  const fill = (zone) => (active(zone) ? sageLight : body);
+  const strokeC = (zone) => (active(zone) ? sage : stroke);
+  const sw = (zone) => (active(zone) ? 1.2 : 0.8);
+
+  // Viewbox: 0 0 40 100
+  return (
+    <svg
+      width={size * 0.42}
+      height={size}
+      viewBox="0 0 40 100"
+      fill="none"
+      style={{ flexShrink: 0, display: "block" }}
+    >
+      {/* Head */}
+      <ellipse cx="20" cy="7" rx="5.5" ry="6.5" fill={body} stroke={stroke} strokeWidth="0.8" />
+      {/* Neck */}
+      <rect
+        x="17.5"
+        y="12.5"
+        width="5"
+        height="3.5"
+        rx="1"
+        fill={body}
+        stroke={stroke}
+        strokeWidth="0.8"
+      />
+      {/* Arms */}
+      <path
+        d="M11 19 Q7 26 7.5 34 Q8 37 9.5 37 Q11 37 11.5 34 Q12 28 13 22"
+        fill={fill("arms")}
+        stroke={strokeC("arms")}
+        strokeWidth={sw("arms")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M29 19 Q33 26 32.5 34 Q32 37 30.5 37 Q29 37 28.5 34 Q28 28 27 22"
+        fill={fill("arms")}
+        stroke={strokeC("arms")}
+        strokeWidth={sw("arms")}
+        strokeLinejoin="round"
+      />
+      {/* Torso */}
+      <path
+        d="M13 16 Q10 18 10 24 Q10 30 12 33 L14 44 L26 44 L28 33 Q30 30 30 24 Q30 18 27 16 Z"
+        fill={fill("torso")}
+        stroke={strokeC("torso")}
+        strokeWidth={sw("torso")}
+        strokeLinejoin="round"
+      />
+      {/* Hips */}
+      <path
+        d="M12 43 Q9 46 9 50 Q9 54 12 56 L14 56 L14 44 Z"
+        fill={fill("hips")}
+        stroke={strokeC("hips")}
+        strokeWidth={sw("hips")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M28 43 Q31 46 31 50 Q31 54 28 56 L26 56 L26 44 Z"
+        fill={fill("hips")}
+        stroke={strokeC("hips")}
+        strokeWidth={sw("hips")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 44 L14 56 L26 56 L26 44 Z"
+        fill={fill("hips")}
+        stroke={strokeC("hips")}
+        strokeWidth={sw("hips")}
+        strokeLinejoin="round"
+      />
+      {/* Upper thighs */}
+      <path
+        d="M14 56 Q12 60 12 65 L16 65 L16 56 Z"
+        fill={fill("upper_thighs")}
+        stroke={strokeC("upper_thighs")}
+        strokeWidth={sw("upper_thighs")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M26 56 Q28 60 28 65 L24 65 L24 56 Z"
+        fill={fill("upper_thighs")}
+        stroke={strokeC("upper_thighs")}
+        strokeWidth={sw("upper_thighs")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16 56 L16 65 L24 65 L24 56 Z"
+        fill={fill("upper_thighs")}
+        stroke={strokeC("upper_thighs")}
+        strokeWidth={sw("upper_thighs")}
+        strokeLinejoin="round"
+      />
+      {/* Knees */}
+      <ellipse
+        cx="16"
+        cy="67"
+        rx="3.5"
+        ry="2.5"
+        fill={fill("knees")}
+        stroke={strokeC("knees")}
+        strokeWidth={sw("knees")}
+      />
+      <ellipse
+        cx="24"
+        cy="67"
+        rx="3.5"
+        ry="2.5"
+        fill={fill("knees")}
+        stroke={strokeC("knees")}
+        strokeWidth={sw("knees")}
+      />
+      {/* Lower thighs / calves */}
+      <path
+        d="M12.5 69.5 Q11.5 75 12 82 L19.5 82 L19.5 69.5 Z"
+        fill={fill("calves")}
+        stroke={strokeC("calves")}
+        strokeWidth={sw("calves")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M27.5 69.5 Q28.5 75 28 82 L20.5 82 L20.5 69.5 Z"
+        fill={fill("calves")}
+        stroke={strokeC("calves")}
+        strokeWidth={sw("calves")}
+        strokeLinejoin="round"
+      />
+      {/* Feet */}
+      <path
+        d="M12 82 Q11 87 11.5 90 Q12 92 15 92 Q18 92 19 90 L19.5 82 Z"
+        fill={fill("feet")}
+        stroke={strokeC("feet")}
+        strokeWidth={sw("feet")}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M28 82 Q29 87 28.5 90 Q28 92 25 92 Q22 92 21 90 L20.5 82 Z"
+        fill={fill("feet")}
+        stroke={strokeC("feet")}
+        strokeWidth={sw("feet")}
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// Zonas por tipo
+const TYPE_ZONES = {
+  type1: ["hips"],
+  type2: ["hips", "upper_thighs", "knees"],
+  type3: ["hips", "upper_thighs", "knees", "calves"],
+  type4: ["hips", "upper_thighs", "knees", "calves", "arms"],
+  type5: ["calves", "feet"],
+  unknown: [],
+};
 
 // ─── ICON ─────────────────────────────────────────────────────────────────────
 function Icon({ name, size = 20, color = C.sage }) {
@@ -402,7 +556,14 @@ export default function Onboarding({
   initialScreen = "story",
 }) {
   // auth screen state
-  const [screen, setScreen] = useState(initialScreen);
+  const [screen, setScreen] = useState(() => {
+    if (initialScreen !== "story") return initialScreen;
+    try {
+      return localStorage.getItem("lt_story_seen") ? "welcome" : "story";
+    } catch {
+      return "story";
+    }
+  });
   const [storySlide, setStorySlide] = useState(0);
   const [email, setEmail] = useState("");
   const [magicSent, setMagicSent] = useState(false);
@@ -825,7 +986,12 @@ export default function Onboarding({
             {isLastSlide ? (
               <>
                 <button
-                  onClick={() => setScreen("welcome")}
+                  onClick={() => {
+                    try {
+                      localStorage.setItem("lt_story_seen", "1");
+                    } catch {}
+                    setScreen("welcome");
+                  }}
                   style={{
                     width: "100%",
                     padding: "14px",
@@ -1071,7 +1237,12 @@ export default function Onboarding({
         <div style={S.card}>
           <Logo />
           <button
-            onClick={() => setScreen("welcome")}
+            onClick={() => {
+              try {
+                localStorage.setItem("lt_story_seen", "1");
+              } catch {}
+              setScreen("welcome");
+            }}
             style={{
               ...S.btnSecondary,
               marginBottom: 16,
@@ -1194,7 +1365,7 @@ export default function Onboarding({
                     gap: 12,
                   }}
                 >
-                  <span style={{ fontSize: 22, flexShrink: 0 }}>{t.emoji}</span>
+                  <BodySilhouette zones={TYPE_ZONES[t.val]} size={52} />
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: t.border }}>{t.label}</div>
                     <div
@@ -1216,7 +1387,15 @@ export default function Onboarding({
           </button>
 
           <div style={{ textAlign: "center", marginTop: 12 }}>
-            <button onClick={() => setScreen("welcome")} style={S.btnSecondary}>
+            <button
+              onClick={() => {
+                try {
+                  localStorage.setItem("lt_story_seen", "1");
+                } catch {}
+                setScreen("welcome");
+              }}
+              style={S.btnSecondary}
+            >
               ← {lang === "es" ? "Volver" : "Back"}
             </button>
           </div>
@@ -1653,7 +1832,7 @@ export default function Onboarding({
                   gap: 12,
                 }}
               >
-                <span style={{ fontSize: 22, flexShrink: 0 }}>{t.emoji}</span>
+                <BodySilhouette zones={TYPE_ZONES[t.val]} size={52} />
                 <div style={{ flex: 1 }}>
                   <div
                     style={{
