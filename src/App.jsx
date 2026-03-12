@@ -1045,6 +1045,7 @@ const NAV_ITEMS = [
   { key: "foods", icon: "utensils", es: "Alimentos", en: "Foods" },
   { key: "supps", icon: "pill", es: "Suplementos", en: "Supplements" },
   { key: "centers", icon: "mappin", es: "Centros", en: "Centers" },
+  { key: "forum", icon: "message", es: "Foro", en: "Forum" },
   { key: "info", icon: "book", es: "Información", en: "Info" },
   { key: "profile", icon: "user", es: "Perfil", en: "Profile" },
 ];
@@ -1775,7 +1776,7 @@ export default function App() {
       keys: ["home", "today", "history", "charts"],
     },
     { label: lang === "es" ? "Salud" : "Health", keys: ["foods", "supps"] },
-    { label: lang === "es" ? "Recursos" : "Resources", keys: ["centers", "info"] },
+    { label: lang === "es" ? "Recursos" : "Resources", keys: ["centers", "forum", "info"] },
     { label: lang === "es" ? "Cuenta" : "Account", keys: ["profile"] },
   ];
 
