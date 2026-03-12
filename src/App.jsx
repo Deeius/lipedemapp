@@ -1181,7 +1181,13 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [onboardingInitialScreen, setOnboardingInitialScreen] = useState("story");
-  const [showOnboarding, setShowOnboarding] = useState(() => { try { return !localStorage.getItem("lt_onboarding_done"); } catch { return true; } });
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try {
+      return !localStorage.getItem("lt_onboarding_done");
+    } catch {
+      return true;
+    }
+  });
   const [tab, setTab] = useState("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [entry, setEntry] = useState(defaultEntry());
@@ -1290,7 +1296,9 @@ export default function App() {
 
     // Si el usuario se acaba de loguear (Google/magic link), cerrar onboarding
     if (user) {
-      try { localStorage.setItem("lt_onboarding_done", "1"); } catch {}
+      try {
+        localStorage.setItem("lt_onboarding_done", "1");
+      } catch {}
       setShowOnboarding(false);
       setShowWelcome(false);
     }
