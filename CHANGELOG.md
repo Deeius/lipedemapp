@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.36](https://github.com/Deeius/lipedemapp/compare/v1.0.35...v1.0.36) (2026-03-12)
+
+
+### Bug Fixes
+
+* added suggestions section and admin panel ([0913f1f](https://github.com/Deeius/lipedemapp/commit/0913f1f03b8d2b1bbcc9a03dc68fbdfdec43fc48))
+* added suggestions section and admin panel ([2877ac6](https://github.com/Deeius/lipedemapp/commit/2877ac60c4d7734b16f6ce3d4385310bed3b4e66))
+* added suggestions section and admin panel ([488652f](https://github.com/Deeius/lipedemapp/commit/488652f63f107c58ebbebcc5f8d91a059439cb46))
+
 ### [1.0.35](https://github.com/Deeius/lipedemapp/compare/v1.0.34...v1.0.35) (2026-03-12)
 
 
