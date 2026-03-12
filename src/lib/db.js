@@ -163,3 +163,42 @@ export async function updateSuggestionStatus(id, status) {
     .eq("id", id);
   if (error) console.error("updateSuggestionStatus:", error);
 }
+
+// ── FORUM POSTS ───────────────────────────────────────────
+export async function getForumPosts() {
+  const { data, error } = await supabase
+    .from("forum_posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) console.error("getForumPosts:", error);
+  return data ?? [];
+}
+
+export async function insertForumPost({ user_id, author_name, text, stage, country, treatment }) {
+  const { data, error } = await supabase
+    .from("forum_posts")
+    .insert({ user_id, author_name, text, stage, country, treatment })
+    .select()
+    .single();
+  if (error) {
+    console.error("insertForumPost:", error);
+    throw error;
+  }
+  return data;
+}
+
+export async function updateForumReactions(id, reactions) {
+  const { error } = await supabase
+    .from("forum_posts")
+    .update({ reactions })
+    .eq("id", id);
+  if (error) console.error("updateForumReactions:", error);
+}
+
+export async function deleteForumPost(id) {
+  const { error } = await supabase
+    .from("forum_posts")
+    .delete()
+    .eq("id", id);
+  if (error) console.error("deleteForumPost:", error);
+}
