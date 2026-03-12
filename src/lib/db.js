@@ -157,10 +157,7 @@ export async function getSuggestions() {
 }
 
 export async function updateSuggestionStatus(id, status) {
-  const { error } = await supabase
-    .from("suggestions")
-    .update({ status })
-    .eq("id", id);
+  const { error } = await supabase.from("suggestions").update({ status }).eq("id", id);
   if (error) console.error("updateSuggestionStatus:", error);
 }
 
@@ -188,17 +185,11 @@ export async function insertForumPost({ user_id, author_name, text, stage, count
 }
 
 export async function updateForumReactions(id, reactions) {
-  const { error } = await supabase
-    .from("forum_posts")
-    .update({ reactions })
-    .eq("id", id);
+  const { error } = await supabase.from("forum_posts").update({ reactions }).eq("id", id);
   if (error) console.error("updateForumReactions:", error);
 }
 
 export async function deleteForumPost(id) {
-  const { error } = await supabase
-    .from("forum_posts")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("forum_posts").delete().eq("id", id);
   if (error) console.error("deleteForumPost:", error);
 }
