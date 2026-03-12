@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { supabase } from "./lib/supabase";
 
 // ─── PALETTE ─────────────────────────────────────────────────────────────────
@@ -402,14 +402,7 @@ export default function Onboarding({
   initialScreen = "story",
 }) {
   // auth screen state
-  const [screen, setScreen] = useState(() => {
-    if (initialScreen !== "story") return initialScreen;
-    try {
-      return localStorage.getItem("lt_story_seen") ? "welcome" : "story";
-    } catch {
-      return "story";
-    }
-  });
+  const [screen, setScreen] = useState(initialScreen);
   const [storySlide, setStorySlide] = useState(0);
   const [email, setEmail] = useState("");
   const [magicSent, setMagicSent] = useState(false);
@@ -832,12 +825,7 @@ export default function Onboarding({
             {isLastSlide ? (
               <>
                 <button
-                  onClick={() => {
-                    try {
-                      localStorage.setItem("lt_story_seen", "1");
-                    } catch {}
-                    setScreen("welcome");
-                  }}
+                  onClick={() => setScreen("welcome")}
                   style={{
                     width: "100%",
                     padding: "14px",
@@ -1083,12 +1071,7 @@ export default function Onboarding({
         <div style={S.card}>
           <Logo />
           <button
-            onClick={() => {
-              try {
-                localStorage.setItem("lt_story_seen", "1");
-              } catch {}
-              setScreen("welcome");
-            }}
+            onClick={() => setScreen("welcome")}
             style={{
               ...S.btnSecondary,
               marginBottom: 16,
@@ -1233,15 +1216,7 @@ export default function Onboarding({
           </button>
 
           <div style={{ textAlign: "center", marginTop: 12 }}>
-            <button
-              onClick={() => {
-                try {
-                  localStorage.setItem("lt_story_seen", "1");
-                } catch {}
-                setScreen("welcome");
-              }}
-              style={S.btnSecondary}
-            >
+            <button onClick={() => setScreen("welcome")} style={S.btnSecondary}>
               ← {lang === "es" ? "Volver" : "Back"}
             </button>
           </div>
