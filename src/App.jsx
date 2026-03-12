@@ -22,6 +22,8 @@ import HistoryTab from "./components/history/HistoryTab";
 import ProfileTab from "./components/profile/ProfileTab";
 import FoodsTab from "./components/foods/FoodsTab";
 import InfoTab from "./components/info/InfoTab";
+import CentersSection from "./components/info/CentersSection";
+import CommunityForum from "./components/info/CommunityForum";
 import Onboarding from "./Onboarding";
 
 import { useAuth } from "./hooks/useAuth";
@@ -2665,14 +2667,9 @@ export default function App() {
             </>
           )}
 
-          {/* ── INFO ── */}
-          {tab === "info" && (
-            <InfoTab
-              infoFilter={infoFilter}
-              setInfoFilter={setInfoFilter}
-              setShowGuide={setShowGuide}
-              INFO_RESOURCES={INFO_RESOURCES}
-              profile={profile}
+          {/* ── CENTERS ── */}
+          {tab === "centers" && (
+            <CentersSection
               userCenters={userCenters}
               pendingCenters={pendingCenters}
               centerFilter={centerFilter}
@@ -2685,6 +2682,25 @@ export default function App() {
               approveCenter={approveCenter}
               rejectCenter={rejectCenter}
               setTab={setTab}
+              lang={lang}
+              C={C}
+              S={S}
+              t={t}
+            />
+          )}
+
+          {/* ── FORUM ── */}
+          {tab === "forum" && (
+            <CommunityForum lang={lang} C={C} profile={profile} userId={user?.id} />
+          )}
+
+          {/* ── INFO ── */}
+          {tab === "info" && (
+            <InfoTab
+              infoFilter={infoFilter}
+              setInfoFilter={setInfoFilter}
+              setShowGuide={setShowGuide}
+              INFO_RESOURCES={INFO_RESOURCES}
               lang={lang}
               C={C}
               S={S}
