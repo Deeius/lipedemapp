@@ -395,9 +395,14 @@ function Logo() {
 }
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
-export default function Onboarding({ initialLang = "es", onComplete, loginWithGoogle }) {
+export default function Onboarding({
+  initialLang = "es",
+  onComplete,
+  loginWithGoogle,
+  initialScreen = "story",
+}) {
   // auth screen state
-  const [screen, setScreen] = useState("story");
+  const [screen, setScreen] = useState(initialScreen);
   const [storySlide, setStorySlide] = useState(0);
   const [email, setEmail] = useState("");
   const [magicSent, setMagicSent] = useState(false);
