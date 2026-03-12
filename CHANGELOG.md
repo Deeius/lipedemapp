@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.30](https://github.com/Deeius/lipedemapp/compare/v1.0.29...v1.0.30) (2026-03-12)
+
+
+### Bug Fixes
+
+* app ([648ad4c](https://github.com/Deeius/lipedemapp/commit/648ad4c50789dca6981aa83a3376fe171f6e9a15))
+* app ([d6851f1](https://github.com/Deeius/lipedemapp/commit/d6851f1bb8c3213f39177bed94d6a776c81fa948))
+* restore useState import in WelcomeGuide ([12505e5](https://github.com/Deeius/lipedemapp/commit/12505e545d1fb098290fbfabba8d20b7dc3d4ef1))
+* test ([f025c7a](https://github.com/Deeius/lipedemapp/commit/f025c7a3c2d80db6b62584a83a3bdf4175981185))
+* test ([a48b851](https://github.com/Deeius/lipedemapp/commit/a48b851462192a33c6872a2d2a90f7fb6014641d))
+
 ### [1.0.29](https://github.com/Deeius/lipedemapp/compare/v1.0.28...v1.0.29) (2026-03-12)
 
 
