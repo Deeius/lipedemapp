@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.32](https://github.com/Deeius/lipedemapp/compare/v1.0.31...v1.0.32) (2026-03-12)
+
+
+### Bug Fixes
+
+* change sidetab ([65c932d](https://github.com/Deeius/lipedemapp/commit/65c932db2db69df2305189fe537122a35555b7e7))
+
 ### [1.0.31](https://github.com/Deeius/lipedemapp/compare/v1.0.30...v1.0.31) (2026-03-12)
 
 
