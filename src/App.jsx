@@ -1180,6 +1180,7 @@ export default function App() {
   const [lang, setLang] = useState("es");
   const [showWelcome, setShowWelcome] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
+  const [onboardingInitialScreen, setOnboardingInitialScreen] = useState("story");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [tab, setTab] = useState("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1356,8 +1357,9 @@ export default function App() {
     logout(); // Supabase signOut
     localStorage.removeItem("lt_welcome_seen");
     localStorage.removeItem("lt_onboarding_done");
-    setShowWelcome(true);
-    setShowOnboarding(false);
+    setShowWelcome(false);
+    setShowOnboarding(true);
+    setOnboardingInitialScreen("welcome");
     setAvatarMenu(false);
   };
 
@@ -1790,6 +1792,7 @@ export default function App() {
         initialLang={lang}
         onComplete={handleOnboardingComplete}
         loginWithGoogle={loginWithGoogle}
+        initialScreen={onboardingInitialScreen}
       />
     );
   }
