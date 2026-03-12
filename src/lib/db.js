@@ -133,36 +133,33 @@ export async function migrateFromLocalStorage(userId) {
   }
 }
 
-// ── FORUM POSTS ───────────────────────────────────────────
-export async function getForumPosts() {
+// ── SUGGESTIONS ───────────────────────────────────────────
+export async function insertSuggestion({ user_id, type, description, email }) {
+  const { error } = await supabase.from("suggestions").insert({
+    user_id,
+    type,
+    description,
+    email,
+  });
+  if (error) {
+    console.error("insertSuggestion:", error);
+    throw error;
+  }
+}
+
+export async function getSuggestions() {
   const { data, error } = await supabase
-    .from("forum_posts")
+    .from("suggestions")
     .select("*")
     .order("created_at", { ascending: false });
-  if (error) console.error("getForumPosts:", error);
+  if (error) console.error("getSuggestions:", error);
   return data ?? [];
 }
 
-export async function insertForumPost(userId, post) {
-  const { data, error } = await supabase
-    .from("forum_posts")
-    .insert({ user_id: userId, ...post })
-    .select()
-    .single();
-  if (error) console.error("insertForumPost:", error);
-  return data ?? null;
-}
-
-export async function updateForumReactions(postId, reactions) {
-  const { error } = await supabase.from("forum_posts").update({ reactions }).eq("id", postId);
-  if (error) console.error("updateForumReactions:", error);
-}
-
-export async function deleteForumPost(userId, postId) {
+export async function updateSuggestionStatus(id, status) {
   const { error } = await supabase
-    .from("forum_posts")
-    .delete()
-    .eq("id", postId)
-    .eq("user_id", userId);
-  if (error) console.error("deleteForumPost:", error);
+    .from("suggestions")
+    .update({ status })
+    .eq("id", id);
+  if (error) console.error("updateSuggestionStatus:", error);
 }

@@ -24,6 +24,8 @@ import FoodsTab from "./components/foods/FoodsTab";
 import InfoTab from "./components/info/InfoTab";
 import CentersSection from "./components/info/CentersSection";
 import CommunityForum from "./components/info/CommunityForum";
+import SuggestionsTab from "./components/info/SuggestionsTab";
+import AdminTab from "./components/info/AdminTab";
 import Onboarding from "./Onboarding";
 
 import { useAuth } from "./hooks/useAuth";
@@ -1047,6 +1049,8 @@ const NAV_ITEMS = [
   { key: "centers", icon: "mappin", es: "Centros", en: "Centers" },
   { key: "forum", icon: "message", es: "Foro", en: "Forum" },
   { key: "info", icon: "book", es: "Información", en: "Info" },
+  { key: "suggestions", icon: "lightbulb", es: "Sugerencias", en: "Suggestions" },
+  { key: "admin", icon: "shield", es: "Admin", en: "Admin" },
   { key: "profile", icon: "user", es: "Perfil", en: "Profile" },
 ];
 
@@ -1114,6 +1118,17 @@ function Icon({ name, size = 18, color = "currentColor", strokeWidth = 1.75 }) {
     message: (
       <svg style={s} viewBox="0 0 24 24" {...p}>
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+    lightbulb: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+        <path d="M9 18h6M10 22h4" />
+      </svg>
+    ),
+    shield: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
     user: (
@@ -1781,8 +1796,14 @@ export default function App() {
       keys: ["home", "today", "history", "charts"],
     },
     { label: lang === "es" ? "Salud" : "Health", keys: ["foods", "supps"] },
-    { label: lang === "es" ? "Recursos" : "Resources", keys: ["centers", "forum", "info"] },
-    { label: lang === "es" ? "Cuenta" : "Account", keys: ["profile"] },
+    {
+      label: lang === "es" ? "Recursos" : "Resources",
+      keys: ["centers", "forum", "info", "suggestions"],
+    },
+    {
+      label: lang === "es" ? "Cuenta" : "Account",
+      keys: profile?.role === "admin" ? ["profile", "admin"] : ["profile"],
+    },
   ];
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
@@ -2667,6 +2688,12 @@ export default function App() {
               t={t}
             />
           )}
+
+          {/* ── SUGGESTIONS ── */}
+          {tab === "suggestions" && <SuggestionsTab lang={lang} C={C} S={S} userId={user?.id} />}
+
+          {/* ── ADMIN ── */}
+          {tab === "admin" && profile?.role === "admin" && <AdminTab lang={lang} C={C} />}
 
           {/* ── PROFILE ── */}
           {tab === "profile" && (
