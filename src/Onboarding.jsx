@@ -317,6 +317,42 @@ function Icon({ name, size = 20, color = C.sage }) {
         <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
       </svg>
     ),
+    microscope: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M6 18h8M10 22v-4" />
+        <path d="M14.5 9.5 16 11l-3.5 3.5-1.5-1.5" />
+        <path d="m9 7 1 1" />
+        <path d="M11 5a2 2 0 1 1 4 0 2 2 0 0 1-4 0z" />
+        <path d="M9.5 14.5 6 18" />
+        <path d="m11 5-1.5 1.5" />
+      </svg>
+    ),
+    users: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+    heart: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+      </svg>
+    ),
+    chart: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+        <line x1="2" y1="20" x2="22" y2="20" />
+      </svg>
+    ),
+    leaf: (
+      <svg style={s} viewBox="0 0 24 24" {...p}>
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" />
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+      </svg>
+    ),
   };
   return icons[name] || null;
 }
@@ -635,27 +671,27 @@ export default function Onboarding({ initialLang = "es", onComplete, loginWithGo
   if (screen === "story") {
     const slides_es = [
       {
-        emoji: "🔬",
+        icon: "microscope",
         stat: "Reconocida por la OMS en 2018",
         text: "Durante décadas, el lipedema fue confundido con obesidad o linfedema. Hoy por fin tiene nombre propio.",
       },
       {
-        emoji: "👩",
+        icon: "users",
         stat: "Afecta al 11% de las mujeres",
         text: "Es más común de lo que parece, pero pocas reciben un diagnóstico a tiempo. Muchas tardan años en saber qué les pasa.",
       },
       {
-        emoji: "💧",
+        icon: "heart",
         stat: "Dolor, inflamación, fatiga",
         text: "No es solo estética. El lipedema duele, cansa y afecta a la vida cotidiana de formas que solo quien lo vive entiende de verdad.",
       },
       {
-        emoji: "📊",
+        icon: "chart",
         stat: "Cada caso es único",
         text: "No existe un lipedema igual a otro. Llevar un seguimiento personalizado es una de las cosas más útiles que puedes hacer.",
       },
       {
-        emoji: "🌿",
+        icon: "leaf",
         stat: "Estás en el lugar correcto",
         text: "Lipedema Tracker nació para ayudarte a entender tu cuerpo, seguir tus síntomas y tomar el control de tu bienestar.",
         cta: true,
@@ -663,27 +699,27 @@ export default function Onboarding({ initialLang = "es", onComplete, loginWithGo
     ];
     const slides_en = [
       {
-        emoji: "🔬",
+        icon: "microscope",
         stat: "Recognised by the WHO in 2018",
         text: "For decades, lipedema was confused with obesity or lymphoedema. Today it finally has its own name.",
       },
       {
-        emoji: "👩",
+        icon: "users",
         stat: "Affects 11% of women",
         text: "It's more common than it seems, but few receive a timely diagnosis. Many spend years not knowing what's happening to them.",
       },
       {
-        emoji: "💧",
+        icon: "heart",
         stat: "Pain, inflammation, fatigue",
         text: "It's not just aesthetic. Lipedema hurts, exhausts, and affects daily life in ways only those living it truly understand.",
       },
       {
-        emoji: "📊",
+        icon: "chart",
         stat: "Every case is unique",
         text: "No two cases of lipedema are the same. Keeping a personalised log is one of the most useful things you can do.",
       },
       {
-        emoji: "🌿",
+        icon: "leaf",
         stat: "You're in the right place",
         text: "Lipedema Tracker was born to help you understand your body, track your symptoms and take control of your wellbeing.",
         cta: true,
@@ -735,7 +771,21 @@ export default function Onboarding({ initialLang = "es", onComplete, loginWithGo
                 padding: "0 4px",
               }}
             >
-              <div style={{ fontSize: 48, marginBottom: 16 }}>{slide.emoji}</div>
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 20,
+                  background: C.creamFaint,
+                  border: `1.5px solid ${C.border}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 20px",
+                }}
+              >
+                <Icon name={slide.icon} size={28} color={C.sage} />
+              </div>
               <div
                 style={{
                   display: "inline-block",
