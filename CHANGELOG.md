@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.26](https://github.com/Deeius/lipedemapp/compare/v1.0.25...v1.0.26) (2026-03-12)
+
+
+### Bug Fixes
+
+* improving login logout process ([7620f73](https://github.com/Deeius/lipedemapp/commit/7620f73a6e430bfface5bf03e1aa98a70cb09406))
+
 ### [1.0.25](https://github.com/Deeius/lipedemapp/compare/v1.0.24...v1.0.25) (2026-03-12)
 
 
