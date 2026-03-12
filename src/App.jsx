@@ -1260,7 +1260,7 @@ export default function App() {
       if (ss) setSupps(JSON.parse(ss));
       if (sl2) setLang(sl2);
       if (sw) setShowWelcome(false);
-      if (sw && !so) setShowOnboarding(true);
+      if (sw && !so && !user) setShowOnboarding(true);
     } catch {}
 
     // Si hay sesión activa, sobreescribe con datos de Supabase
@@ -1286,6 +1286,15 @@ export default function App() {
         console.error("Supabase load:", e);
       }
     })();
+
+    // Si el usuario se acaba de loguear (Google/magic link), cerrar onboarding
+    if (user) {
+      try {
+        localStorage.setItem("lt_onboarding_done", "1");
+      } catch {}
+      setShowOnboarding(false);
+      setShowWelcome(false);
+    }
   }, [user]);
 
   const handleEnterApp = useCallback(() => {
