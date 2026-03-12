@@ -1,3 +1,4 @@
+import { useState } from "react";
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const WC = {
   bg: "#f0f5f2", // fondo verde pálido
