@@ -6,6 +6,10 @@ export default [
   js.configs.recommended,
   {
     languageOptions: {
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
       globals: {
         window: 'readonly',
         document: 'readonly',
@@ -22,6 +26,7 @@ export default [
       'react-hooks': reactHooks,
     },
     rules: {
+      'react/jsx-uses-vars': 'error',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'no-unused-vars': 'warn',
@@ -29,6 +34,21 @@ export default [
     },
     settings: {
       react: { version: 'detect' },
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx}', '**/__mocks__/**/*.js', '**/test/**/*.js'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        vi: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+      },
     },
   },
 ]
