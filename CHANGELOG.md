@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.39](https://github.com/Deeius/lipedemapp/compare/v1.0.38...v1.0.39) (2026-03-18)
+
+
+### Bug Fixes
+
+* regenerate package-lock.json for Node 20 compatibility ([2948160](https://github.com/Deeius/lipedemapp/commit/29481609cb28c09c48886ee6ca1b4a1d37c9e5a5))
+* regenerate package-lock.json with npm 10 for CI compatibility ([cb50c98](https://github.com/Deeius/lipedemapp/commit/cb50c98ac5b8d7527414b638f7ce9f941811923d))
+
 ### [1.0.38](https://github.com/Deeius/lipedemapp/compare/v1.0.37...v1.0.38) (2026-03-17)
 
 ### [1.0.37](https://github.com/Deeius/lipedemapp/compare/v1.0.36...v1.0.37) (2026-03-12)
