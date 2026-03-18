@@ -1,4 +1,4 @@
-# 🌿 Lipedema Tracker — v2.4
+# 🌿 Lipedema Tracker
 
 Aplicación de seguimiento de salud personalizada para mujeres con lipedema. Bilingüe (ES/EN), responsive, con onboarding guiado y navegación adaptativa.
 
@@ -74,12 +74,29 @@ lipedema-tracker/
 ├── index.html
 ├── package.json
 ├── vite.config.js
-├── vercel.json          ← cabeceras de caché configuradas
+├── vitest.config.js        ← configuración de tests
+├── vercel.json             ← cabeceras de caché
 └── src/
     ├── main.jsx
-    ├── WelcomeGuide.jsx  ← guía visual de bienvenida (4 secciones)
-    ├── Onboarding.jsx    ← onboarding en 6 pasos
-    └── App.jsx           ← app principal (~1800 líneas)
+    ├── App.jsx              ← app principal (~2700 líneas, estado global)
+    ├── Onboarding.jsx       ← onboarding en 6 pasos
+    ├── WelcomeGuide.jsx     ← guía visual de bienvenida
+    ├── components/
+    │   ├── home/            ← HomeTab, HealthSummary, CycleSummary, Treatments…
+    │   ├── today/           ← TodayTab, WaterTracker, InflammationTracker, CycleCalendar…
+    │   ├── history/         ← HistoryTab, LogEntry
+    │   ├── foods/           ← FoodsTab, AddFoodForm, FoodsList
+    │   ├── profile/         ← ProfileTab
+    │   ├── info/            ← InfoTab, SuggestionsTab, CentersSection, CommunityForum…
+    │   └── shared/          ← Icon (SVG reutilizable)
+    ├── hooks/
+    │   └── useAuth.js       ← hook de autenticación Supabase
+    ├── lib/
+    │   ├── db.js            ← funciones CRUD para Supabase
+    │   └── supabase.js      ← cliente Supabase
+    └── test/
+        ├── helpers.js       ← mocks compartidos (C, S, t, entry factory)
+        └── setup.js         ← localStorage polyfill, jest-dom matchers
 ```
 
 ---
@@ -107,16 +124,30 @@ lipedema-tracker/
 
 ---
 
+## 🧪 Tests
+
+Framework: **Vitest** + **React Testing Library** + **jsdom**
+
+```bash
+npm test              # modo watch
+npx vitest run        # una sola ejecución
+```
+
+**105 tests** cubriendo:
+- **db.js**: CRUD completo (profiles, logs, foods, supplements, cycle, suggestions, migration)
+- **useAuth**: sesión, login/logout, migración localStorage → Supabase
+- **Componentes**: WaterTracker, InflammationTracker, SupplementsCheck, PillTracker, CycleCalendar, AddFoodForm, FoodsList, ProfileTab, LogEntry, HistoryTab, HealthSummary, CycleSummary, SuggestionsTab, Treatments
+
+---
+
 ## 🔒 Privacidad
 
-Todos los datos se guardan únicamente en el navegador (`localStorage`). No se envía ningún dato a servidores externos. La detección de ubicación usa la API de geolocalización del navegador + Nominatim (OpenStreetMap) solo en el momento del onboarding, sin almacenar coordenadas.
+Sin cuenta, todos los datos se guardan únicamente en el navegador (`localStorage`). Con Google OAuth, los datos se sincronizan a Supabase (con RLS por usuario). La detección de ubicación usa la API de geolocalización del navegador + Nominatim (OpenStreetMap) solo en el momento del onboarding, sin almacenar coordenadas.
 
 ---
 
 ## 🛣 Próximas funcionalidades
 
-- [ ] Login social con Google (Firebase Auth)
-- [ ] Sincronización de datos entre dispositivos
 - [ ] Directorio de centros especializados verificados por provincia
 - [ ] Exportación de datos a PDF / CSV
 - [ ] Notificaciones de registro diario
